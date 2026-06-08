@@ -13,7 +13,7 @@ const HomePage = () => {
     if (!jwtToken) {
       // Set a timeout before navigating to login page
       const timeoutId = setTimeout(() => {
-        navigate("/capstone/login");
+        navigate("/login");
       }, 100);
 
       return () => clearTimeout(timeoutId);

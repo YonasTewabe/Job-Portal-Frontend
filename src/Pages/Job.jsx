@@ -120,7 +120,7 @@ const Job = ({ deleteJob }) => {
         <br /> <br />
         <div className="container m-auto py-6 px-6">
           <Link
-            to="/capstone/jobs"
+            to="/jobs"
             className="text-indigo-500 hover:text-indigo-600 flex items-center"
           >
             <FaArrowLeft className="mr-2" /> Back to Job Listings

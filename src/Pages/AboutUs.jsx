@@ -22,7 +22,7 @@ const AboutUs = () => {
         <p className="mb-4 text-gray-700">
           If you have any questions or feedback, please don&apos;t hesitate to
           reach out to us. Our contact information can be found{" "}
-          <Link to="/capstone/contact" className="text-indigo-500 font-bold">
+          <Link to="/contact" className="text-indigo-500 font-bold">
             here
           </Link>
           . We value your input and are committed to improving our platform

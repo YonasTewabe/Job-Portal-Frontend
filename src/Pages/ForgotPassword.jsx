@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
-import emailjs from "@emailjs/browser";
 
 const ForgotPassword = () => {
   const [Email, setEmail] = useState("");
@@ -22,23 +21,6 @@ const ForgotPassword = () => {
     return password;
   };
 
-  const resetEmail = async (email, password) => {
-    const templateParams = {
-      user_email: email,
-      password: password
-    }
-    try {
-      await emailjs.send(
-        "service_cdqe8jz",
-        "template_hftvrv8",
-        templateParams,
-        "mNJZuOq6lqTT9mHE7"
-      );
-    } catch (error) {
-      console.error("Error sending email:", error);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -52,8 +34,6 @@ const ForgotPassword = () => {
       await axios.patch(`/api/profile/email/${Email}`, {
         password: generatedPassword,
       });
-
-      resetEmail(Email, generatedPassword); // Pass the generated password to resetEmail
 
       toast.success("Reset Email Sent");
       navigate(`/login`);

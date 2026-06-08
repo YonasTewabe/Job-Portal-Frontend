@@ -35,7 +35,7 @@ const Account = ({ deleteUser }) => {
         localStorage.removeItem("usercompleted");
         localStorage.removeItem("hrcompleted");
         localStorage.removeItem("hrStatus");
-        navigate("/capstone/login");
+        navigate("/login");
       } else {
         toast.error("Unable to delete account. Try again later.");
       }

@@ -3,7 +3,6 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
-import emailjs from "@emailjs/browser";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -37,8 +36,7 @@ const SignUp = () => {
         }),
       });
       toast.success("Sign up successful. Please log in.");
-      signupEmail();
-      navigate("/capstone/login");
+      navigate("/login");
     } catch (error) {
       if (error.response && error.response.status === 409) {
         toast.error("Email already in use");
@@ -46,21 +44,6 @@ const SignUp = () => {
         toast.error("Failed to sign up. Please try again later.");
       }
       console.error(error);
-    }
-  };
-  const signupEmail = async () => {
-    const templateParams = {
-      email,
-    };
-    try {
-      await emailjs.send(
-        "service_s02dvbp",
-        "template_g4h1i5f",
-        templateParams,
-        "CxqrPI5OiPSTIGXkB"
-      );
-    } catch (error) {
-      console.error("Error sending email:", error);
     }
   };
 

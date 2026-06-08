@@ -8,10 +8,10 @@ const Footer = () => {
     >
       <p>&#169; 2024 All Rights Reserved!</p>
       <div className="mt-4">
-        <Link to="/capstone/contact" className="text-white mx-2">
+        <Link to="/contact" className="text-white mx-2">
           Contact Us
         </Link>
-        <Link to="/capstone/about" className="text-white mx-2">
+        <Link to="/about" className="text-white mx-2">
           About Us
         </Link>
       </div>

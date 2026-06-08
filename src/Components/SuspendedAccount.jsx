@@ -16,7 +16,7 @@ const SuspendedAccount = () => {
       </p>
 
       <Link
-        to="/capstone/contact"
+        to="/contact"
         className="text-white bg-indigo-700 hover:bg-indigo-900 rounded-md px-3 py-2 mt-4"
       >
         Contact

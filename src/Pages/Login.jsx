@@ -22,7 +22,7 @@ const ValidatedLoginForm = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/profile/login", {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/profile/login`, {
         email,
         password,
       });
@@ -156,12 +156,12 @@ const ValidatedLoginForm = () => {
           </div>
         </form>
         <div className="text-center mt-4 flex justify-between">
-          <Link to="/capstone/forgotpassword" className="text-sm text-blue-500">
+          <Link to="/forgotpassword" className="text-sm text-blue-500">
             Forgot Password?
           </Link>
           <span className="text-sm">
             Don&apos;t have an account yet?
-            <Link to="/capstone/signup" className="text-blue-500">
+            <Link to="/signup" className="text-blue-500">
               Sign Up
             </Link>
           </span>

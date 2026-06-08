@@ -4,7 +4,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import emailjs from "@emailjs/browser";
 import Donut from "./ViewReport";
 import withAuth from "../withAuth";
 import Spinner from "../Components/Spinner";
@@ -42,63 +41,6 @@ const ViewApplicants = () => {
     fetchData();
   }, [jobId, refreshKey]); // Fetch data whenever jobId changes
 
-  const sendSuccessEmail = async (applicant) => {
-    const templateParams = {
-      user_email: applicant.contactemail,
-      job: applicant.jobtitle,
-      company: applicant.companyname,
-    };
-    try {
-      await emailjs.send(
-        "service_w15r7ap",
-        "template_naazvah",
-        templateParams,
-        "BXXQ2nYkNnwzZHBbD"
-      );
-    } catch (error) {
-      console.error("Error sending success email:", error);
-    }
-  };
-
-  const sendRejectEmail = async (applicant) => {
-    const templateParams = {
-      user_email: applicant.contactemail,
-      job: applicant.jobtitle,
-      company: applicant.companyname,
-    };
-    try {
-      await emailjs.send(
-        "service_w15r7ap",
-        "template_mk7er5h",
-        templateParams,
-        "BXXQ2nYkNnwzZHBbD"
-      );
-    } catch (error) {
-      console.error("Error sending rejection email:", error);
-    }
-  };
-
-  const sendInterviewEmail = async (applicant, interviewDate, interviewLocation) => {
-    const templateParams = {
-      user_email: applicant.contactemail,
-      job: applicant.jobtitle,
-      company: applicant.companyname,
-      interviewDate,
-      interviewLocation
-    };
-    try {
-      await emailjs.send(
-        "service_cdqe8jz",
-        "template_scytmuo",
-        templateParams,
-        "mNJZuOq6lqTT9mHE7"
-      );
-    } catch (error) {
-      console.error("Error sending interview email:", error);
-    }
-  };
-  
-
   const renderCV = (cv) => {
     if (cv) {
       return (
@@ -129,8 +71,6 @@ const ViewApplicants = () => {
       setUser_email(applicant.contactemail);
       setUserStatus("Under Consideration");
       setUserJob(applicant.jobtitle);
-
-      sendSuccessEmail(applicant);
     } catch (error) {
       console.error("Error accepting application:", error);
     }
@@ -153,10 +93,6 @@ const ViewApplicants = () => {
       setUser_email(applicant.contactemail);
       setUserStatus("Interview Scheduled");
       setUserJob(applicant.jobtitle);
-
-      setTimeout(() => {
-        sendInterviewEmail(applicant, interviewDate, interviewLocation);
-      }, 3000);
     } catch (error) {
       console.error("Error scheduling interview:", error);
     }
@@ -175,8 +111,6 @@ const ViewApplicants = () => {
       setUser_email(applicant.contactemail);
       setUserStatus("Rejected");
       setUserJob(applicant.jobtitle);
-
-      sendRejectEmail(applicant);
     } catch (error) {
       console.error("Error rejecting application:", error);
     }

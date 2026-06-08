@@ -139,7 +139,7 @@ const Navbar = () => {
           <AiOutlineMenu size={30} />
         </div>
 
-        <NavLink to="/capstone/">
+        <NavLink to="/">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl px-2 text-white font-bold">
             Application Tracker
           </h1>
