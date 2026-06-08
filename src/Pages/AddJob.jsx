@@ -1,17 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import withAuth from "../withAuth";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
-import UnauthorizedAccess from '../Components/UnauthorizedAccess';
-import SuspendedAccount from '../Components/SuspendedAccount';
-import Cookies from "js-cookie";
+import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import SuspendedAccount from "../Components/SuspendedAccount";
+import { useAuth } from "../context/AuthContext";
 
 // eslint-disable-next-line react/prop-types
 const AddJob = ({ addJobSubmit }) => {
   const [user, setUser] = useState(null);
-  const userId = Cookies.get("userId");
+  const { user: authUser } = useAuth();
+  const userId = authUser?.userId;
+  const myRole = authUser?.role;
+  const hrStatus = authUser?.hrStatus;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,8 +41,6 @@ const AddJob = ({ addJobSubmit }) => {
   const companyPhone = user?.companyPhone || '';
 
   const navigate = useNavigate();
-  const myRole = localStorage.getItem('role');
-  const hrStatus = localStorage.getItem('hrStatus');
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -221,4 +221,4 @@ const AddJob = ({ addJobSubmit }) => {
   ) : null;
 };
 
-export default withAuth(AddJob);
+export default AddJob;

@@ -3,26 +3,28 @@ import { useState } from "react";
 import { useParams, useNavigate, useLoaderData } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
-import * as Yup from 'yup';
+import * as Yup from "yup";
 
 const CompanyInfo = () => {
   const user = useLoaderData();
-  const [companyname, setCompanyName] = useState(user.companyname || '');
-  const [companydescription, setCompanyDescription] = useState(user.companydescription || '');
-  const [companyPhone, setCompanyPhone] = useState(user.companyPhone || '');
-  const [contactemail, setContactEmail] = useState(user.contactemail || '');
+  const [companyname, setCompanyName] = useState(user.companyname || "");
+  const [companydescription, setCompanyDescription] = useState(user.companydescription || "");
+  const [companyPhone, setCompanyPhone] = useState(user.companyPhone || "");
+  const [contactemail, setContactEmail] = useState(user.contactemail || "");
   const [formErrors, setFormErrors] = useState({});
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
 
   const validationSchema = Yup.object().shape({
-    companyname: Yup.string().required('Company Name is required'),
-    companydescription: Yup.string().required('Company Description is required'),
-    contactemail: Yup.string().email('Invalid email address').required('Email is required'),
-    companyPhone: Yup.string().matches(/^[0-9]{9}$/, 'Phone number must be 9 digits').required('Phone number is required'),
+    companyname: Yup.string().required("Company Name is required"),
+    companydescription: Yup.string().required("Company Description is required"),
+    contactemail: Yup.string().email("Invalid email address").required("Email is required"),
+    companyPhone: Yup.string().matches(/^[0-9]{9}$/, "Phone number must be 9 digits").required("Phone number is required"),
   });
 
   const handleSubmit = async (e) => {
@@ -65,8 +67,6 @@ const CompanyInfo = () => {
       }
     }
   };
-
-  const myRole = localStorage.getItem('role');
 
   return (
     <>
@@ -175,4 +175,4 @@ const CompanyInfo = () => {
   );
 };
 
-export default withAuth(CompanyInfo);
+export default CompanyInfo;

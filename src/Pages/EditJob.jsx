@@ -1,12 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
-import { useParams, useLoaderData, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { useState } from "react";
+import { useParams, useLoaderData, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
-import withAuth from "../withAuth";
-import UnauthorizedAccess from '../Components/UnauthorizedAccess';
-
+import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import { useAuth } from "../context/AuthContext";
 
 // eslint-disable-next-line no-unused-vars
 const EditJob = ({ updateJobSubmit }) => {
@@ -18,13 +17,13 @@ const EditJob = ({ updateJobSubmit }) => {
   const [requirement, setRequirement] = useState(job.requirement);
   const [salary, setSalary] = useState(job.salary);
   const [companyName, setCompanyName] = useState(job.companyName);
-  const [companyDescription, setCompanyDescription] = useState(
-    job.companyDescription
-  );
+  const [companyDescription, setCompanyDescription] = useState(job.companyDescription);
   const [contactEmail, setContactEmail] = useState(job.contactEmail);
   const [companyPhone, setCompanyPhone] = useState(job.companyPhone);
   const [deadline, setDeadline] = useState(job.deadline);
-  const myRole= localStorage.getItem('role')
+
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -300,4 +299,4 @@ const EditJob = ({ updateJobSubmit }) => {
      </>
   );
 };
-export default withAuth (EditJob);
+export default EditJob;

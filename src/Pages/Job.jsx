@@ -6,7 +6,7 @@ import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import Cookies from "js-cookie";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 
 // eslint-disable-next-line react/prop-types
 const Job = ({ deleteJob }) => {
@@ -14,8 +14,9 @@ const Job = ({ deleteJob }) => {
   const job = useLoaderData();
   const [user, setUser] = useState(null);
 
-  const role = localStorage.getItem("role");
-  const userId = Cookies.get("userId");
+  const { user: authUser } = useAuth();
+  const role = authUser?.role;
+  const userId = authUser?.userId;
 
   if (userId && !user) {
     const fetchUser = async () => {
@@ -260,4 +261,4 @@ const jobLoader = async ({ params }) => {
 };
 
 export { Job, jobLoader };
-export default withAuth(Job);
+export default Job;

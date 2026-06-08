@@ -1,32 +1,29 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
-import axios from "axios";
+import api from "../axiosInterceptor";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Donut from "./ViewReport";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
 
 const ViewApplicants = () => {
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user_email, setUser_email] = useState("");
-  const [userStatus, setUserStatus] = useState("");
-  const [userJob, setUserJob] = useState("");
   const [interviewDate, setInterviewDate] = useState("");
   const [interviewLocation, setInterviewLocation] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [sortCriterion, setSortCriterion] = useState("");
   const [sortAscending, setSortAscending] = useState(true);
   const jobId = Cookies.get("jobId");
-  const myRole = localStorage.getItem("role");
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/application/all`);
+        const response = await api.get("/api/application/all");
         const filteredApplicants = response.data.filter(
           (application) => application.jobid === jobId
         );
@@ -60,17 +57,11 @@ const ViewApplicants = () => {
 
   const acceptClick = async (applicant) => {
     try {
-      await axios.patch(`/api/application/${applicant.id}`, {
-        status: "Under Consideration",
-      });
+      await api.patch(`/api/application/${applicant.id}`, { status: "Under Consideration" });
       const updatedApplicants = applicants.map((app) =>
         app.id === applicant.id ? { ...app, status: "Under Consideration" } : app
       );
       setApplicants(updatedApplicants);
-
-      setUser_email(applicant.contactemail);
-      setUserStatus("Under Consideration");
-      setUserJob(applicant.jobtitle);
     } catch (error) {
       console.error("Error accepting application:", error);
     }
@@ -78,7 +69,7 @@ const ViewApplicants = () => {
 
   const interviewClick = async (applicant) => {
     try {
-      await axios.patch(`/api/application/${applicant.id}`, {
+      await api.patch(`/api/application/${applicant.id}`, {
         status: "Interview Scheduled",
         interviewDate,
         interviewLocation,
@@ -89,10 +80,6 @@ const ViewApplicants = () => {
           : app
       );
       setApplicants(updatedApplicants);
-
-      setUser_email(applicant.contactemail);
-      setUserStatus("Interview Scheduled");
-      setUserJob(applicant.jobtitle);
     } catch (error) {
       console.error("Error scheduling interview:", error);
     }
@@ -100,17 +87,11 @@ const ViewApplicants = () => {
 
   const rejectClick = async (applicant) => {
     try {
-      await axios.patch(`/api/application/${applicant.id}`, {
-        status: "Rejected",
-      });
+      await api.patch(`/api/application/${applicant.id}`, { status: "Rejected" });
       const updatedApplicants = applicants.map((app) =>
         app.id === applicant.id ? { ...app, status: "Rejected" } : app
       );
       setApplicants(updatedApplicants);
-
-      setUser_email(applicant.contactemail);
-      setUserStatus("Rejected");
-      setUserJob(applicant.jobtitle);
     } catch (error) {
       console.error("Error rejecting application:", error);
     }
@@ -330,4 +311,4 @@ const ViewApplicants = () => {
   );
 };
 
-export default withAuth(ViewApplicants);
+export default ViewApplicants;

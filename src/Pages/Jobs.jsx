@@ -1,13 +1,11 @@
-/* eslint-disable react-refresh/only-export-components */
-import JobListings from '../Components/JobListings';
-import withAuth from "../withAuth";
+import JobListings from "../Components/JobListings";
 
 const Jobs = () => {
   return (
-    <div className=' px-4 py-6'>
-    <JobListings />
+    <div className="px-4 py-6">
+      <JobListings />
     </div>
-  )
-}
+  );
+};
 
-export default withAuth (Jobs)
+export default Jobs;

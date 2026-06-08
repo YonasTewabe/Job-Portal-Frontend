@@ -3,21 +3,21 @@ import { useState } from "react";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { BiShow, BiHide } from "react-icons/bi";
-import withAuth from "../withAuth";
 import { toast } from "react-toastify";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import { useAuth } from "../context/AuthContext";
+import axios from "../axiosInterceptor";
 
 const AddHr = () => {
   const [email, setEmail] = useState("");
-  // eslint-disable-next-line no-unused-vars
-  const [role, setRole] = useState("hr");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const myRole = localStorage.getItem("role");
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
 
   const passwordRegex =
     /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -29,16 +29,14 @@ const AddHr = () => {
       return;
     }
     try {
-      await fetch("/api/profile/signup", {
+      await axios.post("/api/profile/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password,
-          role,
-        }),
+        email,
+        password,
+        role: "hr",
       });
-      toast.success("Succesfully added new HR.");
+      toast.success("Successfully added new HR.");
       navigate("/");
     } catch (error) {
       if (error.response && error.response.status === 409) {
@@ -191,4 +189,4 @@ const AddHr = () => {
   );
 };
 
-export default withAuth(AddHr);
+export default AddHr;

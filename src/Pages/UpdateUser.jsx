@@ -4,7 +4,7 @@ import { useParams, useNavigate, useLoaderData } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
 
 const UpdateUser = () => {
@@ -17,7 +17,8 @@ const UpdateUser = () => {
   const [experience, setExperience] = useState(user.experience || "None");
   const [cv, setCv] = useState(user.cv);
   const [userPhone, setUserPhone] = useState(user.userPhone || "");
-  const myRole= localStorage.getItem('role')
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -279,4 +280,4 @@ const UpdateUser = () => {
   );
 };
 
-export default withAuth(UpdateUser);
+export default UpdateUser;

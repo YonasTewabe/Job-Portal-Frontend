@@ -4,19 +4,22 @@ import {
   Route,
   createRoutesFromElements,
 } from "react-router-dom";
-import HomePage from "./Pages/HomePage";
 import Layout from "./Components/Layout";
-import Jobs from "./Pages/Jobs";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import axios from "./axiosInterceptor";
+
+// Pages
+import HomePage from "./Pages/HomePage";
 import NotFoundPage from "./Pages/NotFoundPage";
+import Jobs from "./Pages/Jobs";
 import Job, { jobLoader } from "./Pages/Job";
 import AddJob from "./Pages/AddJob";
 import EditJob from "./Pages/EditJob";
 import ViewReport from "./Pages/ViewReport";
-import axios from "./axiosInterceptor";
 import Account, { userLoader } from "./Pages/Account";
 import UpdateUser from "./Pages/UpdateUser";
 import SignUp from "./Pages/SignUp";
-import ValidatedLoginForm from "./Pages/Login";
+import Login from "./Pages/Login";
 import ViewApplicants from "./Pages/ViewApplicants";
 import ContactUs from "./Pages/ContactUs";
 import AboutUs from "./Pages/AboutUs";
@@ -29,73 +32,69 @@ import CompanyInfo from "./Pages/CompanyInfo";
 import ViewUserList from "./Pages/ViewUserList";
 
 const App = () => {
-  // Add new job
-  const addJob = async (newJob) => {
-    await axios.post("/api/jobs", newJob);
-  };
-
-  // Deleting job
-  const deleteJob = async (id) => {
-    await axios.delete(`/api/jobs/${id}`);
-  };
-
-  // Updating job
-  const updateJob = async (job) => {
-    await axios.put(`/api/jobs/${job.id}`, job);
-  };
-
-  const deleteUser = async (id) => {
-    await axios.delete(`/api/profile/${id}`);
-  };
+  const addJob    = (newJob) => axios.post("/api/jobs", newJob);
+  const deleteJob = (id)    => axios.delete(`/api/jobs/${id}`);
+  const updateJob = (job)   => axios.put(`/api/jobs/${job.id}`, job);
+  const deleteUser = (id)   => axios.delete(`/api/profile/${id}`);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
-        <Route index element={<HomePage />} />
-        <Route path="*" element={<NotFoundPage />} />
-        <Route path="jobs" element={<Jobs />} />
-        <Route path="report" element={<ViewReport />} />
-        <Route path="add-job" element={<AddJob addJobSubmit={addJob} />} />
+        {/* Public */}
+        <Route path="login"         element={<Login />} />
+        <Route path="signup"        element={<SignUp />} />
+        <Route path="forgotpassword" element={<ForgotPassword />} />
+        <Route path="contact"       element={<ContactUs />} />
+        <Route path="about"         element={<AboutUs />} />
+        <Route path="*"             element={<NotFoundPage />} />
+
+        {/* Protected */}
+        <Route index element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="jobs"    element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+        <Route path="report"  element={<ProtectedRoute><ViewReport /></ProtectedRoute>} />
+        <Route path="status"  element={<ProtectedRoute><ViewStatus /></ProtectedRoute>} />
+        <Route path="add-hr"  element={<ProtectedRoute><AddHr /></ProtectedRoute>} />
+        <Route path="view-hr" element={<ProtectedRoute><ViewHrList /></ProtectedRoute>} />
+        <Route path="view-users" element={<ProtectedRoute><ViewUserList /></ProtectedRoute>} />
+
         <Route
-          path="UpdateUser/:id"
-          element={<UpdateUser />}
-          loader={userLoader}
-        />
-        <Route
-          path="CompanyInfo/:id"
-          element={<CompanyInfo />}
-          loader={userLoader}
-        />
-        <Route
-          path="edit-job/:id"
-          element={<EditJob updateJobSubmit={updateJob} />}
-          loader={jobLoader}
+          path="add-job"
+          element={<ProtectedRoute><AddJob addJobSubmit={addJob} /></ProtectedRoute>}
         />
         <Route
           path="job/:id"
-          element={<Job deleteJob={deleteJob} />}
+          element={<ProtectedRoute><Job deleteJob={deleteJob} /></ProtectedRoute>}
+          loader={jobLoader}
+        />
+        <Route
+          path="edit-job/:id"
+          element={<ProtectedRoute><EditJob updateJobSubmit={updateJob} /></ProtectedRoute>}
           loader={jobLoader}
         />
         <Route
           path="account/:id"
-          element={<Account deleteUser={deleteUser} />}
+          element={<ProtectedRoute><Account deleteUser={deleteUser} /></ProtectedRoute>}
           loader={userLoader}
         />
-        <Route path="signup" element={<SignUp />} />
-        <Route path="login" element={<ValidatedLoginForm />} />
+        <Route
+          path="UpdateUser/:id"
+          element={<ProtectedRoute><UpdateUser /></ProtectedRoute>}
+          loader={userLoader}
+        />
+        <Route
+          path="CompanyInfo/:id"
+          element={<ProtectedRoute><CompanyInfo /></ProtectedRoute>}
+          loader={userLoader}
+        />
         <Route
           path="applicants/:id"
-          element={<ViewApplicants />}
+          element={<ProtectedRoute><ViewApplicants /></ProtectedRoute>}
           loader={userLoader}
         />
-        <Route path="contact" element={<ContactUs />} />
-        <Route path="about" element={<AboutUs />} />
-        <Route path="status" element={<ViewStatus />} />
-        <Route path="add-hr" element={<AddHr />} />
-        <Route path="changepassword/:id" element={<ChangePassword />} />
-        <Route path="forgotpassword" element={<ForgotPassword />} />
-        <Route path="view-hr" element={<ViewHrList />} />
-        <Route path="view-users" element={<ViewUserList />} />
+        <Route
+          path="changepassword/:id"
+          element={<ProtectedRoute><ChangePassword /></ProtectedRoute>}
+        />
       </Route>
     )
   );

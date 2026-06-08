@@ -1,43 +1,33 @@
-/* eslint-disable react-refresh/only-export-components */
 import axios from "../axiosInterceptor";
 import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
 
 const ViewStatus = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cookies] = useCookies(["userId"]);
-  const myRole = localStorage.getItem("role");
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
+  const userId = authUser?.userId;
 
-  function refreshPage() {
-    setTimeout(() => {
-      window.location.reload(false);
-    }, 500);
-  }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `/api/application/all`
-        );
+        const response = await axios.get("/api/application/all");
         const filteredApplications = response.data.filter(
-          (application) => application.userid === cookies.userId
+          (application) => application.userid === userId
         );
-
         setApplications(filteredApplications);
       } catch (error) {
         console.error("Error fetching application data:", error);
       } finally {
         setLoading(false);
-        refreshPage;
       }
     };
 
     fetchData();
-  }, [cookies.userId]);
+  }, [userId]);
 
   if (loading) {
     return <Spinner />;
@@ -56,34 +46,18 @@ const ViewStatus = () => {
               <table className="border-collapse border border-gray-800 w-full">
                 <thead>
                   <tr>
-                    <th className="border border-gray-800 px-4 py-2">
-                      Company Name
-                    </th>
-                    <th className="border border-gray-800 px-4 py-2">
-                      Job Title
-                    </th>
-                    <th className="border border-gray-800 px-4 py-2">
-                      Application Date
-                    </th>
+                    <th className="border border-gray-800 px-4 py-2">Company Name</th>
+                    <th className="border border-gray-800 px-4 py-2">Job Title</th>
+                    <th className="border border-gray-800 px-4 py-2">Application Date</th>
                     <th className="border border-gray-800 px-4 py-2">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {applications.map((application, index) => (
-                    <tr
-                      key={index}
-                      className={index % 2 === 0 ? "bg-indigo-100" : ""}
-                    >
-                      <td className="border border-gray-800 px-4 py-2">
-                        {application.companyname}
-                      </td>
-                      <td className="border border-gray-800 px-4 py-2">
-                        {application.jobtitle}
-                      </td>
-                      <td className="border border-gray-800 px-4 py-2">
-                        {application.applicationdate}
-                      </td>
-
+                    <tr key={index} className={index % 2 === 0 ? "bg-indigo-100" : ""}>
+                      <td className="border border-gray-800 px-4 py-2">{application.companyname}</td>
+                      <td className="border border-gray-800 px-4 py-2">{application.jobtitle}</td>
+                      <td className="border border-gray-800 px-4 py-2">{application.applicationdate}</td>
                       <td
                         className={`border border-gray-800 px-4 py-2 ${
                           application.status === "Pending"
@@ -111,4 +85,4 @@ const ViewStatus = () => {
   );
 };
 
-export default withAuth(ViewStatus);
+export default ViewStatus;

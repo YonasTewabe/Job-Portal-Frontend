@@ -1,12 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { BiShow, BiHide } from "react-icons/bi";
-import Cookies from "js-cookie";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 import axios from "../axiosInterceptor";
 
 const ChangePassword = () => {
@@ -17,10 +15,10 @@ const ChangePassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const passwordRegex =
-    /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
+  const { user: authUser } = useAuth();
+  const id = authUser?.userId;
 
-  const id = Cookies.get("userId");
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -197,4 +195,4 @@ const ChangePassword = () => {
   );
 };
 
-export default withAuth(ChangePassword);
+export default ChangePassword;

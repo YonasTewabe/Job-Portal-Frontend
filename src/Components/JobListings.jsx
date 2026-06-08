@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "../axiosInterceptor";
 import JobListing from "./JobListing";
 import Spinner from "./Spinner";
-import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const JobListings = ({ isHome = false }) => {
   const [jobs, setJobs] = useState([]);
@@ -12,8 +12,9 @@ const JobListings = ({ isHome = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState(isHome ? "desc" : "asc");
   const [sortCriteria, setSortCriteria] = useState("");
-  const role = localStorage.getItem("role");
-  const userId = Cookies.get("userId");
+  const { user: authUser } = useAuth();
+  const role = authUser?.role;
+  const userId = authUser?.userId;
 
   useEffect(() => {
     const fetchJobs = async () => {

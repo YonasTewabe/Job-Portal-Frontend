@@ -1,83 +1,76 @@
 import { useState } from "react";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
+import axios from "../axiosInterceptor";
+
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
+
+const schema = Yup.object().shape({
+  email: Yup.string().email("Invalid email address").required("Email is required"),
+  password: Yup.string()
+    .required("Password is required")
+    .matches(
+      passwordRegex,
+      "Password must contain a number, uppercase, lowercase, and special character"
+    )
+    .min(8, "Password must be at least 8 characters"),
+  confirmPassword: Yup.string()
+    .required("Confirm Password is required")
+    .oneOf([Yup.ref("password")], "Passwords must match"),
+});
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // eslint-disable-next-line no-unused-vars
-  const [role, setRole] = useState("user");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const passwordRegex =
-    /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
+  const validate = () => {
+    try {
+      schema.validateSync({ email, password, confirmPassword }, { abortEarly: false });
+      setErrors({});
+      return true;
+    } catch (err) {
+      const fieldErrors = {};
+      err.inner.forEach((e) => { fieldErrors[e.path] = e.message; });
+      setErrors(fieldErrors);
+      return false;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
-    if (!validateForm()) {
-      return;
-    }
-
+    setLoading(true);
     try {
-      await fetch("/api/profile/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password,
-          role,
-        }),
+      const { status } = await axios.post("/api/profile/signup", {
+        email,
+        password,
+        role: "user",
       });
-      toast.success("Sign up successful. Please log in.");
+
+      if (status === 409) {
+        toast.error("Email already in use");
+        return;
+      }
+
+      toast.success("Account created. Please log in.");
       navigate("/login");
     } catch (error) {
-      if (error.response && error.response.status === 409) {
+      if (error.response?.status === 409) {
         toast.error("Email already in use");
       } else {
         toast.error("Failed to sign up. Please try again later.");
       }
-      console.error(error);
-    }
-  };
-
-  const validateForm = () => {
-    const schema = Yup.object().shape({
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
-      password: Yup.string()
-        .required("Password is required")
-        .matches(
-          passwordRegex,
-          "Password must contain at least one number, one uppercase letter, one lowercase letter, and one special character"
-        )
-        .min(8, "Password must be at least 8 characters"),
-      confirmPassword: Yup.string()
-        .oneOf([password], "Passwords must match")
-        .required("Confirm Password is required"),
-    });
-
-    try {
-      schema.validateSync(
-        { email, password, confirmPassword },
-        { abortEarly: false }
-      );
-      setErrors({});
-      return true;
-    } catch (error) {
-      const newErrors = {};
-      error.inner.forEach((err) => {
-        newErrors[err.path] = err.message;
-      });
-      setErrors(newErrors);
-      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,18 +78,17 @@ const SignUp = () => {
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <p className="text-2xl text-indigo-700 text-center">Sign Up</p>
-        <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-8">
+
+        <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-8" noValidate>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
+            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
               Email
             </label>
             <input
               id="email"
               name="email"
-              type="text"
+              type="email"
+              autoComplete="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -104,14 +96,9 @@ const SignUp = () => {
                 errors.email ? "border-red-500" : ""
               }`}
             />
-            {errors.email && (
-              <div className="text-red-500 text-sm">{errors.email}</div>
-            )}
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
 
-            <label
-              htmlFor="password"
-              className="block text-gray-700 text-sm font-bold mt-6 mb-2"
-            >
+            <label htmlFor="password" className="block text-gray-700 text-sm font-bold mt-6 mb-2">
               Password
             </label>
             <div className="relative">
@@ -119,29 +106,26 @@ const SignUp = () => {
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`border rounded py-2 px-3 w-full ${
+                className={`border rounded py-2 px-3 w-full pr-10 ${
                   errors.password ? "border-red-500" : ""
                 }`}
               />
               <button
                 type="button"
+                aria-label={showPassword ? "Hide password" : "Show password"}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? <BiHide /> : <BiShow />}
               </button>
             </div>
-            {errors.password && (
-              <div className="text-red-500 text-sm">{errors.password}</div>
-            )}
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
 
-            <label
-              htmlFor="confirmPassword"
-              className="block text-gray-700 text-sm font-bold mt-6 mb-2"
-            >
+            <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mt-6 mb-2">
               Confirm Password
             </label>
             <div className="relative">
@@ -149,34 +133,45 @@ const SignUp = () => {
                 id="confirmPassword"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
+                autoComplete="new-password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`border rounded py-2 px-3 w-full ${
+                className={`border rounded py-2 px-3 w-full pr-10 ${
                   errors.confirmPassword ? "border-red-500" : ""
                 }`}
               />
               <button
                 type="button"
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                onClick={() => setShowConfirmPassword((v) => !v)}
               >
                 {showConfirmPassword ? <BiHide /> : <BiShow />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <div className="text-red-500 text-sm">
-                {errors.confirmPassword}
-              </div>
+              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
             )}
+
             <button
               type="submit"
-              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              disabled={loading}
+              className="mt-4 bg-blue-500 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded"
             >
-              Sign Up
+              {loading ? "Creating account…" : "Sign Up"}
             </button>
           </div>
         </form>
+
+        <div className="text-center mt-4">
+          <span className="text-sm">
+            Already have an account?{" "}
+            <Link to="/login" className="text-blue-500">
+              Log in
+            </Link>
+          </span>
+        </div>
       </div>
     </div>
   );

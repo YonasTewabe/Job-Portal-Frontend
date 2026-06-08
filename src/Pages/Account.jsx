@@ -3,8 +3,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { useLoaderData, Link, useNavigate, useParams } from "react-router-dom";
 import axios from "../axiosInterceptor";
-import withAuth from "../withAuth";
-import Cookies from "js-cookie";
+import { useAuth } from "../context/AuthContext";
 
 // eslint-disable-next-line react-refresh/only-export-components, react/prop-types
 const Account = ({ deleteUser }) => {
@@ -12,7 +11,8 @@ const Account = ({ deleteUser }) => {
   const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
   const param = useParams();
-  const role = localStorage.getItem("role");
+  const { user: authUser, logout } = useAuth();
+  const role = authUser?.role;
 
   //Delete Account
   const onDelete = (userId) => {
@@ -28,13 +28,7 @@ const Account = ({ deleteUser }) => {
       if (result.isConfirmed) {
         await deleteUser(userId);
         toast.success("Account Deleted Successfully");
-        Cookies.remove("userId");
-        Cookies.remove("jwt");
-        Cookies.remove("jobId");
-        localStorage.removeItem("role");
-        localStorage.removeItem("usercompleted");
-        localStorage.removeItem("hrcompleted");
-        localStorage.removeItem("hrStatus");
+        logout();
         navigate("/login");
       } else {
         toast.error("Unable to delete account. Try again later.");
@@ -223,4 +217,4 @@ const userLoader = async ({ params }) => {
 };
 
 export { Account, userLoader };
-export default withAuth(Account);
+export default Account;

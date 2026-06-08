@@ -1,44 +1,34 @@
-/* eslint-disable react-refresh/only-export-components */
 import axios from "../axiosInterceptor";
 import { useEffect, useState } from "react";
-import withAuth from "../withAuth";
+import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
 
-const ViewHrList = () => {
+const ViewUserList = () => {
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState([]);
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-  const myRole = localStorage.getItem("role");
+  const { user: authUser } = useAuth();
+  const myRole = authUser?.role;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profilesResponse] = await Promise.all([
-          axios.get(`/api/profile/all`),
-        ]);
-
-        const profilesData = profilesResponse.data;
-
-        const filteredProfiles = profilesData.filter(
-          (profile) => profile.role === "user"
-        );
-
-        setProfiles(filteredProfiles);
+        const response = await axios.get("/api/profile/all");
+        setProfiles(response.data.filter((p) => p.role === "user"));
       } catch (error) {
-        console.error("Error fetching application data:", error);
+        console.error("Error fetching user list:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
   const handleSort = (key) => {
     if (key === sortKey) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
       setSortOrder("asc");
@@ -46,16 +36,15 @@ const ViewHrList = () => {
   };
 
   const sortedProfiles = profiles.slice().sort((a, b) => {
-    if (sortKey && sortOrder) {
-      const comparison = a[sortKey].localeCompare(b[sortKey]);
-      return sortOrder === "asc" ? comparison : -comparison;
-    }
-    return 0;
+    if (!sortKey) return 0;
+    const cmp = String(a[sortKey]).localeCompare(String(b[sortKey]));
+    return sortOrder === "asc" ? cmp : -cmp;
   });
 
-  if (loading) {
-    return <Spinner />;
-  }
+  const SortIcon = ({ col }) =>
+    sortKey === col ? (sortOrder === "asc" ? " ▲" : " ▼") : null;
+
+  if (loading) return <Spinner />;
 
   return (
     <>
@@ -64,58 +53,33 @@ const ViewHrList = () => {
         <div className="bg-indigo-100 py-10">
           <div className="w-full bg-white shadow-md rounded">
             <br />
-            <h1 className="text-indigo-700 text-3xl items-center text-center">
-              Registered Users
-            </h1>
+            <h1 className="text-indigo-700 text-3xl items-center text-center">Registered Users</h1>
             <div className="container mx-auto py-10 px-6">
               {profiles.length > 0 ? (
                 <table className="border-collapse border border-gray-800 w-full">
                   <thead>
                     <tr>
-                      <th className="border border-gray-800 px-4 py-2" onClick={() => handleSort("fullname")} style={{ position: "relative", cursor: "pointer" }}>
-                        Full Name {sortKey === "fullname" && sortOrder !== null && (sortOrder === "asc" ? <span style={{ position: "absolute", right: "5px", top: "3px" }}>▲</span> : <span style={{ position: "absolute", right: "5px", top: "3px" }}>▼</span>)}
-                      </th>
-                      <th className="border border-gray-800 px-4 py-2" onClick={() => handleSort("age")} style={{ position: "relative", cursor: "pointer" }}>
-                        Age {sortKey === "age" && sortOrder !== null && (sortOrder === "asc" ? <span style={{ position: "absolute", right: "5px", top: "3px" }}>▲</span> : <span style={{ position: "absolute", right: "5px", top: "3px" }}>▼</span>)}
-                      </th>
-                      <th className="border border-gray-800 px-4 py-2" onClick={() => handleSort("sex")} style={{ position: "relative", cursor: "pointer" }}>
-                        Sex {sortKey === "sex" && sortOrder !== null && (sortOrder === "asc" ? <span style={{ position: "absolute", right: "5px", top: "3px" }}>▲</span> : <span style={{ position: "absolute", right: "5px", top: "3px" }}>▼</span>)}
-                      </th>
-                      <th className="border border-gray-800 px-4 py-2" onClick={() => handleSort("degree")} style={{ position: "relative", cursor: "pointer" }}>
-                        Education {sortKey === "degree" && sortOrder !== null && (sortOrder === "asc" ? <span style={{ position: "absolute", right: "5px", top: "3px" }}>▲</span> : <span style={{ position: "absolute", right: "5px", top: "3px" }}>▼</span>)}
-                      </th>
-                      <th className="border border-gray-800 px-4 py-2" onClick={() => handleSort("university")} style={{ position: "relative", cursor: "pointer" }}>
-                        University {sortKey === "university" && sortOrder !== null && (sortOrder === "asc" ? <span style={{ position: "absolute", right: "5px", top: "3px" }}>▲</span> : <span style={{ position: "absolute", right: "5px", top: "3px" }}>▼</span>)}
-                      </th>
-                      <th className="border border-gray-800 px-4 py-2" onClick={() => handleSort("experience")} style={{ position: "relative", cursor: "pointer" }}>
-                        Experience {sortKey === "experience" && sortOrder !== null && (sortOrder === "asc" ? <span style={{ position: "absolute", right: "5px", top: "3px" }}>▲</span> : <span style={{ position: "absolute", right: "5px", top: "3px" }}>▼</span>)}
-                      </th>
+                      {["fullname", "age", "sex", "degree", "university", "experience"].map((col) => (
+                        <th
+                          key={col}
+                          className="border border-gray-800 px-4 py-2 cursor-pointer select-none"
+                          onClick={() => handleSort(col)}
+                        >
+                          {col.charAt(0).toUpperCase() + col.slice(1)}
+                          <SortIcon col={col} />
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {sortedProfiles.map((profile, index) => (
-                      <tr
-                        key={index}
-                        className={index % 2 === 0 ? "bg-indigo-100" : ""}
-                      >
-                        <td className="border border-gray-800 px-4 py-2">
-                          {profile.fullname}
-                        </td>
-                        <td className="border border-gray-800 px-4 py-2">
-                          {profile.age}
-                        </td>
-                        <td className="border border-gray-800 px-4 py-2">
-                          {profile.sex}
-                        </td>
-                        <td className="border border-gray-800 px-4 py-2">
-                          {profile.degree}
-                        </td>
-                        <td className="border border-gray-800 px-4 py-2">
-                          {profile.university}
-                        </td>
-                        <td className="border border-gray-800 px-4 py-2">
-                          {profile.experience}
-                        </td>
+                      <tr key={index} className={index % 2 === 0 ? "bg-indigo-100" : ""}>
+                        <td className="border border-gray-800 px-4 py-2">{profile.fullname}</td>
+                        <td className="border border-gray-800 px-4 py-2">{profile.age}</td>
+                        <td className="border border-gray-800 px-4 py-2">{profile.sex}</td>
+                        <td className="border border-gray-800 px-4 py-2">{profile.degree}</td>
+                        <td className="border border-gray-800 px-4 py-2">{profile.university}</td>
+                        <td className="border border-gray-800 px-4 py-2">{profile.experience}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -135,4 +99,4 @@ const ViewHrList = () => {
   );
 };
 
-export default withAuth(ViewHrList);
+export default ViewUserList;

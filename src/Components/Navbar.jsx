@@ -6,14 +6,15 @@ import { IoMdPersonAdd } from "react-icons/io";
 import { GoPlusCircle } from "react-icons/go";
 import { useNavigate, NavLink } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
-import Cookies from "js-cookie";
 import axios from "../axiosInterceptor";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
   const sidebarRef = useRef(null);
   const linkClass = ({ isActive }) => (isActive ? "text-[#3b82f6]" : "");
-  const role = localStorage.getItem("role");
+  const { user, logout } = useAuth();
+  const role = user?.role;
 
   const hrMenu = [
     {
@@ -104,16 +105,11 @@ const Navbar = () => {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-      Cookies.remove("userId");
-      Cookies.remove("jwt");
-      Cookies.remove("jobId");
-      localStorage.removeItem("role");
-      localStorage.removeItem("usercompleted");
-      localStorage.removeItem("hrcompleted");
-      localStorage.removeItem("hrStatus");
-      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
+    } finally {
+      logout();
+      navigate("/login", { replace: true });
     }
   };
 
@@ -125,7 +121,7 @@ const Navbar = () => {
     };
   }, []);
 
-  const storedId = Cookies.get("userId");
+  const storedId = user?.userId;
   const value = storedId ? `/account/${storedId}` : "/";
 
   if (role !== "user" && role !== "admin" && role !== "hr") {
