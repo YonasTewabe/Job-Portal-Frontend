@@ -58,14 +58,20 @@ const JobListings = ({ isHome = false }) => {
     <section className="py-12 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+            {isHome && <span className="section-eyebrow mb-3">Open positions</span>}
+            <h2 className={`font-bold text-slate-900 tracking-tight ${isHome ? "text-2xl sm:text-3xl mt-3" : "text-xl"}`}>
               {isHome ? "Recent Listings" : "Browse Jobs"}
             </h2>
             {!isHome && (
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-slate-500 mt-1">
                 {display.length} {display.length === 1 ? "position" : "positions"} available
+              </p>
+            )}
+            {isHome && (
+              <p className="text-sm text-slate-500 mt-1.5 max-w-lg">
+                Discover the latest opportunities from companies on the platform.
               </p>
             )}
           </div>

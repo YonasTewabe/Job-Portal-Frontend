@@ -20,14 +20,12 @@ const menus = {
     { icon: <FaHome />,      text: "Home",            link: "/home" },
     { icon: <FaBriefcase />, text: "Browse Jobs",      link: "/jobs" },
     { icon: <FaList />,      text: "My Applications",  link: "/status" },
-    { icon: <FaComments />,  text: "Messages",         link: "/messages" },
   ],
   company_admin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/company/dashboard" },
     { icon: <FaUserPlus />,      text: "Post a Job", link: "/add-job" },
-    { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
+    { icon: <FaBriefcase />,     text: "My Jobs",   link: "/jobs" },
     { icon: <FaList />,          text: "Payments",   link: "/company/payments" },
-    { icon: <FaComments />,      text: "Messages",   link: "/messages" },
   ],
   superadmin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/superadmin/dashboard" },
@@ -36,7 +34,6 @@ const menus = {
     { icon: <FaUsers />,         text: "Job Seekers", link: "/superadmin/applicants" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
     { icon: <FaList />,          text: "Payments",    link: "/superadmin/payments" },
-    { icon: <FaComments />,      text: "Messages",    link: "/messages" },
   ],
 };
 
@@ -106,8 +103,7 @@ const Navbar = () => {
   return (
     <>
       {/* ── Top bar ───────────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-4 gap-3
-        bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-4 gap-3 nav-glass">
 
         <button
           onClick={() => setOpen(true)}

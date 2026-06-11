@@ -59,8 +59,9 @@ const UserDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
         <div>
-          <PageTitle>Welcome back, {authUser?.name || "there"} 👋</PageTitle>
-          <p className="text-sm text-gray-500 mt-1">Here's a summary of your job search activity.</p>
+          <span className="section-eyebrow mb-3">Dashboard</span>
+          <PageTitle className="mt-3">Welcome back, {authUser?.name || "there"}</PageTitle>
+          <p className="text-sm text-slate-500 mt-1.5">Here's a summary of your job search activity.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Link to="/messages" className={Btn.secondary("gap-2 px-4 py-2.5 text-sm")}>

@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { Page, PageTitle, Card, Table, Tr, Td, Empty } from "../Components/ui";
-import { formatEducationSummary, formatExperienceSummary } from "../Components/ProfileEducationExperience";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn } from "../Components/ui";
+import { FaSort, FaSortUp, FaSortDown, FaFilePdf, FaComments } from "react-icons/fa";
 
 const COLS = [
-  { key: "fullname",   label: "Full Name" },
-  { key: "dateOfBirth", label: "Date of Birth" },
-  { key: "age",         label: "Age" },
-  { key: "sex",        label: "Sex" },
-  { key: "educations",  label: "Education" },
-  { key: "experiences", label: "Experience" },
+  { key: "fullname", label: "Name" },
+  { key: "email",    label: "Email" },
+  { key: "phone",    label: "Phone" },
+  { key: "cv",       label: "CV", sortable: false },
+  { key: "message",  label: "Message", sortable: false },
 ];
 
 const ViewUserList = () => {
@@ -37,10 +36,8 @@ const ViewUserList = () => {
   };
 
   const sortValue = (profile, key) => {
-    if (key === "educations") return formatEducationSummary(profile.educations);
-    if (key === "experiences") return formatExperienceSummary(profile.experiences);
-    if (key === "dateOfBirth") return profile.dateOfBirth ?? "";
-    if (key === "age") return String(profile.age ?? "");
+    if (key === "phone") return String(profile.phone ?? profile.userPhone ?? "");
+    if (key === "cv") return String(profile.cv ?? "");
     return String(profile[key] ?? "");
   };
 
@@ -62,8 +59,10 @@ const ViewUserList = () => {
 
   const headers = COLS.map((c) => ({
     key:     c.key,
-    label:   <span className="inline-flex items-center">{c.label}<SortIcon col={c.key} /></span>,
-    onClick: () => handleSort(c.key),
+    label:   c.sortable === false
+      ? c.label
+      : <span className="inline-flex items-center">{c.label}<SortIcon col={c.key} /></span>,
+    onClick: c.sortable === false ? undefined : () => handleSort(c.key),
   }));
 
   return (
@@ -80,12 +79,36 @@ const ViewUserList = () => {
         >
           {sorted.map((p, i) => (
             <Tr key={p.id ?? i} striped={i % 2 !== 0}>
-              <Td className="font-semibold text-gray-900">{p.fullname}</Td>
-              <Td className="text-gray-500 text-xs">{p.dateOfBirth || "—"}</Td>
-              <Td className="text-gray-500">{p.age ?? "—"}</Td>
-              <Td className="text-gray-500">{p.sex}</Td>
-              <Td className="text-gray-600 text-xs max-w-xs">{formatEducationSummary(p.educations)}</Td>
-              <Td className="text-gray-600 text-xs max-w-xs">{formatExperienceSummary(p.experiences)}</Td>
+              <Td className="font-semibold text-gray-900 whitespace-nowrap">{p.fullname || "—"}</Td>
+              <Td className="text-gray-500 text-xs">{p.email || "—"}</Td>
+              <Td className="text-gray-500 text-xs whitespace-nowrap">
+                {p.phone || p.userPhone ? `+251 ${p.phone || p.userPhone}` : "—"}
+              </Td>
+              <Td>
+                {p.cv ? (
+                  <button
+                    type="button"
+                    onClick={() => window.open(`/api/applicants/cv/${p.cv}`, "_blank")}
+                    className="inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium"
+                  >
+                    <FaFilePdf className="text-red-500" size={12} /> PDF
+                  </button>
+                ) : (
+                  <span className="text-xs text-gray-400">—</span>
+                )}
+              </Td>
+              <Td>
+                {p.user?.id ? (
+                  <Link
+                    to={`/messages?userId=${p.user.id}`}
+                    className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
+                  >
+                    <FaComments size={12} /> Message
+                  </Link>
+                ) : (
+                  <span className="text-xs text-gray-400">—</span>
+                )}
+              </Td>
             </Tr>
           ))}
         </Table>

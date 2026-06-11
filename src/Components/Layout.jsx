@@ -14,7 +14,7 @@ const Layout = () => {
   const showPublicNav = !user && !AUTH_PATHS.includes(pathname);
 
   return (
-  <div className="min-h-screen flex flex-col bg-slate-50">
+  <div className="app-shell">
     {user ? <Navbar /> : showPublicNav && <PublicNavbar />}
     <div className="flex-1">
       <Outlet />

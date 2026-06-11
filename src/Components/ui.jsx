@@ -2,14 +2,14 @@ import { Children } from "react";
 
 // ─── Input ────────────────────────────────────────────────────────────────────
 export const inputCls = (error) =>
-  `w-full rounded-xl border px-3.5 py-2.5 text-sm text-gray-900 bg-white
-   shadow-sm transition-all duration-150
-   placeholder:text-gray-400
-   focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500
-   disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400
+  `w-full rounded-xl border px-3.5 py-2.5 text-sm text-slate-900 bg-white
+   shadow-sm transition-all duration-200
+   placeholder:text-slate-400
+   focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500
+   disabled:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-400
    ${error
-     ? "border-red-400 bg-red-50 focus:ring-red-400 focus:border-red-400"
-     : "border-gray-200 hover:border-gray-300"}`;
+     ? "border-red-400 bg-red-50 focus:ring-red-400/30 focus:border-red-400"
+     : "border-slate-200 hover:border-slate-300"}`;
 
 export const Field = ({ label, htmlFor, error, hint, children }) => (
   <div className="mb-5">
@@ -37,14 +37,14 @@ export const Btn = {
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 export const Card = ({ children, className = "" }) => (
-  <div className={`bg-white rounded-2xl border border-gray-100 shadow-card p-6 ${className}`}>
+  <div className={`surface-card p-6 ${className}`}>
     {children}
   </div>
 );
 
 // ─── Section headings ─────────────────────────────────────────────────────────
 export const PageTitle = ({ children, className = "" }) => (
-  <h1 className={`text-2xl font-bold text-gray-900 tracking-tight ${className}`}>{children}</h1>
+  <h1 className={`text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight ${className}`}>{children}</h1>
 );
 
 export const SectionTitle = ({ children }) => (
@@ -92,13 +92,13 @@ export const Table = ({ headers, children, empty }) => {
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-100 text-sm">
         <thead>
-          <tr className="bg-gray-50/80">
+          <tr className="bg-slate-50/90 border-b border-slate-100">
             {headers.map((h) => (
               <th
                 key={h.key ?? h.label}
                 onClick={h.onClick}
-                className={`px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider
-                  ${h.onClick ? "cursor-pointer select-none hover:text-gray-600 transition-colors" : ""}`}
+                className={`px-4 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider
+                  ${h.onClick ? "cursor-pointer select-none hover:text-slate-700 transition-colors" : ""}`}
               >
                 {h.label}{h.sort}
               </th>
@@ -131,8 +131,10 @@ export const Td = ({ children, className = "" }) => (
 // ─── Empty state ──────────────────────────────────────────────────────────────
 export const Empty = ({ message = "No data found.", icon = "📭" }) => (
   <div className="py-20 text-center">
-    <p className="text-3xl mb-3">{icon}</p>
-    <p className="text-sm text-gray-500 font-medium">{message}</p>
+    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-2xl">
+      {icon}
+    </div>
+    <p className="text-sm text-slate-500 font-medium">{message}</p>
   </div>
 );
 
@@ -155,11 +157,10 @@ export const AuthBackHome = () => {
 };
 
 export const AuthCard = ({ title, subtitle, children }) => (
-  <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
-    <div className="w-full max-w-md">
+  <div className="auth-backdrop">
+    <div className="w-full max-w-md relative z-10">
       <AuthBackHome />
-      {/* Card */}
-      <div className="bg-white rounded-3xl shadow-float border border-gray-100 px-8 py-10">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-float border border-slate-200/80 px-8 py-10">
         <div className="flex flex-col items-center mb-8 gap-3">
           <Logo size={44} variant="color" />
           <div className="text-center">

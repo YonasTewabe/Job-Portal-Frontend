@@ -2,28 +2,46 @@ import { Link } from "react-router-dom";
 import Logo from "./Logo";
 
 const Footer = () => (
-  <footer className="bg-white border-t border-gray-100 mt-auto">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+  <footer className="bg-white border-t border-slate-200/80 mt-auto">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
         {/* Brand */}
-        <div className="flex items-center gap-2.5">
-          <Logo size={22} variant="color" />
-          <span className="text-sm font-semibold text-gray-700 tracking-tight">Application Tracker</span>
+        <div>
+          <div className="flex items-center gap-2.5 mb-3">
+            <Logo size={24} variant="color" />
+            <span className="text-sm font-bold text-slate-800 tracking-tight">Application Tracker</span>
+          </div>
+          <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
+            The modern way to track job applications and connect talent with opportunity.
+          </p>
         </div>
 
-        {/* Links */}
-        <nav className="flex items-center gap-6">
-          <Link to="/contact" className="text-sm link-muted">
-            Contact
-          </Link>
-          <Link to="/about" className="text-sm link-muted">
-            About
-          </Link>
-        </nav>
+        {/* Platform */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Platform</h3>
+          <nav className="flex flex-col gap-2.5">
+            <Link to="/jobs" className="text-sm link-muted w-fit">Browse jobs</Link>
+            <Link to="/signup" className="text-sm link-muted w-fit">Sign up</Link>
+            <Link to="/register/company" className="text-sm link-muted w-fit">For companies</Link>
+          </nav>
+        </div>
 
-        {/* Copyright */}
-        <p className="text-xs text-gray-400">
-          © {new Date().getFullYear()} Application Tracker
+        {/* Company */}
+        <div>
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Company</h3>
+          <nav className="flex flex-col gap-2.5">
+            <Link to="/contact" className="text-sm link-muted w-fit">Contact</Link>
+            <Link to="/about" className="text-sm link-muted w-fit">About</Link>
+          </nav>
+        </div>
+      </div>
+
+      <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p className="text-xs text-slate-400">
+          © {new Date().getFullYear()} Application Tracker. All rights reserved.
+        </p>
+        <p className="text-xs text-slate-400">
+          Built for job seekers and recruiters
         </p>
       </div>
     </div>

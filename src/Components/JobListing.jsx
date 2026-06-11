@@ -12,14 +12,15 @@ const JobListing = ({ job }) => {
   const open = isJobOpen(job);
 
   return (
-    <article className="group surface-card-interactive flex flex-col">
+    <article className="group surface-card-interactive flex flex-col overflow-hidden">
+      <div className="h-1 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="p-5 flex-1">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
           {/* Company initial avatar */}
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center
-              justify-center text-brand-600 font-bold text-sm shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200/80 flex items-center
+              justify-center text-brand-600 font-bold text-sm shrink-0 shadow-inner-soft">
               {job.companyName?.charAt(0)?.toUpperCase() ?? <FaBuilding size={14} />}
             </div>
             <div className="min-w-0">
