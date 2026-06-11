@@ -32,6 +32,7 @@ import ViewApplicants from "./Pages/ViewApplicants";
 import ContactUs from "./Pages/ContactUs";
 import AboutUs from "./Pages/AboutUs";
 import ViewStatus from "./Pages/ViewStatus";
+import Notifications from "./Pages/Notifications";
 import ChangePassword from "./Pages/ChangePassword";
 import ForgotPassword from "./Pages/ForgotPassword";
 import ViewUserList from "./Pages/ViewUserList";
@@ -44,6 +45,7 @@ import AddCompany from "./Pages/AddCompany";
 import CompanyDashboard from "./Pages/CompanyDashboard";
 import UserDashboard from "./Pages/UserDashboard";
 import MyProfile from "./Pages/MyProfile";
+import Messages from "./Pages/Messages";
 
 const App = () => {
   const addJob    = (newJob) => axios.post("/api/jobs", newJob);
@@ -130,6 +132,8 @@ const App = () => {
         <Route path="home"       element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path="report"     element={<ProtectedRoute><ViewReport /></ProtectedRoute>} />
         <Route path="status"     element={<ProtectedRoute><ViewStatus /></ProtectedRoute>} />
+        <Route path="messages"   element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+        <Route path="notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
 
         <Route
           path="add-job"

@@ -22,7 +22,7 @@ const AddJob = () => {
   const [location,    setLocation]    = useState("");
   const [description, setDescription] = useState("");
   const [requirement, setRequirement] = useState("");
-  const [salary,      setSalary]      = useState("Negotiable");
+  const [salary,      setSalary]      = useState("");
   const [deadline,    setDeadline]    = useState("");
   const [postingFee, setPostingFee] = useState(null);
 
@@ -52,13 +52,21 @@ const AddJob = () => {
       toast.error("Application deadline must be a future date.");
       return;
     }
-    const jobData = { title, type, location, description, requirement, salary, deadline, companyId };
+    const jobData = {
+      title,
+      type,
+      location,
+      description,
+      requirement,
+      deadline,
+      companyId,
+      ...(salary.trim() ? { salary: salary.trim() } : {}),
+    };
     setPendingJob(jobData, postingFee);
     navigate("/pay");
   };
 
-  const jobTypes   = ["Full-Time", "Part-Time", "Remote", "Internship"];
-  const salaryOpts = ["Negotiable", "Under 10,000", "10,000 - 15,000", "15,000 - 20,000", "20,000 - 25,000", "Over 25,000"];
+  const jobTypes = ["Full-Time", "Part-Time", "Remote", "Internship"];
 
   return (
     <FormCard
@@ -83,10 +91,15 @@ const AddJob = () => {
               {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </Field>
-          <Field label="Salary range" htmlFor="salary">
-            <select id="salary" value={salary} onChange={(e) => setSalary(e.target.value)} className={inputCls()}>
-              {salaryOpts.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
+          <Field label="Salary" htmlFor="salary" hint="Optional — e.g. 15,000 - 20,000 ETB or Negotiable">
+            <input
+              id="salary"
+              type="text"
+              placeholder="Leave empty if not specified"
+              value={salary}
+              onChange={(e) => setSalary(e.target.value)}
+              className={inputCls()}
+            />
           </Field>
         </div>
 

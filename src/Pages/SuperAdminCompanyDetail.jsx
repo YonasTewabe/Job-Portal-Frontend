@@ -6,8 +6,9 @@ import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { toast } from "react-toastify";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Badge } from "../Components/ui";
-import { FaArrowLeft, FaUsers } from "react-icons/fa";
-import { isJobOpen } from "../utils/jobs";
+import { FaArrowLeft, FaUsers, FaComments } from "react-icons/fa";
+import { Btn } from "../Components/ui";
+import { isJobOpen, sortJobsByPostedDate } from "../utils/jobs";
 
 const SuperAdminCompanyDetail = () => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const SuperAdminCompanyDetail = () => {
         const companyData = companyRes.data;
         const jobsData = Array.isArray(jobsRes.data) ? jobsRes.data : [];
         setCompany(companyData);
-        setJobs(jobsData);
+        setJobs(sortJobsByPostedDate(jobsData));
 
         const counts = {};
         await Promise.all(
@@ -56,6 +57,8 @@ const SuperAdminCompanyDetail = () => {
   if (authUser?.role !== "superadmin") return <NotFoundPage />;
   if (loading) return <div className="py-24"><Spinner loading /></div>;
   if (!company) return <NotFoundPage />;
+
+  const sortedJobs = sortJobsByPostedDate(jobs);
 
   const headers = [
     { label: "Job",        key: "title" },
@@ -86,21 +89,29 @@ const SuperAdminCompanyDetail = () => {
             <p className="text-sm text-gray-600 mt-2 max-w-2xl">{company.description}</p>
           )}
         </div>
-        <Badge status={company.isActive ? "Active" : "Suspended"} />
+        <div className="flex items-center gap-3">
+          <Link
+            to={`/messages?companyId=${company.id}`}
+            className={Btn.secondary("gap-2 text-sm")}
+          >
+            <FaComments size={14} /> Message company
+          </Link>
+          <Badge status={company.isActive ? "Active" : "Suspended"} />
+        </div>
       </div>
 
       <Card className="p-0 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-900">Jobs</h2>
-          <span className="text-xs text-gray-400">{jobs.length} total</span>
+          <span className="text-xs text-gray-400">{sortedJobs.length} total</span>
         </div>
         <Table
           headers={headers}
-          empty={jobs.length === 0
+          empty={sortedJobs.length === 0
             ? <Empty message="No jobs posted for this company yet." icon="📝" />
             : null}
         >
-          {jobs.map((job, i) => (
+          {sortedJobs.map((job, i) => (
             <Tr key={job.id} striped={i % 2 !== 0}>
               <Td className="font-medium text-gray-900">{job.title}</Td>
               <Td>

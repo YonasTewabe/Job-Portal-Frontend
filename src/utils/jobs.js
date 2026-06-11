@@ -11,8 +11,19 @@ export const normalizeJob = (job) => {
   };
 };
 
+export const getJobPostedDate = (job) => job?.createdAt ?? job?.postedDate ?? null;
+
+export const sortJobsByPostedDate = (jobs, order = "desc") => {
+  const dir = order === "asc" ? 1 : -1;
+  return [...(jobs ?? [])].sort((a, b) => {
+    const aTime = new Date(getJobPostedDate(a) ?? 0).getTime();
+    const bTime = new Date(getJobPostedDate(b) ?? 0).getTime();
+    return dir * (aTime - bTime);
+  });
+};
+
 export const normalizeJobs = (jobs) =>
-  (Array.isArray(jobs) ? jobs : []).map(normalizeJob);
+  sortJobsByPostedDate(Array.isArray(jobs) ? jobs.map(normalizeJob) : []);
 
 export const isJobOpen = (job) => {
   if (job?.isOpen === false) return false;

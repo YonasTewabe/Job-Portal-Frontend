@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import {
   FaHome, FaBriefcase, FaUserPlus, FaList, FaUsers,
-  FaBuilding, FaTachometerAlt, FaBars, FaTimes,
+  FaBuilding, FaTachometerAlt, FaBars, FaTimes, FaComments,
 } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 import { MdOutlineAccountCircle } from "react-icons/md";
@@ -13,18 +13,21 @@ import { useCompany } from "../hooks/useCompany";
 import { APP_NAME } from "../constants/brand";
 import Logo from "./Logo";
 import NotificationBell from "./NotificationBell";
+import { useChat } from "../context/ChatContext";
 
 const menus = {
   user: [
     { icon: <FaHome />,      text: "Home",            link: "/home" },
     { icon: <FaBriefcase />, text: "Browse Jobs",      link: "/jobs" },
     { icon: <FaList />,      text: "My Applications",  link: "/status" },
+    { icon: <FaComments />,  text: "Messages",         link: "/messages" },
   ],
   company_admin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/company/dashboard" },
     { icon: <FaUserPlus />,      text: "Post a Job", link: "/add-job" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
     { icon: <FaList />,          text: "Payments",   link: "/company/payments" },
+    { icon: <FaComments />,      text: "Messages",   link: "/messages" },
   ],
   superadmin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/superadmin/dashboard" },
@@ -32,8 +35,8 @@ const menus = {
     { icon: <FaUsers />,         text: "Super Admins", link: "/superadmin/admins" },
     { icon: <FaUsers />,         text: "Job Seekers", link: "/superadmin/applicants" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
-    { icon: <FaList />,          text: "Job Pricing", link: "/superadmin/pricing" },
     { icon: <FaList />,          text: "Payments",    link: "/superadmin/payments" },
+    { icon: <FaComments />,      text: "Messages",    link: "/messages" },
   ],
 };
 
@@ -79,6 +82,7 @@ const Navbar = () => {
   const role = user?.role;
   const menuItems = menus[role] ?? [];
   const { isSuspended } = useCompany();
+  const { unreadCount: chatUnread } = useChat();
 
   const handleLogout = async () => {
     try { await axios.post("/api/auth/logout", { withCredentials: true }); }
@@ -125,6 +129,18 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
+          <Link
+            to="/messages"
+            className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all"
+            aria-label="Messages"
+          >
+            <FaComments size={18} />
+            {chatUnread > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-brand-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {chatUnread > 9 ? "9+" : chatUnread}
+              </span>
+            )}
+          </Link>
           <NotificationBell />
           <Link
             to={profilePath}

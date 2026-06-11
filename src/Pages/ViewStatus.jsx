@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaComments } from "react-icons/fa";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty } from "../Components/ui";
+import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
 
 const ViewStatus = () => {
   const [applications, setApplications] = useState([]);
@@ -36,6 +38,7 @@ const ViewStatus = () => {
     { label: "Job Title",  key: "title" },
     { label: "Applied On", key: "date" },
     { label: "Status",     key: "status" },
+    { label: "Chat",       key: "chat" },
   ];
 
   return (
@@ -71,13 +74,25 @@ const ViewStatus = () => {
                 <Badge status={app.status} />
                 {app.status === "Interview Scheduled" && app.interviewDate && (
                   <p className="text-xs text-gray-400 mt-1">
-                    {new Date(app.interviewDate).toLocaleString([], {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
+                    {app.interviewHasTime
+                      ? new Date(app.interviewDate).toLocaleString([], {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })
+                      : new Date(app.interviewDate).toLocaleDateString([], {
+                          dateStyle: "short",
+                        })}
                     {app.interviewLocation ? ` — ${app.interviewLocation}` : ""}
                   </p>
                 )}
+              </Td>
+              <Td>
+                <Link
+                  to={`/messages?applicationId=${app.id}`}
+                  className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
+                >
+                  <FaComments size={12} /> Message
+                </Link>
               </Td>
             </Tr>
           ))}

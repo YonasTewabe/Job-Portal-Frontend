@@ -17,6 +17,7 @@ const Job = ({ deleteJob }) => {
   const job = useLoaderData();
   const [applicantProfile, setApplicantProfile] = useState(null);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [applicationId, setApplicationId] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [togglingOpen, setTogglingOpen] = useState(false);
@@ -41,15 +42,17 @@ const Job = ({ deleteJob }) => {
           const { data: apps } = await axios.get(`/api/applications?applicantId=${profile.id}`);
           if (cancelled) return;
           const list = Array.isArray(apps) ? apps : [];
-          const applied = list.some(
+          const match = list.find(
             (app) => (app.job?.id ?? app.jobId) === job.id
           );
-          setAlreadyApplied(applied);
+          setAlreadyApplied(!!match);
+          setApplicationId(match?.id ?? null);
         }
       } catch {
         if (!cancelled) {
           setApplicantProfile(null);
           setAlreadyApplied(false);
+          setApplicationId(null);
         }
       } finally {
         if (!cancelled) setProfileLoading(false);
@@ -161,10 +164,12 @@ const Job = ({ deleteJob }) => {
                 border border-gray-100 px-3 py-1 rounded-full">
                 <FaMapMarkerAlt className="text-orange-400" size={10} />{job.location}
               </span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
-                border border-gray-100 px-3 py-1 rounded-full">
-                <FaDollarSign className="text-emerald-500" size={10} />{job.salary}
-              </span>
+              {job.salary && (
+                <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                  border border-gray-100 px-3 py-1 rounded-full">
+                  <FaDollarSign className="text-emerald-500" size={10} />{job.salary}
+                </span>
+              )}
               <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
                 border border-gray-100 px-3 py-1 rounded-full">
                 <FaClock className="text-brand-400" size={10} />Deadline: {job.deadline}
@@ -265,6 +270,14 @@ const Job = ({ deleteJob }) => {
                     <Link to="/status" className={Btn.ghost("w-full py-2.5 text-center block")}>
                       View application status
                     </Link>
+                    {applicationId && (
+                      <Link
+                        to={`/messages?applicationId=${applicationId}`}
+                        className={Btn.secondary("w-full py-2.5 text-center block")}
+                      >
+                        Message employer
+                      </Link>
+                    )}
                   </div>
                 ) : profileComplete ? (
                   <button

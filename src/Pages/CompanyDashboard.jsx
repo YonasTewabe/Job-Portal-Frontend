@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { Page, Card, Badge, Table, Tr, Td, Empty } from "../Components/ui";
 import { FaBriefcase, FaEnvelope, FaPlus } from "react-icons/fa";
 import PostJobLink from "../Components/PostJobLink";
+import { sortJobsByPostedDate } from "../utils/jobs";
 
 const StatCard = ({ icon, label, value, color = { bg: "bg-brand-50", text: "text-brand-600" } }) => (
   <Card className="flex items-center gap-4">
@@ -30,13 +31,15 @@ const CompanyDashboard = () => {
   useEffect(() => {
     if (authUser?.role !== "company_admin") return;
     axios.get("/api/companies/mine")
-      .then(({ data }) => { setCompany(data); setJobs(data.jobs ?? []); })
+      .then(({ data }) => { setCompany(data); setJobs(sortJobsByPostedDate(data.jobs ?? [])); })
       .catch(() => toast.error("Failed to load company data"))
       .finally(() => setLoading(false));
   }, [authUser]);
 
   if (authUser?.role !== "company_admin") return <NotFoundPage />;
   if (loading) return <div className="py-24"><Spinner loading /></div>;
+
+  const sortedJobs = sortJobsByPostedDate(jobs);
 
   const headers = [
     { label: "Title",    key: "title" },
@@ -68,7 +71,7 @@ const CompanyDashboard = () => {
         <StatCard
           icon={<FaBriefcase size={18} />}
           label="Jobs Posted"
-          value={jobs.length}
+          value={sortedJobs.length}
           color={{ bg: "bg-brand-50", text: "text-brand-600" }}
         />
         <Card className="flex items-center gap-4">
@@ -103,14 +106,14 @@ const CompanyDashboard = () => {
       {/* Jobs table */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-gray-700">Job Listings</h2>
-        <span className="text-xs text-gray-400">{jobs.length} total</span>
+        <span className="text-xs text-gray-400">{sortedJobs.length} total</span>
       </div>
       <Card className="p-0 overflow-hidden">
         <Table
           headers={headers}
-          empty={jobs.length === 0 ? <Empty message="No jobs posted yet." icon="📝" /> : null}
+          empty={sortedJobs.length === 0 ? <Empty message="No jobs posted yet." icon="📝" /> : null}
         >
-          {jobs.map((job, i) => (
+          {sortedJobs.map((job, i) => (
             <Tr key={job.id} striped={i % 2 !== 0}>
               <Td className="font-medium text-gray-900">{job.title}</Td>
               <Td>

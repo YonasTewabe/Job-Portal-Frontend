@@ -100,6 +100,11 @@ const PaymentHistory = () => {
             {payments.length > 0 && ` · Total ${formatMoney(totalAmount)}`}
           </p>
         </div>
+        {isSuperAdmin && (
+          <Link to="/superadmin/pricing" className={Btn.secondary("text-sm shrink-0")}>
+            Set Job posting price
+          </Link>
+        )}
       </div>
 
       <Card className="mb-6">

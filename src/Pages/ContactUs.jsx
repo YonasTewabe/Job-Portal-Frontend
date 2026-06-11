@@ -1,6 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
+import axios from "../axiosInterceptor";
+import { useAuth } from "../context/AuthContext";
 import { Page, Card, Field, inputCls, Btn } from "../Components/ui";
 
 const INFO = [
@@ -11,15 +13,55 @@ const INFO = [
 
 const ContactUs = () => {
   const form = useRef();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [displayEmail, setDisplayEmail] = useState("");
+
+  useEffect(() => {
+    if (!user) {
+      setDisplayEmail("");
+      return;
+    }
+    if (user.email) {
+      setDisplayEmail(user.email);
+      return;
+    }
+    axios.get("/api/users/me")
+      .then(({ data }) => setDisplayEmail(data.email ?? ""))
+      .catch(() => setDisplayEmail(""));
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const subject = String(formData.get("subject") ?? "").trim();
+    const message = String(formData.get("message") ?? "").trim();
+
+    if (!subject || !message) return;
+
+    const payload = { subject, message };
+
+    if (!user) {
+      payload.name = String(formData.get("Your_name") ?? "").trim();
+      payload.email = String(formData.get("email") ?? "").trim();
+      if (!payload.name || !payload.email) return;
+    }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    toast.info("Contact form is currently unavailable. Please email us directly.");
-    setLoading(false);
-    e.target.reset();
+    try {
+      await axios.post("/api/chat/contact-inquiries", payload);
+      toast.success(
+        user
+          ? "Your message was sent. You can view it under Messages."
+          : "Your message was sent. We'll get back to you as soon as we can."
+      );
+      e.target.reset();
+    } catch (err) {
+      toast.error(err.response?.data?.message ?? "Failed to send message");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,7 +72,6 @@ const ContactUs = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Contact info */}
         <Card>
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">Get in touch</h2>
           <ul className="space-y-5">
@@ -48,35 +89,64 @@ const ContactUs = () => {
           </ul>
         </Card>
 
-        {/* Form */}
         <Card>
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">Send a message</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Your message is sent as a one-way inquiry. Replies are not available in chat — use email or phone for urgent follow-up.
+          </p>
           <form ref={form} onSubmit={handleSubmit} className="space-y-1">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Full name" htmlFor="name">
-                <input
-                  id="name" name="Your_name" type="text" required placeholder="Jane Doe"
-                  className={inputCls()}
-                />
-              </Field>
-              <Field label="Email" htmlFor="email">
-                <input
-                  id="email" name="email" type="email" required placeholder="you@example.com"
-                  className={inputCls()}
-                />
-              </Field>
-            </div>
+            {user ? (
+              <div className="grid grid-cols-2 gap-3 mb-1">
+                <Field label="Full name">
+                  <p className="text-sm text-gray-800 font-medium py-2.5">{user.name}</p>
+                </Field>
+                <Field label="Email">
+                  <p className="text-sm text-gray-800 font-medium py-2.5">{displayEmail || "—"}</p>
+                </Field>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Full name" htmlFor="name">
+                  <input
+                    id="name"
+                    name="Your_name"
+                    type="text"
+                    required
+                    placeholder="Jane Doe"
+                    className={inputCls()}
+                  />
+                </Field>
+                <Field label="Email" htmlFor="email">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    className={inputCls()}
+                  />
+                </Field>
+              </div>
+            )}
 
             <Field label="Subject" htmlFor="subject">
               <input
-                id="subject" name="subject" type="text" required placeholder="How can we help?"
+                id="subject"
+                name="subject"
+                type="text"
+                required
+                placeholder="How can we help?"
                 className={inputCls()}
               />
             </Field>
 
             <Field label="Message" htmlFor="message">
               <textarea
-                id="message" name="message" rows={5} required placeholder="Your message…"
+                id="message"
+                name="message"
+                rows={5}
+                required
+                placeholder="Your message…"
                 className={inputCls() + " resize-none"}
               />
             </Field>

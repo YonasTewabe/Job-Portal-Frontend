@@ -7,7 +7,16 @@ import NotFoundPage from "./NotFoundPage";
 import { toast } from "react-toastify";
 import { Page, PageTitle, Card, Badge } from "../Components/ui";
 import { FaBuilding, FaBriefcase, FaUsers, FaCheckCircle, FaChevronRight } from "react-icons/fa";
-import { countOpenJobs } from "../utils/jobs";
+import { countOpenJobs, isJobOpen, sortJobsByPostedDate, getJobPostedDate } from "../utils/jobs";
+
+const RECENT_LIMIT = 5;
+
+const companyRecency = (company) => {
+  const deadlines = (company.jobs ?? [])
+    .map((j) => new Date(j.deadline).getTime())
+    .filter((t) => !Number.isNaN(t));
+  return deadlines.length ? Math.max(...deadlines) : 0;
+};
 
 const StatCard = ({ icon, label, value, color }) => (
   <Card className="flex items-center gap-4">
@@ -37,7 +46,7 @@ const SuperAdminDashboard = () => {
     ])
       .then(([companiesRes, jobsRes, usersRes]) => {
         setCompanies(Array.isArray(companiesRes.data) ? companiesRes.data : []);
-        setJobs(Array.isArray(jobsRes.data) ? jobsRes.data : []);
+        setJobs(sortJobsByPostedDate(Array.isArray(jobsRes.data) ? jobsRes.data : []));
         setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
       })
       .catch(() => toast.error("Failed to load dashboard data"))
@@ -50,8 +59,10 @@ const SuperAdminDashboard = () => {
   const activeCompanies = companies.filter((c) => c.isActive).length;
   const openJobsCount   = countOpenJobs(jobs);
   const recentCompanies = [...companies]
-    .sort((a, b) => (b.id ?? 0) - (a.id ?? 0))
-    .slice(0, 5);
+    .sort((a, b) => companyRecency(b) - companyRecency(a))
+    .slice(0, RECENT_LIMIT);
+
+  const recentJobs = sortJobsByPostedDate(jobs).slice(0, RECENT_LIMIT);
 
   return (
     <Page className="max-w-5xl">
@@ -101,24 +112,7 @@ const SuperAdminDashboard = () => {
             <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
-        <Link to="/superadmin/companies/new" className="group">
-          <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Add Company</p>
-              <p className="text-xs text-gray-500 mt-0.5">Register a new company manually</p>
-            </div>
-            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
-          </Card>
-        </Link>
-        <Link to="/superadmin/admins" className="group">
-          <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Super Admins</p>
-              <p className="text-xs text-gray-500 mt-0.5">View or add platform administrators</p>
-            </div>
-            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
-          </Card>
-        </Link>
+
         <Link to="/jobs" className="group">
           <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
             <div>
@@ -132,60 +126,86 @@ const SuperAdminDashboard = () => {
           <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
             <div>
               <p className="text-sm font-semibold text-gray-900">Payment History</p>
-              <p className="text-xs text-gray-500 mt-0.5">View job posting payments by company and date</p>
-            </div>
-            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
-          </Card>
-        </Link>
-        <Link to="/superadmin/pricing" className="group sm:col-span-2">
-          <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Job Posting Price</p>
-              <p className="text-xs text-gray-500 mt-0.5">Set the Chapa fee charged per job post</p>
+              <p className="text-xs text-gray-500 mt-0.5">View job posting payments</p>
             </div>
             <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
       </div>
 
-      {/* Recent companies */}
-      <Card>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-semibold text-gray-900">Recent Companies</h2>
-          <Link
-            to="/superadmin/companies"
-            className="text-xs link-brand"
-          >
-            View all →
-          </Link>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent companies */}
+        <Card>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-sm font-semibold text-gray-500">Recent Companies</h2>
+            <Link to="/superadmin/companies" className="text-xs link-brand">
+              View all →
+            </Link>
+          </div>
 
-        {recentCompanies.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">No companies registered yet.</p>
-        ) : (
-          <ul className="divide-y divide-gray-50">
-            {recentCompanies.map((company) => (
-              <li key={company.id} className="flex items-center justify-between py-3.5 gap-4">
-                <div className="min-w-0">
-                  <Link
-                    to={`/superadmin/companies/${company.id}`}
-                    className="text-sm font-semibold text-gray-900 truncate hover:text-brand-700 hover:underline block"
-                  >
-                    {company.name}
-                  </Link>
-                  <p className="text-xs text-gray-400 truncate">{company.contactEmail}</p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-xs text-gray-500">
-                    {countOpenJobs(company.jobs)} open · {company.jobs?.length ?? 0} total
-                  </span>
-                  <Badge status={company.isActive ? "Active" : "Suspended"} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+          {recentCompanies.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">No companies registered yet.</p>
+          ) : (
+            <ul className="divide-y divide-gray-50">
+              {recentCompanies.map((company) => (
+                <li key={company.id} className="flex items-center justify-between py-3.5 gap-4">
+                  <div className="min-w-0">
+                    <Link
+                      to={`/superadmin/companies/${company.id}`}
+                      className="text-sm font-semibold text-gray-900 truncate hover:text-brand-700 hover:underline block"
+                    >
+                      {company.name}
+                    </Link>
+                    <p className="text-xs text-gray-400 truncate">{company.contactEmail}</p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs text-gray-500">
+                      {countOpenJobs(company.jobs)} open · {company.jobs?.length ?? 0} total
+                    </span>
+                    <Badge status={company.isActive ? "Active" : "Suspended"} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        {/* Recent jobs */}
+        <Card>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-sm font-semibold text-gray-500">Recent Jobs</h2>
+            <Link to="/jobs" className="text-xs link-brand">
+              View all →
+            </Link>
+          </div>
+
+          {recentJobs.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">No jobs posted yet.</p>
+          ) : (
+            <ul className="divide-y divide-gray-50">
+              {recentJobs.map((job) => (
+                <li key={job.id} className="flex items-center justify-between py-3.5 gap-4">
+                  <div className="min-w-0">
+                    <Link
+                      to={`/job/${job.id}`}
+                      className="text-sm font-semibold text-gray-900 truncate hover:text-brand-700 hover:underline block"
+                    >
+                      {job.title}
+                    </Link>
+                    <p className="text-xs text-gray-400 truncate">
+                      {job.company?.name ?? "—"}
+                      {getJobPostedDate(job)
+                        ? ` · Posted ${new Date(getJobPostedDate(job)).toLocaleDateString()}`
+                        : ""}
+                    </p>
+                  </div>
+                  <Badge status={isJobOpen(job) ? "Active" : "Closed"} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      </div>
     </Page>
   );
 };

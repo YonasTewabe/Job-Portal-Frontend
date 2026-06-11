@@ -1,13 +1,13 @@
 import axios from "../axiosInterceptor";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Donut from "./ViewReport";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Badge, Btn, inputCls, Empty, Table, Tr, Td, Field, SectionTitle, InfoRow } from "../Components/ui";
-import { FaSortUp, FaSortDown, FaFilePdf, FaSync, FaTimes } from "react-icons/fa";
+import { FaSortUp, FaSortDown, FaFilePdf, FaSync, FaTimes, FaComments } from "react-icons/fa";
 import { calculateAge } from "../utils/profileSchema";
 
 const mergeApplication = (current, data) => ({
@@ -28,6 +28,22 @@ const formatDateRange = (start, end) => {
   return ` (${start}${end ? ` – ${end}` : " – Present"})`;
 };
 
+const getTodayDateString = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+const isInterviewInPast = (interviewDate, interviewTime) => {
+  const now = new Date();
+  if (!interviewTime) {
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const selected = new Date(`${interviewDate}T00:00:00`);
+    return selected < todayStart;
+  }
+  return new Date(`${interviewDate}T${interviewTime}`) < now;
+};
+
 const ApplicantActions = ({
   applicant,
   getInterviewFields,
@@ -40,6 +56,7 @@ const ApplicantActions = ({
   onRescheduleSave,
   onRescheduleCancel,
   actionLoading,
+  minInterviewDate,
 }) => {
   const busy = actionLoading === applicant.id;
 
@@ -75,12 +92,13 @@ const ApplicantActions = ({
             <input
               id="modal-interview-date"
               type="date"
+              min={minInterviewDate}
               value={fields.interviewDate}
               onChange={(e) => updateInterview(applicant.id, "interviewDate", e.target.value)}
               className={inputCls()}
             />
           </Field>
-          <Field label="Interview time" htmlFor="modal-interview-time">
+          <Field label="Interview time (optional)" htmlFor="modal-interview-time">
             <input
               id="modal-interview-time"
               type="time"
@@ -104,7 +122,7 @@ const ApplicantActions = ({
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); schedule(applicant); }}
-            disabled={busy || !fields.interviewDate || !fields.interviewTime || !fields.interviewLocation}
+            disabled={busy || !fields.interviewDate || !fields.interviewLocation}
             className={Btn.primary("flex-1 text-sm py-2 disabled:opacity-40")}
           >
             {busy ? "Updating…" : "Schedule interview"}
@@ -132,12 +150,13 @@ const ApplicantActions = ({
               <input
                 id="reschedule-date"
                 type="date"
+                min={minInterviewDate}
                 value={fields.interviewDate}
                 onChange={(e) => updateInterview(applicant.id, "interviewDate", e.target.value)}
                 className={inputCls()}
               />
             </Field>
-            <Field label="Time" htmlFor="reschedule-time">
+            <Field label="Time (optional)" htmlFor="reschedule-time">
               <input
                 id="reschedule-time"
                 type="time"
@@ -164,7 +183,7 @@ const ApplicantActions = ({
             <button
               type="button"
               onClick={() => onRescheduleSave(applicant)}
-              disabled={!fields.interviewDate || !fields.interviewTime || !fields.interviewLocation}
+              disabled={!fields.interviewDate || !fields.interviewLocation}
               className={Btn.primary("flex-1 text-sm py-2 disabled:opacity-40")}
             >
               Save changes
@@ -204,11 +223,12 @@ const ApplicantDetailModal = ({
   reschedule,
   getApplicantCv,
   actionLoading,
+  minInterviewDate,
 }) => {
   const [rescheduleMode, setRescheduleMode] = useState(false);
 
   const openReschedule = (app) => {
-    const parts = parseInterviewParts(app.interviewDate);
+    const parts = parseInterviewParts(app.interviewDate, app.interviewHasTime);
     updateInterview(app.id, "interviewDate", parts.date);
     updateInterview(app.id, "interviewTime", parts.time);
     updateInterview(app.id, "interviewLocation", app.interviewLocation ?? "");
@@ -315,10 +335,20 @@ const ApplicantDetailModal = ({
             {applicant.status === "Interview Scheduled" && !rescheduleMode && (
               <div>
                 <SectionTitle>Interview</SectionTitle>
-                <InfoRow label="When" value={formatInterviewWhen(applicant.interviewDate)} />
+                <InfoRow label="When" value={formatInterviewWhen(applicant.interviewDate, applicant.interviewHasTime)} />
                 <InfoRow label="Where" value={applicant.interviewLocation ?? "—"} />
               </div>
             )}
+
+            <div className="pt-2 border-t border-gray-100">
+              <SectionTitle>Communication</SectionTitle>
+              <Link
+                to={`/messages?applicationId=${applicant.id}`}
+                className={Btn.secondary("gap-2 text-sm inline-flex")}
+              >
+                <FaComments size={14} /> Message applicant
+              </Link>
+            </div>
 
             {canManage && (
               <div className="pt-2 border-t border-gray-100">
@@ -335,6 +365,7 @@ const ApplicantDetailModal = ({
                   onRescheduleSave={handleRescheduleSave}
                   onRescheduleCancel={() => setRescheduleMode(false)}
                   actionLoading={actionLoading}
+                  minInterviewDate={minInterviewDate}
                 />
               </div>
             )}
@@ -345,14 +376,14 @@ const ApplicantDetailModal = ({
   );
 };
 
-const parseInterviewParts = (iso) => {
+const parseInterviewParts = (iso, hasTime = false) => {
   if (!iso) return { date: "", time: "" };
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return { date: "", time: "" };
   const pad = (n) => String(n).padStart(2, "0");
   return {
     date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
-    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    time: hasTime ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : "",
   };
 };
 
@@ -406,7 +437,7 @@ const ViewApplicants = () => {
 
   const getInterviewFields = (applicant) => {
     const idata = interviewData[applicant.id] ?? {};
-    const parts = parseInterviewParts(applicant.interviewDate);
+    const parts = parseInterviewParts(applicant.interviewDate, applicant.interviewHasTime);
     return {
       interviewDate: idata.interviewDate ?? parts.date,
       interviewTime: idata.interviewTime ?? parts.time,
@@ -414,24 +445,41 @@ const ViewApplicants = () => {
     };
   };
 
+  const buildInterviewPatch = (interviewDate, interviewTime, interviewLocation) => {
+    const hasTime = !!interviewTime;
+    return {
+      interviewDate: hasTime
+        ? new Date(`${interviewDate}T${interviewTime}`).toISOString()
+        : interviewDate,
+      interviewHasTime: hasTime,
+      interviewLocation,
+    };
+  };
+
   const schedule = (a) => {
     const { interviewDate, interviewTime, interviewLocation } = getInterviewFields(a);
-    if (!interviewDate || !interviewTime || !interviewLocation) return;
-    const interviewDateTime = new Date(`${interviewDate}T${interviewTime}`).toISOString();
+    if (!interviewDate || !interviewLocation) return;
+    if (isInterviewInPast(interviewDate, interviewTime)) {
+      toast.error("Interview must be scheduled for today or a future date");
+      return;
+    }
     patchStatus(
       a,
-      { status: "Interview Scheduled", interviewDate: interviewDateTime, interviewLocation },
+      { status: "Interview Scheduled", ...buildInterviewPatch(interviewDate, interviewTime, interviewLocation) },
       "Interview scheduled"
     );
   };
 
   const reschedule = async (a) => {
     const { interviewDate, interviewTime, interviewLocation } = getInterviewFields(a);
-    if (!interviewDate || !interviewTime || !interviewLocation) return;
-    const interviewDateTime = new Date(`${interviewDate}T${interviewTime}`).toISOString();
+    if (!interviewDate || !interviewLocation) return;
+    if (isInterviewInPast(interviewDate, interviewTime)) {
+      toast.error("Interview must be scheduled for today or a future date");
+      return;
+    }
     await patchStatus(
       a,
-      { interviewDate: interviewDateTime, interviewLocation },
+      buildInterviewPatch(interviewDate, interviewTime, interviewLocation),
       "Interview rescheduled"
     );
   };
@@ -467,10 +515,11 @@ const ViewApplicants = () => {
 
   const formatAppliedDate = (app) => formatDate(getAppliedDate(app));
 
-  const formatInterviewWhen = (dateStr) => {
+  const formatInterviewWhen = (dateStr, hasTime = true) => {
     if (!dateStr) return "—";
     const d = new Date(dateStr);
     if (Number.isNaN(d.getTime())) return dateStr;
+    if (!hasTime) return d.toLocaleDateString();
     return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   };
 
@@ -596,6 +645,7 @@ const ViewApplicants = () => {
           reschedule={reschedule}
           getApplicantCv={getApplicantCv}
           actionLoading={actionLoading}
+          minInterviewDate={getTodayDateString()}
         />
       )}
     </Page>

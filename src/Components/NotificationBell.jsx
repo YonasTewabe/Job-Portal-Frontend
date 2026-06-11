@@ -112,18 +112,14 @@ const NotificationBell = () => {
             )}
           </div>
 
-          {notifications.length > 0 && hubPath && (
+          {hubPath && (
             <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/50">
               <button
                 type="button"
                 onClick={() => { setOpen(false); navigate(hubPath); }}
                 className="text-xs font-medium link-brand"
               >
-                {user?.role === "user"
-                  ? "View applications"
-                  : user?.role === "company_admin"
-                    ? "Company dashboard"
-                    : "Go to dashboard"}
+                All notifications
               </button>
             </div>
           )}

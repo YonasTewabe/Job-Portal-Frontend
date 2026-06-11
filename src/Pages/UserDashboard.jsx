@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
-import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty } from "../Components/ui";
-import { FaBriefcase, FaCheckCircle, FaClock } from "react-icons/fa";
+import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
+import { FaBriefcase, FaCheckCircle, FaClock, FaComments } from "react-icons/fa";
 
 const StatCard = ({ icon, label, value, color }) => (
   <Card className="flex items-center gap-4">
@@ -51,6 +51,7 @@ const UserDashboard = () => {
     { label: "Applied",   key: "applied" },
     { label: "Status",    key: "status" },
     { label: "Interview", key: "interview" },
+    { label: "Chat",      key: "chat" },
   ];
 
   return (
@@ -61,12 +62,14 @@ const UserDashboard = () => {
           <PageTitle>Welcome back, {authUser?.name || "there"} 👋</PageTitle>
           <p className="text-sm text-gray-500 mt-1">Here's a summary of your job search activity.</p>
         </div>
-        <Link
-          to="/jobs"
-          className="btn-primary px-4 py-2.5"
-        >
-          <FaBriefcase size={13} /> Browse Jobs
-        </Link>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link to="/messages" className={Btn.secondary("gap-2 px-4 py-2.5 text-sm")}>
+            <FaComments size={13} /> Messages
+          </Link>
+          <Link to="/jobs" className="btn-primary px-4 py-2.5">
+            <FaBriefcase size={13} /> Browse Jobs
+          </Link>
+        </div>
       </div>
 
       {/* Stat cards */}
@@ -115,8 +118,19 @@ const UserDashboard = () => {
               <Td><Badge status={app.status} /></Td>
               <Td className="text-xs text-gray-400">
                 {app.status === "Interview Scheduled" && app.interviewDate
-                  ? `${new Date(app.interviewDate).toLocaleDateString()} — ${app.interviewLocation ?? ""}`
+                  ? `${app.interviewHasTime
+                      ? new Date(app.interviewDate).toLocaleString([], { dateStyle: "short", timeStyle: "short" })
+                      : new Date(app.interviewDate).toLocaleDateString([], { dateStyle: "short" })
+                    } — ${app.interviewLocation ?? ""}`
                   : "—"}
+              </Td>
+              <Td>
+                <Link
+                  to={`/messages?applicationId=${app.id}`}
+                  className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
+                >
+                  <FaComments size={12} /> Message
+                </Link>
               </Td>
             </Tr>
           ))}

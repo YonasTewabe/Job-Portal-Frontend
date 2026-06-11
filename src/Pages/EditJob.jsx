@@ -14,7 +14,7 @@ const EditJob = ({ updateJobSubmit }) => {
   const [location,    setLocation]    = useState(job.location    || "");
   const [description, setDescription] = useState(job.description || "");
   const [requirement, setRequirement] = useState(job.requirement || "");
-  const [salary,      setSalary]      = useState(job.salary      || "Negotiable");
+  const [salary,      setSalary]      = useState(job.salary      || "");
   const [deadline,    setDeadline]    = useState(formatDeadlineForInput(job.deadline));
   const [loading,     setLoading]     = useState(false);
 
@@ -34,16 +34,24 @@ const EditJob = ({ updateJobSubmit }) => {
     }
     setLoading(true);
     try {
-      await axios.patch(`/api/jobs/${id}`, { title, type, location, description, requirement, salary, deadline });
-      if (updateJobSubmit) updateJobSubmit({ id, title, type, location, description, requirement, salary, deadline });
+      const payload = {
+        title,
+        type,
+        location,
+        description,
+        requirement,
+        deadline,
+        salary: salary.trim() || null,
+      };
+      await axios.patch(`/api/jobs/${id}`, payload);
+      if (updateJobSubmit) updateJobSubmit({ id, ...payload });
       toast.success("Job updated successfully");
       navigate(`/job/${id}`);
     } catch { toast.error("Failed to update job. Please try again."); }
     finally { setLoading(false); }
   };
 
-  const jobTypes   = ["Full-Time", "Part-Time", "Remote", "Internship"];
-  const salaryOpts = ["Negotiable", "Under 10,000", "10,000 - 15,000", "15,000 - 20,000", "20,000 - 25,000", "Over 25,000"];
+  const jobTypes = ["Full-Time", "Part-Time", "Remote", "Internship"];
 
   return (
     <FormCard title="Edit Job" subtitle="Update the details for this listing.">
@@ -61,10 +69,15 @@ const EditJob = ({ updateJobSubmit }) => {
               {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </Field>
-          <Field label="Salary range" htmlFor="salary">
-            <select id="salary" value={salary} onChange={(e) => setSalary(e.target.value)} className={inputCls()}>
-              {salaryOpts.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
+          <Field label="Salary" htmlFor="salary" hint="Optional — leave empty if not specified">
+            <input
+              id="salary"
+              type="text"
+              placeholder="e.g. 15,000 - 20,000 ETB"
+              value={salary}
+              onChange={(e) => setSalary(e.target.value)}
+              className={inputCls()}
+            />
           </Field>
         </div>
 

@@ -5,7 +5,7 @@ import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PostJobLink from "./PostJobLink";
-import { normalizeJobs, isJobOpen } from "../utils/jobs";
+import { normalizeJobs, isJobOpen, getJobPostedDate } from "../utils/jobs";
 import { FaSearch, FaPlus } from "react-icons/fa";
 
 const JobListings = ({ isHome = false }) => {
@@ -13,8 +13,8 @@ const JobListings = ({ isHome = false }) => {
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState(null);
   const [searchTerm,   setSearchTerm]   = useState("");
-  const [sortOrder,    setSortOrder]    = useState(isHome ? "desc" : "asc");
-  const [sortCriteria, setSortCriteria] = useState("");
+  const [sortOrder,    setSortOrder]    = useState("desc");
+  const [sortCriteria, setSortCriteria] = useState("postedDate");
 
   const { user: authUser } = useAuth();
   const role      = authUser?.role;
@@ -31,16 +31,19 @@ const JobListings = ({ isHome = false }) => {
   if (loading) return <div className="py-24"><Spinner loading /></div>;
   if (error)   return <p className="text-center py-24 text-red-500 text-sm">Failed to load jobs.</p>;
 
-  const visibleJobs = !authUser ? jobs.filter(isJobOpen) : jobs;
+  const hideClosedJobs = !authUser || role === "user";
+  const visibleJobs = hideClosedJobs ? jobs.filter(isJobOpen) : jobs;
 
   const filtered = visibleJobs.filter((job) =>
     [job.title, job.requirement, job.companyName, job.description]
       .some((f) => f?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const sorted = sortCriteria === "" ? filtered : [...filtered].sort((a, b) => {
+  const sorted = [...filtered].sort((a, b) => {
     const dir = sortOrder === "asc" ? 1 : -1;
     switch (sortCriteria) {
+      case "postedDate":
+        return dir * (new Date(getJobPostedDate(a) ?? 0) - new Date(getJobPostedDate(b) ?? 0));
       case "deadline":    return dir * (new Date(a.deadline) - new Date(b.deadline));
       case "type":        return dir * a.type.localeCompare(b.type);
       case "title":       return dir * a.title.localeCompare(b.title);
@@ -102,7 +105,7 @@ const JobListings = ({ isHome = false }) => {
                   shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500
                   hover:border-gray-300 transition-all appearance-none"
               >
-                <option value="">Sort by…</option>
+                <option value="postedDate">Posted Date</option>
                 <option value="title">Title</option>
                 <option value="companyName">Company</option>
                 <option value="deadline">Deadline</option>
@@ -131,7 +134,9 @@ const JobListings = ({ isHome = false }) => {
           <div className="py-24 text-center">
             <p className="text-4xl mb-4">🔍</p>
             <p className="text-sm text-gray-500 font-medium">
-              {!authUser ? "No open positions right now." : "No jobs match your search."}
+              {hideClosedJobs && display.length === 0 && !searchTerm
+                ? "No open positions right now."
+                : "No jobs match your search."}
             </p>
           </div>
         )}

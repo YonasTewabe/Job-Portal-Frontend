@@ -1,5 +1,3 @@
-import { getDefaultRoute } from "./routes";
-
 /** Normalize stored paths and resolve fallbacks for older notifications. */
 export const resolveNotificationLink = (notification, role) => {
   let path = notification?.linkPath ?? null;
@@ -27,7 +25,4 @@ export const resolveNotificationLink = (notification, role) => {
   }
 };
 
-export const getNotificationHubPath = (role) => {
-  if (role === "user") return "/status";
-  return getDefaultRoute(role);
-};
+export const getNotificationHubPath = () => "/notifications";
