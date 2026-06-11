@@ -81,7 +81,7 @@ const Login = () => {
         </Field>
 
         <div className="flex justify-end mb-2">
-          <Link to="/forgotpassword" className="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">
+          <Link to="/forgotpassword" className="text-xs text-brand-700 hover:text-brand-800 font-medium hover:underline">
             Forgot password?
           </Link>
         </div>
@@ -94,7 +94,7 @@ const Login = () => {
       <div className="mt-6 pt-6 border-t border-gray-100 text-center">
         <p className="text-sm text-gray-500">
           No account?{" "}
-          <Link to="/signup" className="text-brand-600 font-semibold hover:underline">
+          <Link to="/signup" className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
             Create one
           </Link>
         </p>

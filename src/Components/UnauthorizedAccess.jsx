@@ -24,7 +24,7 @@ const UnauthorizedAccess = () => {
         </button>
         <Link
           to="/"
-          className="bg-brand-600 hover:bg-brand-700 text-white font-semibold
+          className="btn-primary bg-brand-600 hover:bg-brand-700 text-white font-semibold
             px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm"
         >
           Home

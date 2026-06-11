@@ -5,6 +5,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Brand palette (CSS variables — always available, even if Tailwind JIT misses a class) */
+:root {
+  --brand-50:  #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --brand-800: #1e40af;
+  --brand-900: #1e3a8a;
+
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6b7280;
+  --surface-page:   #f8fafc;
+  --surface-card:   #ffffff;
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
@@ -15,12 +35,56 @@
   body {
     @apply bg-slate-50 text-gray-900;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    color: var(--text-primary);
   }
 
-  /* Consistent focus ring — use raw value since brand-500 (#6366f1) isn't
-     available as a Tailwind utility inside @layer base at parse time */
   :focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #6366f1;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--brand-500);
+  }
+}
+
+@layer components {
+  /* Primary action button — explicit colors guarantee contrast */
+  .btn-primary {
+    background-color: var(--brand-600);
+    color: #ffffff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--brand-700);
+    color: #ffffff;
+  }
+
+  /* Outline brand button */
+  .btn-outline-brand {
+    background-color: var(--surface-card);
+    color: var(--brand-700);
+    border: 2px solid var(--brand-600);
+  }
+  .btn-outline-brand:hover {
+    background-color: var(--brand-600);
+    color: #ffffff;
+  }
+
+  /* Sidebar / nav active state — dark text on tinted background */
+  .nav-item-active {
+    background-color: var(--brand-100);
+    color: var(--brand-800);
+    font-weight: 600;
+  }
+  .nav-item-active:hover {
+    background-color: var(--brand-200);
+    color: var(--brand-900);
+  }
+
+  /* Hero section surface */
+  .hero-surface {
+    background: linear-gradient(
+      135deg,
+      var(--brand-50) 0%,
+      var(--brand-100) 50%,
+      var(--surface-page) 100%
+    );
+    border-bottom: 1px solid var(--brand-200);
   }
 }

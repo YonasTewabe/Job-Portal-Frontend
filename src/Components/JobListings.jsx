@@ -67,7 +67,7 @@ const JobListings = ({ isHome = false }) => {
           {!isHome && role === "company_admin" && (
             <Link
               to="/add-job"
-              className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
+              className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
                 font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
             >
               <FaPlus size={11} /> Post a Job
@@ -130,7 +130,7 @@ const JobListings = ({ isHome = false }) => {
         ) : (
           <div className="py-24 text-center">
             <p className="text-4xl mb-4">🔍</p>
-            <p className="text-sm text-gray-400 font-medium">No jobs match your search.</p>
+            <p className="text-sm text-gray-500 font-medium">No jobs match your search.</p>
           </div>
         )}
       </div>

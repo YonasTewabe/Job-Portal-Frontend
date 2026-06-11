@@ -47,8 +47,8 @@ const NavItem = ({ icon, text, link, onClick }) => (
     className={({ isActive }) =>
       `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
        ${isActive
-         ? "bg-brand-600 text-white shadow-sm"
-         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`
+         ? "nav-item-active shadow-sm"
+         : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`
     }
   >
     <span className="text-base opacity-80">{icon}</span>

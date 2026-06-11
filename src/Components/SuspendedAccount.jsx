@@ -15,7 +15,7 @@ const SuspendedAccount = () => (
     </p>
     <Link
       to="/contact"
-      className="bg-brand-600 hover:bg-brand-700 text-white font-semibold
+      className="btn-primary bg-brand-600 hover:bg-brand-700 text-white font-semibold
         px-6 py-2.5 rounded-xl text-sm transition-all shadow-sm"
     >
       Contact Support

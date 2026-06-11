@@ -57,7 +57,7 @@ const CompanyDashboard = () => {
         </div>
         <Link
           to="/add-job"
-          className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
+          className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
             font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
         >
           <FaPlus size={11} /> Post a Job

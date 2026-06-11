@@ -29,11 +29,11 @@ const base =
   "disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]";
 
 export const Btn = {
-  primary:   (cls = "") => `${base} bg-brand-600 text-white hover:bg-brand-700 shadow-sm focus:ring-brand-500 ${cls}`,
-  secondary: (cls = "") => `${base} bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm focus:ring-gray-400 ${cls}`,
+  primary:   (cls = "") => `${base} btn-primary bg-brand-600 text-white hover:bg-brand-700 shadow-sm focus:ring-brand-500 ${cls}`,
+  secondary: (cls = "") => `${base} bg-white text-gray-800 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 shadow-sm focus:ring-gray-400 ${cls}`,
   danger:    (cls = "") => `${base} bg-red-600 text-white hover:bg-red-700 shadow-sm focus:ring-red-500 ${cls}`,
   success:   (cls = "") => `${base} bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm focus:ring-emerald-500 ${cls}`,
-  ghost:     (cls = "") => `${base} text-brand-600 hover:bg-brand-50 focus:ring-brand-400 ${cls}`,
+  ghost:     (cls = "") => `${base} text-brand-700 hover:bg-brand-50 hover:text-brand-800 focus:ring-brand-400 ${cls}`,
   warning:   (cls = "") => `${base} bg-amber-500 text-white hover:bg-amber-600 shadow-sm focus:ring-amber-400 ${cls}`,
   full:      (variant, cls = "") => Btn[variant](`w-full ${cls}`),
 };
@@ -126,7 +126,7 @@ export const Td = ({ children, className = "" }) => (
 export const Empty = ({ message = "No data found.", icon = "📭" }) => (
   <div className="py-20 text-center">
     <p className="text-3xl mb-3">{icon}</p>
-    <p className="text-sm text-gray-400">{message}</p>
+    <p className="text-sm text-gray-500 font-medium">{message}</p>
   </div>
 );
 

@@ -106,7 +106,7 @@ const SignUp = () => {
       <div className="mt-6 pt-6 border-t border-gray-100 text-center">
         <p className="text-sm text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" className="text-brand-600 font-semibold hover:underline">Sign in</Link>
+          <Link to="/login" className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">Sign in</Link>
         </p>
       </div>
     </AuthCard>

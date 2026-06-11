@@ -71,7 +71,7 @@ const JobListing = ({ job }) => {
       <div className="px-5 pb-5">
         <Link
           to={`/job/${job.id}`}
-          className="block w-full text-center bg-brand-600 hover:bg-brand-700 text-white
+          className="btn-primary block w-full text-center bg-brand-600 hover:bg-brand-700 text-white
             text-xs font-semibold py-2.5 rounded-xl transition-all duration-150
             shadow-sm hover:shadow group-hover:shadow-md"
         >
