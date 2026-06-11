@@ -7,6 +7,7 @@ import NotFoundPage from "./NotFoundPage";
 import { toast } from "react-toastify";
 import { Page, PageTitle, Card, Badge } from "../Components/ui";
 import { FaBuilding, FaBriefcase, FaUsers, FaCheckCircle, FaChevronRight } from "react-icons/fa";
+import { countOpenJobs } from "../utils/jobs";
 
 const StatCard = ({ icon, label, value, color }) => (
   <Card className="flex items-center gap-4">
@@ -47,6 +48,7 @@ const SuperAdminDashboard = () => {
   if (loading) return <div className="py-24"><Spinner loading /></div>;
 
   const activeCompanies = companies.filter((c) => c.isActive).length;
+  const openJobsCount   = countOpenJobs(jobs);
   const recentCompanies = [...companies]
     .sort((a, b) => (b.id ?? 0) - (a.id ?? 0))
     .slice(0, 5);
@@ -77,7 +79,7 @@ const SuperAdminDashboard = () => {
         <StatCard
           icon={<FaBriefcase size={18} />}
           label="Open Jobs"
-          value={jobs.length}
+          value={openJobsCount}
           color={{ bg: "bg-sky-50", text: "text-sky-600" }}
         />
         <StatCard
@@ -138,11 +140,18 @@ const SuperAdminDashboard = () => {
             {recentCompanies.map((company) => (
               <li key={company.id} className="flex items-center justify-between py-3.5 gap-4">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{company.name}</p>
+                  <Link
+                    to={`/superadmin/companies/${company.id}`}
+                    className="text-sm font-semibold text-gray-900 truncate hover:text-brand-700 hover:underline block"
+                  >
+                    {company.name}
+                  </Link>
                   <p className="text-xs text-gray-400 truncate">{company.contactEmail}</p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-xs text-gray-500">{company.jobs?.length ?? 0} jobs</span>
+                  <span className="text-xs text-gray-500">
+                    {countOpenJobs(company.jobs)} open · {company.jobs?.length ?? 0} total
+                  </span>
                   <Badge status={company.isActive ? "Active" : "Suspended"} />
                 </div>
               </li>

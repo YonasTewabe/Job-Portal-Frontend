@@ -12,7 +12,6 @@ import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 const AddJob = ({ addJobSubmit }) => {
   const { user: authUser } = useAuth();
   const myRole    = authUser?.role;
-  const companyId = authUser?.companyId;
   const navigate  = useNavigate();
 
   const [title,       setTitle]       = useState("");
@@ -24,7 +23,8 @@ const AddJob = ({ addJobSubmit }) => {
   const [deadline,    setDeadline]    = useState("");
   const [loading,     setLoading]     = useState(false);
 
-  const { isSuspended, loading: companyLoading } = useCompany();
+  const { company, isSuspended, loading: companyLoading } = useCompany();
+  const companyId = authUser?.companyId ?? company?.id;
 
   if (myRole !== "company_admin") return <NotFoundPage />;
   if (companyLoading) return <div className="py-24"><Spinner loading /></div>;
@@ -32,10 +32,15 @@ const AddJob = ({ addJobSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!companyId) {
+      toast.error("Company not found. Please log in again.");
+      return;
+    }
     setLoading(true);
     try {
-      await axios.post("/api/jobs", { title, type, location, description, requirement, salary, deadline, companyId });
-      if (addJobSubmit) addJobSubmit();
+      const jobData = { title, type, location, description, requirement, salary, deadline, companyId };
+      if (addJobSubmit) await addJobSubmit(jobData);
+      else await axios.post("/api/jobs", jobData);
       toast.success("Job posted successfully");
       navigate("/company/dashboard");
     } catch { toast.error("Failed to post job. Please try again."); }

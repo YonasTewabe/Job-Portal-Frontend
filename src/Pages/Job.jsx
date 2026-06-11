@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import { useAuth } from "../context/AuthContext";
 import { Card, Badge, Btn, Page } from "../Components/ui";
 
@@ -45,8 +44,6 @@ const Job = ({ deleteJob }) => {
       setSubmitting(false);
     }
   };
-
-  const handleViewApplicants = () => Cookies.set("jobId", job.id);
 
   const onDelete = (jobId) => {
     Swal.fire({
@@ -173,7 +170,7 @@ const Job = ({ deleteJob }) => {
           {role === "company_admin" && (
             <Card className="space-y-3">
               <Link to={`/edit-job/${job.id}`} className={Btn.full("primary")}>Edit Job</Link>
-              <Link to={`/applicants/${job.id}`} onClick={handleViewApplicants} className={Btn.full("success")}>
+              <Link to={`/applicants/${job.id}`} className={Btn.full("success")}>
                 View Applicants
               </Link>
               <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
@@ -181,7 +178,10 @@ const Job = ({ deleteJob }) => {
           )}
 
           {role === "superadmin" && (
-            <Card>
+            <Card className="space-y-3">
+              <Link to={`/applicants/${job.id}`} className={Btn.full("success")}>
+                View Applicants
+              </Link>
               <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
             </Card>
           )}

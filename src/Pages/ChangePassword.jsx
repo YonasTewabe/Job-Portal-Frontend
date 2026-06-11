@@ -60,7 +60,7 @@ const ChangePassword = () => {
     try {
       await axios.patch(`/api/users/${id}`, { currentPassword, password: newPassword });
       toast.success("Password changed successfully");
-      navigate(`/account/${id}`);
+      navigate("/profile");
     } catch (error) {
       const msg = error.response?.data?.message ?? "Failed to change password";
       toast.error(msg);

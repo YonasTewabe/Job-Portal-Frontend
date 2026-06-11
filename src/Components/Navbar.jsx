@@ -102,7 +102,7 @@ const Navbar = () => {
 
   if (!user) return null;
 
-  const profilePath = user.userId ? `/account/${user.userId}` : "/";
+  const profilePath = "/profile";
   const dashboardPath = getDefaultRoute(role);
 
   return (
@@ -187,7 +187,12 @@ const Navbar = () => {
 
         {/* User pill */}
         <div className="px-4 pt-4 pb-2">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
+          <Link
+            to={profilePath}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100
+              hover:bg-gray-100 transition-colors"
+          >
             <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
               <MdOutlineAccountCircle size={20} className="text-brand-600" />
             </div>
@@ -195,7 +200,7 @@ const Navbar = () => {
               <p className="text-sm font-semibold text-gray-900 truncate">{user.name || "Account"}</p>
               <p className="text-xs text-gray-400 capitalize">{role?.replace("_", " ")}</p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Nav items */}

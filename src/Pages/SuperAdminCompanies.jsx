@@ -7,6 +7,7 @@ import NotFoundPage from "./NotFoundPage";
 import { toast } from "react-toastify";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn, Badge } from "../Components/ui";
 import { FaPlus } from "react-icons/fa";
+import { countOpenJobs } from "../utils/jobs";
 
 const SuperAdminCompanies = () => {
   const { user: authUser } = useAuth();
@@ -47,6 +48,7 @@ const SuperAdminCompanies = () => {
     { label: "Admin",    key: "admin" },
     { label: "Email",    key: "email" },
     { label: "Jobs",     key: "jobs" },
+    { label: "View",     key: "view" },
     { label: "Status",   key: "status" },
     { label: "Actions",  key: "actions" },
   ];
@@ -74,7 +76,12 @@ const SuperAdminCompanies = () => {
             <Tr key={company.id} striped={i % 2 !== 0}>
               <Td>
                 <div>
-                  <p className="font-semibold text-gray-900">{company.name}</p>
+                  <Link
+                    to={`/superadmin/companies/${company.id}`}
+                    className="font-semibold text-gray-900 hover:text-brand-700 hover:underline"
+                  >
+                    {company.name}
+                  </Link>
                   {company.description && (
                     <p className="text-xs text-gray-400 mt-0.5 line-clamp-1 max-w-xs">{company.description}</p>
                   )}
@@ -83,7 +90,20 @@ const SuperAdminCompanies = () => {
               <Td className="text-gray-600">{company.admin?.name ?? "—"}</Td>
               <Td className="text-gray-400 text-xs">{company.contactEmail}</Td>
               <Td>
-                <span className="text-sm font-semibold text-gray-700">{company.jobs?.length ?? 0}</span>
+                <span className="text-sm font-semibold text-gray-700">
+                  {countOpenJobs(company.jobs)} open
+                </span>
+                <span className="text-xs text-gray-400 ml-1">
+                  / {company.jobs?.length ?? 0} total
+                </span>
+              </Td>
+              <Td>
+                <Link
+                  to={`/superadmin/companies/${company.id}`}
+                  className="text-xs text-brand-600 hover:text-brand-700 font-semibold hover:underline"
+                >
+                  View jobs →
+                </Link>
               </Td>
               <Td>
                 <Badge status={company.isActive ? "Active" : "Suspended"} />

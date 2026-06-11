@@ -32,6 +32,11 @@ export const writeSession = (data) => {
   localStorage.setItem("companyId", data.companyId ?? "");
 };
 
+export const patchSession = (fields) => {
+  if (fields.name != null)      localStorage.setItem("name", fields.name);
+  if (fields.companyId != null) localStorage.setItem("companyId", fields.companyId ?? "");
+};
+
 export const clearSession = () => {
   Cookies.remove("jwt");
   Cookies.remove("userId");

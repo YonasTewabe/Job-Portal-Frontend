@@ -7,10 +7,10 @@ import Spinner from "../Components/Spinner";
 const LABELS = ["Under Consideration", "Interview Scheduled", "Pending", "Rejected"];
 const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
 
-const Donut = () => {
+const Donut = ({ jobId: jobIdProp }) => {
   const [series,  setSeries]  = useState(null);
   const [loading, setLoading] = useState(true);
-  const jobId = Cookies.get("jobId");
+  const jobId = jobIdProp ?? Cookies.get("jobId");
 
   const [options] = useState({
     labels: LABELS,
@@ -22,6 +22,11 @@ const Donut = () => {
   });
 
   useEffect(() => {
+    if (!jobId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     axios.get(`/api/applications?jobId=${jobId}`)
       .then((r) => {
         const data = Array.isArray(r.data) ? r.data : [];
@@ -34,8 +39,7 @@ const Donut = () => {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [jobId]);
 
   if (loading) return <div className="py-8"><Spinner loading /></div>;
   if (!series || series.every((n) => n === 0))

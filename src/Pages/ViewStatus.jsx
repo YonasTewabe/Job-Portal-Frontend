@@ -13,10 +13,19 @@ const ViewStatus = () => {
   const userId = authUser?.userId;
 
   useEffect(() => {
-    axios.get(`/api/applications?applicantId=${userId}`)
-      .then((r) => setApplications(Array.isArray(r.data) ? r.data : []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const load = async () => {
+      try {
+        const { data: applicant } = await axios.get("/api/applicants/me");
+        const { data: apps } = await axios.get(`/api/applications?applicantId=${applicant.id}`);
+        setApplications(Array.isArray(apps) ? apps : []);
+      } catch {
+        setApplications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (userId) load();
+    else setLoading(false);
   }, [userId]);
 
   if (loading) return <div className="py-24"><Spinner loading /></div>;
@@ -47,13 +56,27 @@ const ViewStatus = () => {
         >
           {applications.map((app, i) => (
             <Tr key={app.id ?? i} striped={i % 2 !== 0}>
-              <Td className="font-medium text-gray-700">{app.companyname}</Td>
-              <Td className="font-semibold text-gray-900">{app.jobtitle}</Td>
-              <Td className="text-gray-400 text-xs">{app.applicationdate}</Td>
+              <Td className="font-medium text-gray-700">
+                {app.job?.company?.name ?? app.companyname ?? "—"}
+              </Td>
+              <Td className="font-semibold text-gray-900">
+                {app.job?.title ?? app.jobtitle ?? "—"}
+              </Td>
+              <Td className="text-gray-400 text-xs">
+                {app.applicationDate
+                  ? new Date(app.applicationDate).toLocaleDateString()
+                  : app.applicationdate ?? "—"}
+              </Td>
               <Td>
                 <Badge status={app.status} />
                 {app.interviewDate && (
-                  <p className="text-xs text-gray-400 mt-1">{app.interviewDate}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {new Date(app.interviewDate).toLocaleString([], {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                    {app.interviewLocation ? ` — ${app.interviewLocation}` : ""}
+                  </p>
                 )}
               </Td>
             </Tr>

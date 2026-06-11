@@ -36,9 +36,11 @@ import ViewUserList from "./Pages/ViewUserList";
 // New role-based dashboards
 import SuperAdminDashboard from "./Pages/SuperAdminDashboard";
 import SuperAdminCompanies from "./Pages/SuperAdminCompanies";
+import SuperAdminCompanyDetail from "./Pages/SuperAdminCompanyDetail";
 import AddCompany from "./Pages/AddCompany";
 import CompanyDashboard from "./Pages/CompanyDashboard";
 import UserDashboard from "./Pages/UserDashboard";
+import MyProfile from "./Pages/MyProfile";
 
 const App = () => {
   const addJob    = (newJob) => axios.post("/api/jobs", newJob);
@@ -71,6 +73,10 @@ const App = () => {
         <Route
           path="superadmin/companies/new"
           element={<ProtectedRoute roles={["superadmin"]}><AddCompany /></ProtectedRoute>}
+        />
+        <Route
+          path="superadmin/companies/:id"
+          element={<ProtectedRoute roles={["superadmin"]}><SuperAdminCompanyDetail /></ProtectedRoute>}
         />
 
         {/* ── Company admin ───────────────────────────────────── */}
@@ -109,6 +115,10 @@ const App = () => {
           loader={jobLoader}
         />
         <Route
+          path="profile"
+          element={<ProtectedRoute><MyProfile /></ProtectedRoute>}
+        />
+        <Route
           path="account/:id"
           element={<ProtectedRoute><Account deleteUser={deleteUser} /></ProtectedRoute>}
           loader={userLoader}
@@ -126,7 +136,6 @@ const App = () => {
         <Route
           path="applicants/:id"
           element={<ProtectedRoute><ViewApplicants /></ProtectedRoute>}
-          loader={userLoader}
         />
         <Route
           path="changepassword/:id"

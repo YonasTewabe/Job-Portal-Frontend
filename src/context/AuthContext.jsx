@@ -18,8 +18,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
+  const refreshSession = useCallback(() => {
+    setUser(readSession());
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

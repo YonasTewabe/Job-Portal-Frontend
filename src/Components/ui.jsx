@@ -176,19 +176,27 @@ export const Page = ({ children, className = "" }) => (
 );
 
 // ─── Form card wrapper ────────────────────────────────────────────────────────
-export const FormCard = ({ title, subtitle, children, onSubmit }) => (
-  <div className="pt-20 pb-16 px-4 sm:px-6 max-w-2xl mx-auto">
-    <Card>
-      {title && (
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
-        </div>
-      )}
-      <form onSubmit={onSubmit} noValidate>{children}</form>
-    </Card>
-  </div>
-);
+export const FormCard = ({ title, subtitle, children, onSubmit }) => {
+  const body = onSubmit ? (
+    <form onSubmit={onSubmit} noValidate>{children}</form>
+  ) : (
+    children
+  );
+
+  return (
+    <div className="pt-20 pb-16 px-4 sm:px-6 max-w-2xl mx-auto">
+      <Card>
+        {title && (
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
+            {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+          </div>
+        )}
+        {body}
+      </Card>
+    </div>
+  );
+};
 
 // ─── Section divider label ────────────────────────────────────────────────────
 export const Divider = ({ label }) => (
