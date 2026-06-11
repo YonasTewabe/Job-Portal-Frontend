@@ -1,16 +1,12 @@
 import { Link } from "react-router-dom";
 
-const ViewAllJobs = () => {
-  return (
-    <section className="m-auto max-w-lg my-10 px-6">
-      <Link
-        to="/jobs"
-        className="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
-      >
-        View All Jobs
-      </Link>
-    </section>
-  );
-};
+const ViewAllJobs = () => (
+  <section className="py-10 px-4 text-center">
+    <Link to="/jobs"
+      className="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 font-semibold px-8 py-3 rounded-full hover:bg-gray-900 hover:text-white transition text-sm">
+      View All Jobs →
+    </Link>
+  </section>
+);
 
 export default ViewAllJobs;

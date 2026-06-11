@@ -2,45 +2,49 @@ import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import axios from "../axiosInterceptor";
 import Cookies from "js-cookie";
+import Spinner from "../Components/Spinner";
+
+const LABELS = ["Under Consideration", "Interview Scheduled", "Pending", "Rejected"];
+const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
 
 const Donut = () => {
-  const [underConsideration, setConsideration] = useState(null);
-  const [rejected, setRejected] = useState(null);
-  const [pending, setPending] = useState(null);
-  const [interviewScheduled, setInterview] = useState(null);
+  const [series,  setSeries]  = useState(null);
+  const [loading, setLoading] = useState(true);
   const jobId = Cookies.get("jobId");
 
   const [options] = useState({
-    labels: ["Under Consideration", "Interview Scheduled", "Pending", "Rejected"],
+    labels: LABELS,
+    colors: COLORS,
+    legend: { position: "bottom" },
+    plotOptions: { pie: { donut: { size: "65%" } } },
+    dataLabels: { enabled: true },
+    chart: { animations: { enabled: true } },
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("/api/application/all");
-        const filtered = response.data.filter((a) => a.jobid === jobId);
-        setConsideration(filtered.filter((a) => a.status === "Under Consideration").length);
-        setRejected(filtered.filter((a) => a.status === "Rejected").length);
-        setPending(filtered.filter((a) => a.status === "Pending").length);
-        setInterview(filtered.filter((a) => a.status === "Interview Scheduled").length);
-      } catch (error) {
-        console.error("Error fetching application data:", error);
-      }
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    axios.get(`/api/applications?jobId=${jobId}`)
+      .then((r) => {
+        const data = Array.isArray(r.data) ? r.data : [];
+        setSeries([
+          data.filter((a) => a.status === "Under Consideration").length,
+          data.filter((a) => a.status === "Interview Scheduled").length,
+          data.filter((a) => a.status === "Pending").length,
+          data.filter((a) => a.status === "Rejected").length,
+        ]);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (loading) return <div className="py-8"><Spinner loading /></div>;
+  if (!series || series.every((n) => n === 0))
+    return <p className="text-sm text-gray-400 text-center py-4">No application data yet.</p>;
+
   return (
-    <>
-      <br />
-      <Chart
-        options={options}
-        series={[underConsideration, interviewScheduled, pending, rejected]}
-        type="pie"
-        width="380"
-      />
-    </>
+    <div className="flex justify-center">
+      <Chart options={options} series={series} type="donut" width={380} />
+    </div>
   );
 };
 

@@ -1,124 +1,84 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
-import emailjs from "@emailjs/browser";
 import { toast } from "react-toastify";
+import { Page, Card, Field, inputCls, Btn } from "../Components/ui";
+
+const INFO = [
+  { icon: <FaEnvelope className="text-blue-500" />, label: "Email",   value: "contact@apptracker.com" },
+  { icon: <FaPhone    className="text-blue-500" />, label: "Phone",   value: "+251 919 37 05 44" },
+  { icon: <FaMapMarkerAlt className="text-blue-500" />, label: "Address", value: "123 Main Street, Addis Ababa, Ethiopia" },
+];
 
 const ContactUs = () => {
   const form = useRef();
+  const [loading, setLoading] = useState(false);
 
-  const sendMail = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      await emailjs.sendForm(
-        "service_s02dvbp",
-        "template_41ybe0n",
-        form.current,
-        {
-          publicKey: "CxqrPI5OiPSTIGXkB",
-        }
-      );
-      toast.success(
-        "Thank you for your feedback. Your Email has been received!"
-      );
-    } catch (error) {
-      toast.error("Unable to send mail. Please try again later");
-    }
-
+    setLoading(true);
+    // EmailJS removed — backend email will be wired here later
+    await new Promise((r) => setTimeout(r, 600));
+    toast.info("Contact form is currently unavailable. Please email us directly.");
+    setLoading(false);
     e.target.reset();
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-md rounded px-8 pt-6 pb-8">
-        <div className="w-full pr-4">
-          <h2 className="text-3xl font-bold mb-4 text-indigo-700">Contact</h2>
-          <p className="mb-4">
-            If you have any questions or encounter any issues, please don&apos;t
-            hesitate to reach out using the contact information below or send us
-            an email using the form:
+    <Page className="max-w-4xl">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Contact Us</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Contact info */}
+        <Card>
+          <h2 className="text-base font-semibold text-gray-900 mb-4">Get in touch</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Have questions or issues? Reach us using the details below or send a message via the form.
           </p>
-          <ul className="list-none ml-8 mb-4">
-            <li>
-              <FaEnvelope className="inline-block mr-2" /> Email:
-              yonastewabe21@gmail.com
-            </li>
-            <li>
-              <FaPhone className="inline-block mr-2" /> Phone: +251 919 37 05 44
-            </li>
-            <li>
-              <FaMapMarkerAlt className="inline-block mr-2" /> Address: 123 Main
-              Street, Addis Ababa, Ethiopia
-            </li>
+          <ul className="space-y-4">
+            {INFO.map(({ icon, label, value }) => (
+              <li key={label} className="flex items-start gap-3">
+                <span className="mt-0.5">{icon}</span>
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{label}</p>
+                  <p className="text-sm text-gray-800">{value}</p>
+                </div>
+              </li>
+            ))}
           </ul>
-          <p>
-            We are eager to hear from you! Your suggestions, reviews, feedback,
-            and queries are highly appreciated. Get in touch with us, and we
-            will be delighted to assist you!
-          </p>
-        </div>
-        <div className="w-full pl-4">
-          <h2 className="text-3xl font-bold mb-4 text-indigo-700">
-            Contact Form
-          </h2>
-          <form ref={form} onSubmit={sendMail} className="flex flex-col">
-            <div className="flex mb-4">
-              <div className="w-1/2 pr-2">
-                <label htmlFor="fullName" className="block mb-1">
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  name="Your_name"
-                  type="text"
-                  required
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-              </div>
-              <div className="w-1/2 pl-2">
-                <label htmlFor="email" className="block mb-1">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-              </div>
+        </Card>
+
+        {/* Form */}
+        <Card>
+          <h2 className="text-base font-semibold text-gray-900 mb-4">Send a message</h2>
+          <form ref={form} onSubmit={handleSubmit} className="space-y-1">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Full name" htmlFor="name">
+                <input id="name" name="Your_name" type="text" required placeholder="Jane Doe"
+                  className={inputCls()} />
+              </Field>
+              <Field label="Email" htmlFor="email">
+                <input id="email" name="email" type="email" required placeholder="you@example.com"
+                  className={inputCls()} />
+              </Field>
             </div>
-            <label htmlFor="subject" className="block mb-1 mt-4">
-              Subject
-            </label>
-            <input
-              id="subject"
-              name="subject"
-              type="text"
-              required
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-            <label htmlFor="message" className="block mb-1 mt-4">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              cols="30"
-              rows="3"
-              required
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            ></textarea>
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mt-4"
-            >
-              Send Email
+
+            <Field label="Subject" htmlFor="subject">
+              <input id="subject" name="subject" type="text" required placeholder="How can we help?"
+                className={inputCls()} />
+            </Field>
+
+            <Field label="Message" htmlFor="message">
+              <textarea id="message" name="message" rows={4} required placeholder="Your message…"
+                className={inputCls() + " resize-none"} />
+            </Field>
+
+            <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
+              {loading ? "Sending…" : "Send message"}
             </button>
           </form>
-        </div>
+        </Card>
       </div>
-    </div>
+    </Page>
   );
 };
 

@@ -1,20 +1,9 @@
-import ClipLoader from 'react-spinners/ClipLoader';
+import ClipLoader from "react-spinners/ClipLoader";
 
-const override ={
-  display: 'block',
-  margin: '100px auto'
-}
-
-// eslint-disable-next-line react/prop-types
-const  Spinner= ({loading}) => {
-  return (
-    <ClipLoader 
-    color='#4338ca'
-    loading={ loading }
-    cssOverride={override}
-    size={150}
-    />
-  )
-}
+const Spinner = ({ loading = true, size = 48 }) => (
+  <div className="flex justify-center items-center py-10">
+    <ClipLoader color="#2563eb" loading={loading} size={size} />
+  </div>
+);
 
 export default Spinner;

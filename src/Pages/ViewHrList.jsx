@@ -1,122 +1,93 @@
-import axios from "../axiosInterceptor";
 import { useEffect, useState } from "react";
+import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn } from "../Components/ui";
 
 const ViewHrList = () => {
-  const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState([]);
+  const [loading,  setLoading]  = useState(true);
   const { user: authUser } = useAuth();
   const myRole = authUser?.role;
 
   useEffect(() => {
-    const fetchData = async () => {
+    const load = async () => {
       try {
-        const [profilesResponse, jobsResponse] = await Promise.all([
-          axios.get("/api/profile/all"),
+        const [profilesRes, jobsRes] = await Promise.all([
+          axios.get("/api/users?role=hr"),
+          // Jobs fetched without companyId to count all postings across all HR companies
           axios.get("/api/jobs"),
         ]);
+        const hrs  = Array.isArray(profilesRes.data) ? profilesRes.data : [];
+        const jobs = Array.isArray(jobsRes.data)     ? jobsRes.data     : [];
 
-        const profilesData = profilesResponse.data;
-        const jobsData = jobsResponse.data;
+        const enriched = hrs.map((p) => ({
+          ...p,
+          // Handle both old (companyname) and new (companyName) API shapes
+          displayName: p.companyName ?? p.companyname ?? p.name ?? p.email,
+          jobsPosted:  jobs.filter((j) =>
+            (j.companyName ?? j.companyname) === (p.companyName ?? p.companyname)
+          ).length,
+          // Use status/hrStatus already on the user object; avoid extra fetches
+          hrStatus: String(p.hrStatus ?? p.status ?? "false"),
+        }));
 
-        const filteredProfiles = profilesData.filter((p) => p.role === "hr");
-
-        for (let profile of filteredProfiles) {
-          profile.jobsPosted = jobsData.filter(
-            (job) => job.companyName === profile.companyname
-          ).length;
-          profile.hrStatus = await fetchHrStatus(profile.id);
-        }
-
-        setProfiles(filteredProfiles);
-      } catch (error) {
-        console.error("Error fetching HR list:", error);
-      } finally {
-        setLoading(false);
-      }
+        setProfiles(enriched);
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
     };
-
-    fetchData();
+    load();
   }, []);
 
-  const fetchHrStatus = async (id) => {
+  const toggleStatus = async (id, current) => {
+    const next = current === "true" ? "false" : "true";
     try {
-      const response = await axios.get(`/api/profile/${id}`);
-      return response.data.status;
-    } catch {
-      return "false";
-    }
+      await axios.patch(`/api/users/${id}`, { hrStatus: next });
+      setProfiles((prev) => prev.map((p) => p.id === id ? { ...p, hrStatus: next } : p));
+    } catch (e) { console.error(e); }
   };
 
-  const toggleHrStatus = async (id, currentStatus) => {
-    const newStatus = currentStatus === "false" ? "true" : "false";
-    try {
-      await axios.patch(`/api/profile/${id}`, { hrStatus: newStatus });
-      setProfiles((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, hrStatus: newStatus } : p))
-      );
-    } catch (error) {
-      console.error("Error updating HR status:", error);
-    }
-  };
+  if (loading) return <div className="py-20"><Spinner loading /></div>;
+  if (myRole !== "admin") return <UnauthorizedAccess />;
 
-  const StatusButton = (hrStatus, id) => (
-    <button
-      className={`${hrStatus === "true" ? "bg-red-500" : "bg-green-500"} py-2 px-4 rounded-full`}
-      onClick={() => toggleHrStatus(id, hrStatus)}
-    >
-      {hrStatus === "true" ? "Suspend" : "Activate"}
-    </button>
-  );
-
-  if (loading) return <Spinner />;
+  const headers = [
+    { label: "Company",      key: "company" },
+    { label: "Email",        key: "email" },
+    { label: "Jobs Posted",  key: "jobs" },
+    { label: "Status",       key: "status" },
+    { label: "Action",       key: "action" },
+  ];
 
   return (
-    <>
-      <br />
-      {myRole === "admin" ? (
-        <div className="bg-indigo-100 py-10">
-          <div className="w-full bg-white shadow-md rounded">
-            <br />
-            <h1 className="text-indigo-700 text-3xl items-center text-center">Registered HR</h1>
-            <div className="container mx-auto py-10 px-6">
-              {profiles.length > 0 ? (
-                <table className="border-collapse border border-gray-800 w-full">
-                  <thead>
-                    <tr>
-                      <th className="border border-gray-800 px-4 py-2">Company Name</th>
-                      <th className="border border-gray-800 px-4 py-2">Email</th>
-                      <th className="border border-gray-800 px-4 py-2">Jobs Posted</th>
-                      <th className="border border-gray-800 px-4 py-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {profiles.map((profile, index) => (
-                      <tr key={index} className={index % 2 === 0 ? "bg-indigo-100" : ""}>
-                        <td className="border border-gray-800 px-4 py-2">{profile.companyname}</td>
-                        <td className="border border-gray-800 px-4 py-2">{profile.email}</td>
-                        <td className="border border-gray-800 px-4 py-2">{profile.jobsPosted}</td>
-                        <td className="border border-gray-800 px-4 py-2">
-                          {StatusButton(profile.hrStatus, profile.id)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="container bg-blue-50 mx-auto py-10 px-6">
-                  <p>No registered HR</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <UnauthorizedAccess />
-      )}
-    </>
+    <Page>
+      <PageTitle>Registered HR</PageTitle>
+      <Card className="p-0 overflow-hidden">
+        <Table headers={headers}
+          empty={profiles.length === 0 ? <Empty message="No HR accounts found." /> : null}>
+          {profiles.map((p, i) => (
+            <Tr key={p.id} striped={i % 2 !== 0}>
+              <Td className="font-medium text-gray-900">{p.displayName}</Td>
+              <Td>{p.email}</Td>
+              <Td className="text-center">{p.jobsPosted}</Td>
+              <Td>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                  ${p.hrStatus === "true" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {p.hrStatus === "true" ? "Active" : "Suspended"}
+                </span>
+              </Td>
+              <Td>
+                <button
+                  onClick={() => toggleStatus(p.id, p.hrStatus)}
+                  className={p.hrStatus === "true" ? Btn.danger("text-xs py-1.5 px-3") : Btn.success("text-xs py-1.5 px-3")}>
+                  {p.hrStatus === "true" ? "Suspend" : "Activate"}
+                </button>
+              </Td>
+            </Tr>
+          ))}
+        </Table>
+      </Card>
+    </Page>
   );
 };
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
@@ -6,192 +5,88 @@ import { toast } from "react-toastify";
 import { BiShow, BiHide } from "react-icons/bi";
 import { useAuth } from "../context/AuthContext";
 import axios from "../axiosInterceptor";
+import { FormCard, Field, inputCls, Btn } from "../Components/ui";
+
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
+
+const schema = Yup.object().shape({
+  currentPassword:  Yup.string().required("Current password is required"),
+  newPassword:      Yup.string().required("New password is required")
+    .matches(passwordRegex, "Must include upper, lower, number & special char")
+    .min(8, "At least 8 characters"),
+  confirmPassword:  Yup.string().required("Please confirm your password")
+    .oneOf([Yup.ref("newPassword")], "Passwords must match"),
+});
+
+const PwdField = ({ id, label, value, onChange, show, onToggle, error }) => (
+  <Field label={label} htmlFor={id} error={error}>
+    <div className="relative">
+      <input id={id} type={show ? "text" : "password"} placeholder="••••••••"
+        value={value} onChange={onChange} className={inputCls(error) + " pr-10"} />
+      <button type="button" onClick={onToggle} aria-label="Toggle"
+        className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+        {show ? <BiHide size={18} /> : <BiShow size={18} />}
+      </button>
+    </div>
+  </Field>
+);
 
 const ChangePassword = () => {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [Password, setPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
+  const [currentPassword, setCurrent]       = useState("");
+  const [newPassword, setNew]               = useState("");
+  const [confirmPassword, setConfirm]       = useState("");
+  const [showCurrent, setShowCurrent]       = useState(false);
+  const [showNew, setShowNew]               = useState(false);
+  const [showConfirm, setShowConfirm]       = useState(false);
+  const [errors, setErrors]                 = useState({});
+  const [loading, setLoading]               = useState(false);
   const navigate = useNavigate();
-
   const { user: authUser } = useAuth();
   const id = authUser?.userId;
 
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
+    try {
+      schema.validateSync({ currentPassword, newPassword, confirmPassword }, { abortEarly: false });
+      setErrors({});
+    } catch (err) {
+      const fe = {};
+      err.inner.forEach((e) => { fe[e.path] = e.message; });
+      setErrors(fe);
       return;
     }
 
+    setLoading(true);
     try {
-      const response = await axios.patch(`/api/profile/${id}`, {
-        password: Password,
-      });
-
-      if (response.status !== 200) {
-        throw new Error("Failed to update information");
-      }
-
-      toast.success("Password changed Successfully");
+      await axios.patch(`/api/users/${id}`, { currentPassword, password: newPassword });
+      toast.success("Password changed successfully");
       navigate(`/account/${id}`);
     } catch (error) {
-      toast.error("Failed to update information. Please try again.");
-      console.log(error.message);
-    }
-
-    setCurrentPassword("");
-    setPassword("");
-    setConfirmNewPassword("");
-  };
-
-  const validateForm = () => {
-    const schema = Yup.object().shape({
-      currentPassword: Yup.string().required("Current password is required"),
-      Password: Yup.string()
-        .required("New password is required")
-        .matches(
-          passwordRegex,
-          "Password must contain at least one number, one uppercase letter, one lowercase letter, and one special character"
-        )
-        .min(8, "Password must be at least 8 characters"),
-      confirmNewPassword: Yup.string()
-        .required("Confirm new password is required")
-        .oneOf([Yup.ref("Password"), null], "Passwords must match"),
-    });
-
-    try {
-      schema.validateSync(
-        { currentPassword, Password, confirmNewPassword },
-        { abortEarly: false }
-      );
-      setErrors({});
-      return true;
-    } catch (error) {
-      const newErrors = {};
-      error.inner.forEach((err) => {
-        newErrors[err.path] = err.message;
-      });
-      setErrors(newErrors);
-      return false;
+      const msg = error.response?.data?.message ?? "Failed to change password";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <p className="text-2xl text-indigo-700 text-center">Change Password</p>
-        <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-8">
-          <div className="mb-4">
-            <label
-              htmlFor="currentPassword"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Current Password
-            </label>
-            <div className="relative">
-              <input
-                id="currentPassword"
-                name="currentPassword"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your current password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className={`border rounded py-2 px-3 w-full ${
-                  errors.currentPassword ? "border-red-500" : ""
-                }`}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <BiHide /> : <BiShow />}
-              </button>
-            </div>
-            {errors.currentPassword && (
-              <div className="text-red-500 text-sm">
-                {errors.currentPassword}
-              </div>
-            )}
+    <FormCard title="Change password" onSubmit={handleSubmit}>
+      <PwdField id="currentPassword" label="Current password"
+        value={currentPassword} onChange={(e) => setCurrent(e.target.value)}
+        show={showCurrent} onToggle={() => setShowCurrent((v) => !v)} error={errors.currentPassword} />
 
-            <label
-              htmlFor="newPassword"
-              className="block text-gray-700 text-sm font-bold mt-6 mb-2"
-            >
-              New Password
-            </label>
-            <div className="relative">
-              <input
-                id="newPassword"
-                name="newPassword"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your new password"
-                value={Password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`border rounded py-2 px-3 w-full ${
-                  errors.newPassword ? "border-red-500" : ""
-                }`}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <BiHide /> : <BiShow />}
-              </button>
-            </div>
-            {errors.newPassword && (
-              <div className="text-red-500 text-sm">{errors.newPassword}</div>
-            )}
+      <PwdField id="newPassword" label="New password"
+        value={newPassword} onChange={(e) => setNew(e.target.value)}
+        show={showNew} onToggle={() => setShowNew((v) => !v)} error={errors.newPassword} />
 
-            <label
-              htmlFor="confirmNewPassword"
-              className="block text-gray-700 text-sm font-bold mt-6 mb-2"
-            >
-              Confirm New Password
-            </label>
-            <div className="relative">
-              <input
-                id="confirmNewPassword"
-                name="confirmNewPassword"
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm your new password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                className={`border rounded py-2 px-3 w-full ${
-                  errors.confirmNewPassword ? "border-red-500" : ""
-                }`}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <BiHide /> : <BiShow />}
-              </button>
-            </div>
-            {errors.confirmNewPassword && (
-              <div className="text-red-500 text-sm">
-                {errors.confirmNewPassword}
-              </div>
-            )}
+      <PwdField id="confirmPassword" label="Confirm new password"
+        value={confirmPassword} onChange={(e) => setConfirm(e.target.value)}
+        show={showConfirm} onToggle={() => setShowConfirm((v) => !v)} error={errors.confirmPassword} />
 
-            <div className="text-center mt-6">
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Change Password
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+      <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
+        {loading ? "Saving…" : "Change password"}
+      </button>
+    </FormCard>
   );
 };
 

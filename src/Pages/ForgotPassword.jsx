@@ -1,113 +1,63 @@
-/* eslint-disable react-refresh/only-export-components */
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import axios from "../axiosInterceptor";
+import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
+
+const schema = Yup.object().shape({
+  email: Yup.string().email("Invalid email address").required("Email is required"),
+});
 
 const ForgotPassword = () => {
-  const [Email, setEmail] = useState("");
+  const [email, setEmail]   = useState("");
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const generatePassword = (length) => {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-    let password = "";
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
-    }
-    return password;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
+    try {
+      schema.validateSync({ email }, { abortEarly: false });
+      setErrors({});
+    } catch (err) {
+      const fe = {};
+      err.inner.forEach((e) => { fe[e.path] = e.message; });
+      setErrors(fe);
       return;
     }
 
-    const generatedPassword = generatePassword(9); // Generate a random password
-
+    setLoading(true);
     try {
-      await axios.patch(`/api/profile/email/${Email}`, {
-        password: generatedPassword,
-      });
-
-      toast.success("Reset Email Sent");
-      navigate(`/login`);
-    } catch (error) {
-      toast.error("Failed to send email. Please try again.");
-      console.log(error);
-    }
-  };
-
-  const validateForm = () => {
-    const schema = Yup.object().shape({
-      Email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
-    });
-
-    try {
-      schema.validateSync(
-        { Email },
-        { abortEarly: false }
-      );
-      setErrors({});
-      return true;
-    } catch (error) {
-      const newErrors = {};
-      error.inner.forEach((err) => {
-        newErrors[err.path] = err.message;
-      });
-      setErrors(newErrors);
-      return false;
+      // No dedicated forgot-password endpoint in the current API.
+      // Show guidance to contact support.
+      toast.info("Please contact support to reset your password.");
+      navigate("/login");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <div className="flex justify-center items-center h-screen ">
-        <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-          <p className="text-2xl text-indigo-700 text-center">Reset Password</p>
-          <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-8">
-            <div className="mb-4">
-              <label
-                htmlFor="confirmNewPassword"
-                className="block text-gray-700 text-sm font-bold mt-6 mb-2"
-              >
-                Enter your Email Address
-              </label>
-              <input
-                id="Email"
-                name="Email"
-                type="email"
-                value={Email}
-                placeholder="email@example.com"
-                onChange={(e) => setEmail(e.target.value)}
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                  errors.email ? "border-red-500" : ""
-                }`}
-              />
-              {errors.email && (
-                <div className="text-red-500 text-sm">{errors.email}</div>
-              )}
+    <AuthCard title="Reset your password">
+      <p className="text-sm text-gray-500 mb-6 text-center">
+        Enter your email and we'll send you a reset link.
+      </p>
+      <form onSubmit={handleSubmit} noValidate>
+        <Field label="Email address" htmlFor="email" error={errors.email}>
+          <input id="email" type="email" autoComplete="email" placeholder="you@example.com"
+            value={email} onChange={(e) => setEmail(e.target.value)}
+            className={inputCls(errors.email)} />
+        </Field>
 
-              <div className="text-center mt-6">
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                 Reset Password
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
+          {loading ? "Sending…" : "Send reset link"}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-gray-500">
+        <Link to="/login" className="text-blue-600 hover:underline">← Back to login</Link>
+      </p>
+    </AuthCard>
   );
 };
 

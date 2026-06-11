@@ -1,225 +1,148 @@
 import { useState, useEffect, useRef } from "react";
-import { AiOutlineMenu } from "react-icons/ai";
-import { CiLogout, CiViewList } from "react-icons/ci";
-import { MdOutlineAccountCircle, MdSummarize } from "react-icons/md";
-import { IoMdPersonAdd } from "react-icons/io";
-import { GoPlusCircle } from "react-icons/go";
-import { useNavigate, NavLink } from "react-router-dom";
-import { FaHome } from "react-icons/fa";
+import { NavLink, useNavigate, Link } from "react-router-dom";
+import {
+  FaHome, FaBriefcase, FaUserPlus, FaList, FaUsers,
+  FaBuilding, FaTachometerAlt, FaBars, FaTimes,
+} from "react-icons/fa";
+import { CiLogout } from "react-icons/ci";
+import { MdOutlineAccountCircle } from "react-icons/md";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
+import Logo from "./Logo";
+
+const menus = {
+  user: [
+    { icon: <FaHome />, text: "Home",        link: "/" },
+    { icon: <FaBriefcase />, text: "Browse Jobs", link: "/jobs" },
+    { icon: <FaList />, text: "My Applications", link: "/status" },
+  ],
+  company_admin: [
+    { icon: <FaTachometerAlt />, text: "Dashboard", link: "/company/dashboard" },
+    { icon: <FaUserPlus />, text: "Post a Job",  link: "/add-job" },
+    { icon: <FaBriefcase />, text: "All Jobs",    link: "/jobs" },
+  ],
+  admin: [
+    { icon: <FaHome />, text: "Home",              link: "/" },
+    { icon: <FaUserPlus />, text: "Add HR",         link: "/add-hr" },
+    { icon: <FaList />, text: "Registered HR",      link: "/view-hr" },
+    { icon: <FaUsers />, text: "Registered Users",  link: "/view-users" },
+    { icon: <FaBriefcase />, text: "All Jobs",      link: "/jobs" },
+  ],
+  superadmin: [
+    { icon: <FaTachometerAlt />, text: "Dashboard",    link: "/superadmin/dashboard" },
+    { icon: <FaBuilding />, text: "Companies",          link: "/superadmin/companies/new" },
+    { icon: <FaBriefcase />, text: "All Jobs",          link: "/jobs" },
+  ],
+  hr: [
+    { icon: <FaHome />, text: "Home",      link: "/" },
+    { icon: <FaUserPlus />, text: "Post Job", link: "/add-job" },
+    { icon: <FaBriefcase />, text: "Your Jobs", link: "/jobs" },
+  ],
+};
+
+const NavItem = ({ icon, text, link, onClick }) => (
+  <NavLink
+    to={link}
+    onClick={onClick}
+    className={({ isActive }) =>
+      `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition
+       ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100"}`
+    }
+  >
+    <span className="text-lg">{icon}</span>
+    {text}
+  </NavLink>
+);
 
 const Navbar = () => {
-  const [nav, setNav] = useState(false);
+  const [open, setOpen] = useState(false);
   const sidebarRef = useRef(null);
-  const linkClass = ({ isActive }) => (isActive ? "text-[#3b82f6]" : "");
   const { user, logout } = useAuth();
-  const role = user?.role;
-
-  const hrMenu = [
-    {
-      icon: <FaHome size={25} className="mr-4" />,
-      text: "Home",
-      link: "/",
-      className: { linkClass },
-    },
-    {
-      icon: <GoPlusCircle size={25} className="mr-4" />,
-      text: "Add Job",
-      link: "/add-job",
-      className: { linkClass },
-    },
-    {
-      icon: <MdSummarize size={25} className="mr-4" />,
-      text: "Your Jobs",
-      link: "/jobs",
-      className: { linkClass },
-    },
-  ];
-
-  const adminMenu = [
-    {
-      icon: <FaHome size={25} className="mr-4" />,
-      text: "Home",
-      link: "/",
-      className: { linkClass },
-    },
-    {
-      icon: <IoMdPersonAdd size={25} className="mr-4" />,
-      text: "Add Hr",
-      link: "/add-hr",
-      className: { linkClass },
-    },
-    {
-      icon: <CiViewList size={25} className="mr-4" />,
-      text: "Registered Hr",
-      link: "/view-hr",
-      className: { linkClass },
-    },
-    {
-      icon: <CiViewList size={25} className="mr-4" />,
-      text: "Registered Users",
-      link: "/view-users",
-      className: { linkClass },
-    },
-    {
-      icon: <MdSummarize size={25} className="mr-4" />,
-      text: "All Jobs",
-      link: "/jobs",
-      className: { linkClass },
-    },
-  ];
-
-  const userMenu = [
-    {
-      icon: <FaHome size={25} className="mr-4" />,
-      text: "Home",
-      link: "/",
-      className: { linkClass },
-    },
-    {
-      icon: <CiViewList size={25} className="mr-4" />,
-      text: "All Jobs",
-      link: "/jobs",
-      className: { linkClass },
-    },
-    {
-      icon: <MdSummarize size={25} className="mr-4" />,
-      text: "Applied Jobs",
-      link: "/status",
-      className: { linkClass },
-    },
-  ];
-
-  const handleOutsideClick = (e) => {
-    if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
-      setNav(false);
-    }
-  };
-
   const navigate = useNavigate();
+  const role = user?.role;
+  const menuItems = menus[role] ?? [];
 
   const handleLogout = async () => {
-    try {
-      await axios.post("/api/profile/logout", {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      logout();
-      navigate("/login", { replace: true });
-    }
+    try { await axios.post("/api/auth/logout", { withCredentials: true }); }
+    catch { /* ignore */ }
+    finally { logout(); navigate("/login", { replace: true }); }
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
+    const handler = (e) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) setOpen(false);
     };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const storedId = user?.userId;
-  const value = storedId ? `/account/${storedId}` : "/";
+  if (!user) return null;
 
-  if (role !== "user" && role !== "admin" && role !== "hr") {
-    return null;
-  }
+  const profilePath = user.userId ? `/account/${user.userId}` : "/";
 
   return (
-    <div className="max-w-[1940px] mx-auto flex justify-between items-center p-1 shadow-sm bg-background fixed top-0 left-0 w-full z-50">
-      <div className="flex items-center">
-        <div onClick={() => setNav(!nav)} className="cursor-pointer text-white">
-          <AiOutlineMenu size={30} />
-        </div>
-
-        <NavLink to="/">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl px-2 text-white font-bold">
-            Application Tracker
-          </h1>
-        </NavLink>
-      </div>
-
-      <div className="flex items-center">
-        <NavLink to={value} className="text-white mr-4">
-          <MdOutlineAccountCircle size={30} /> My Profile
-        </NavLink>
-        <button className="text-white" onClick={handleLogout}>
-          <CiLogout size={30} /> Logout
+    <>
+      {/* Top bar */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background shadow-md h-14 flex items-center px-4 gap-3">
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+          className="text-white p-1.5 rounded-lg hover:bg-white/20 transition"
+        >
+          <FaBars size={20} />
         </button>
-      </div>
 
-      {nav && (
-        <div className="bg-black/80 fixed w-full h-screen z-60 top-0 left-0"></div>
+        <Link to="/" className="text-white font-bold text-lg tracking-tight flex-1 truncate flex items-center gap-2">
+          <Logo size={26} variant="white" />
+          <span className="hidden sm:inline">Application Tracker</span>
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <Link to={profilePath} className="flex items-center gap-1.5 text-white text-sm font-medium hover:text-white/80 transition">
+            <MdOutlineAccountCircle size={22} />
+            <span className="hidden sm:inline">{user.name || "Profile"}</span>
+          </Link>
+          <button onClick={handleLogout} className="flex items-center gap-1.5 text-white text-sm font-medium hover:text-white/80 transition ml-2">
+            <CiLogout size={22} />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Overlay */}
+      {open && (
+        <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setOpen(false)} />
       )}
 
-      <div
+      {/* Sidebar */}
+      <aside
         ref={sidebarRef}
-        className={
-          nav
-            ? "fixed top-0 left-0 w-[270px] h-screen bg-white z-70 duration-300"
-            : "fixed top-0 left-[-100%] w-[300px] h-screen bg-white z-70 duration-300"
-        }
+        className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-xl flex flex-col transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="bg-background">
-          <h2 className="text-2xl p-2">Menu</h2>
+        <div className="bg-background px-4 py-4 flex items-center justify-between">
+          <Logo size={24} variant="white" showText />
+          <button onClick={() => setOpen(false)} aria-label="Close menu" className="text-white hover:text-white/70">
+            <FaTimes size={18} />
+          </button>
         </div>
-        <nav>
-          <ul className="flex flex-col p-4 text-gray-800">
-            {role == "user" &&
-              userMenu.map(({ icon, text, link }, index) => {
-                return (
-                  <div key={index} className=" py-4">
-                    <NavLink
-                      to={link}
-                      className={linkClass}
-                      onClick={() => setNav(false)}
-                    >
-                      <li className="text-xl flex cursor-pointer  w-[95%] mx-auto hover:bg-[#e1e9f0]">
-                        {icon} {text}
-                      </li>
-                    </NavLink>
-                  </div>
-                );
-              })}
-            {role == "admin" &&
-              adminMenu.map(({ icon, text, link }, index) => {
-                return (
-                  <div key={index} className=" py-4">
-                    <NavLink
-                      to={link}
-                      className={linkClass}
-                      onClick={() => setNav(false)}
-                    >
-                      <li className="text-xl flex cursor-pointer  w-[95%] mx-auto hover:bg-[#e1e9f0]">
-                        {icon} {text}
-                      </li>
-                    </NavLink>
-                  </div>
-                );
-              })}
-            {role == "hr" &&
-              hrMenu.map(({ icon, text, link }, index) => {
-                return (
-                  <div key={index} className=" py-4">
-                    <NavLink
-                      to={link}
-                      className={linkClass}
-                      onClick={() => setNav(false)}
-                    >
-                      <li className="text-xl flex cursor-pointer  w-[95%] mx-auto hover:bg-[#e1e9f0]">
-                        {icon} {text}
-                      </li>
-                    </NavLink>
-                  </div>
-                );
-              })}
-          </ul>
-        </nav>
-      </div>
-    </div>
+
+        <div className="flex-1 overflow-y-auto p-3 space-y-1">
+          {menuItems.map(({ icon, text, link }) => (
+            <NavItem key={link} icon={icon} text={text} link={link} onClick={() => setOpen(false)} />
+          ))}
+        </div>
+
+        <div className="p-3 border-t border-gray-100">
+          <button
+            onClick={() => { setOpen(false); handleLogout(); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 w-full transition"
+          >
+            <CiLogout size={18} /> Sign out
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };
 

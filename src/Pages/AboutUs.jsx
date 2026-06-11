@@ -1,40 +1,45 @@
 import { Link } from "react-router-dom";
+import { FaBullseye, FaUsers, FaEnvelope } from "react-icons/fa";
+import { Page, Card } from "../Components/ui";
 
-const AboutUs = () => {
-  return (
-    <div className="container mx-auto py-10 px-6">
-      <br />
-      <h1 className="text-3xl font-bold mb-6 text-indigo-700">About Us</h1>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
-        <p className="mb-4 text-gray-700">
-          Our mission is to connect job seekers with the right opportunities and
-          help companies find the best talent. We strive to make the job search
-          process efficient and rewarding for both parties.
-        </p>
-        <h2 className="text-2xl font-bold mb-4">Our Team</h2>
-        <p className="mb-4 text-gray-700">
-          Our team consists of experienced professionals dedicated to providing
-          exceptional service to our users. From developers to customer support,
-          each member plays a crucial role in our success.
-        </p>
-        <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
-        <p className="mb-4 text-gray-700">
-          If you have any questions or feedback, please don&apos;t hesitate to
-          reach out to us. Our contact information can be found{" "}
-          <Link to="/contact" className="text-indigo-500 font-bold">
-            here
-          </Link>
-          . We value your input and are committed to improving our platform
-          based on your suggestions.
-        </p>
-        <p className="text-gray-700">
-          We appreciate your interest and look forward to assisting you in your
-          job search or hiring process!
-        </p>
-      </div>
+const Section = ({ icon, title, children }) => (
+  <Card className="flex gap-4">
+    <div className="shrink-0 w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+      {icon}
     </div>
-  );
-};
+    <div>
+      <h2 className="text-base font-semibold text-gray-900 mb-1">{title}</h2>
+      <div className="text-sm text-gray-600 leading-relaxed">{children}</div>
+    </div>
+  </Card>
+);
+
+const AboutUs = () => (
+  <Page className="max-w-2xl">
+    <h1 className="text-2xl font-bold text-gray-900 mb-6">About Us</h1>
+
+    <div className="space-y-4">
+      <Section icon={<FaBullseye size={18} />} title="Our Mission">
+        We connect job seekers with the right opportunities and help companies find the best talent —
+        making the hiring process efficient and rewarding for everyone.
+      </Section>
+
+      <Section icon={<FaUsers size={18} />} title="Our Team">
+        Our team of experienced professionals is dedicated to delivering exceptional value.
+        Every member — from engineers to support — plays a crucial role in our success.
+      </Section>
+
+      <Section icon={<FaEnvelope size={18} />} title="Get in Touch">
+        <p>
+          Questions or feedback? Reach out through our{" "}
+          <Link to="/contact" className="text-blue-600 font-medium hover:underline">
+            contact page
+          </Link>
+          . We value your input and are continuously improving the platform based on user suggestions.
+        </p>
+      </Section>
+    </div>
+  </Page>
+);
 
 export default AboutUs;

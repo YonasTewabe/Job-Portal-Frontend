@@ -8,7 +8,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback((responseData) => {
     writeSession(responseData);
-    setUser(readSession());
+    const session = readSession();
+    setUser(session);
+    return session;
   }, []);
 
   const logout = useCallback(() => {

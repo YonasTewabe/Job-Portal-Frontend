@@ -31,30 +31,58 @@ import ViewHrList from "./Pages/ViewHrList";
 import CompanyInfo from "./Pages/CompanyInfo";
 import ViewUserList from "./Pages/ViewUserList";
 
+// New role-based dashboards
+import SuperAdminDashboard from "./Pages/SuperAdminDashboard";
+import AddCompany from "./Pages/AddCompany";
+import CompanyDashboard from "./Pages/CompanyDashboard";
+import UserDashboard from "./Pages/UserDashboard";
+
 const App = () => {
   const addJob    = (newJob) => axios.post("/api/jobs", newJob);
   const deleteJob = (id)    => axios.delete(`/api/jobs/${id}`);
-  const updateJob = (job)   => axios.put(`/api/jobs/${job.id}`, job);
-  const deleteUser = (id)   => axios.delete(`/api/profile/${id}`);
+  const updateJob = (job)   => axios.patch(`/api/jobs/${job.id}`, job);
+  const deleteUser = (id)   => axios.delete(`/api/users/${id}`);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
         {/* Public */}
-        <Route path="login"         element={<Login />} />
-        <Route path="signup"        element={<SignUp />} />
+        <Route path="login"          element={<Login />} />
+        <Route path="signup"         element={<SignUp />} />
         <Route path="forgotpassword" element={<ForgotPassword />} />
-        <Route path="contact"       element={<ContactUs />} />
-        <Route path="about"         element={<AboutUs />} />
-        <Route path="*"             element={<NotFoundPage />} />
+        <Route path="contact"        element={<ContactUs />} />
+        <Route path="about"          element={<AboutUs />} />
+        <Route path="*"              element={<NotFoundPage />} />
 
-        {/* Protected */}
+        {/* ── Superadmin ─────────────────────────────────────── */}
+        <Route
+          path="superadmin/dashboard"
+          element={<ProtectedRoute roles={["superadmin"]}><SuperAdminDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="superadmin/companies/new"
+          element={<ProtectedRoute roles={["superadmin"]}><AddCompany /></ProtectedRoute>}
+        />
+
+        {/* ── Company admin ───────────────────────────────────── */}
+        <Route
+          path="company/dashboard"
+          element={<ProtectedRoute roles={["company_admin"]}><CompanyDashboard /></ProtectedRoute>}
+        />
+
+        {/* ── Regular user ────────────────────────────────────── */}
+        <Route
+          path="dashboard"
+          element={<ProtectedRoute roles={["user"]}><UserDashboard /></ProtectedRoute>}
+        />
+
+        {/* ── Shared protected routes ─────────────────────────── */}
         <Route index element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-        <Route path="jobs"    element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
-        <Route path="report"  element={<ProtectedRoute><ViewReport /></ProtectedRoute>} />
-        <Route path="status"  element={<ProtectedRoute><ViewStatus /></ProtectedRoute>} />
-        <Route path="add-hr"  element={<ProtectedRoute><AddHr /></ProtectedRoute>} />
-        <Route path="view-hr" element={<ProtectedRoute><ViewHrList /></ProtectedRoute>} />
+        <Route path="jobs"       element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+        <Route path="report"     element={<ProtectedRoute><ViewReport /></ProtectedRoute>} />
+        <Route path="status"     element={<ProtectedRoute><ViewStatus /></ProtectedRoute>} />
+        <Route path="add-hr"     element={<ProtectedRoute><AddHr /></ProtectedRoute>} />
+        <Route path="view-hr"    element={<ProtectedRoute><ViewHrList /></ProtectedRoute>} />
         <Route path="view-users" element={<ProtectedRoute><ViewUserList /></ProtectedRoute>} />
 
         <Route
