@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useLoaderData, Link, useNavigate } from "react-router-dom";
+import { useLoaderData, Link, useNavigate, useRevalidator } from "react-router-dom";
 import { FaArrowLeft, FaMapMarkerAlt, FaClock, FaDollarSign, FaBuilding, FaPhone, FaEnvelope } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "../axiosInterceptor";
@@ -7,12 +7,16 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, Badge, Btn, Page } from "../Components/ui";
+import { isJobOpen } from "../utils/jobs";
 
 const Job = ({ deleteJob }) => {
   const navigate = useNavigate();
+  const { revalidate } = useRevalidator();
   const job = useLoaderData();
   const [applicantProfile, setApplicantProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [togglingOpen, setTogglingOpen] = useState(false);
 
   const { user: authUser } = useAuth();
   const role   = authUser?.role;
@@ -20,20 +24,28 @@ const Job = ({ deleteJob }) => {
 
   useEffect(() => {
     if (role === "user" && userId) {
+      setProfileLoading(true);
       axios.get("/api/applicants/me")
         .then((r) => setApplicantProfile(r.data))
-        .catch(() => {});
+        .catch(() => setApplicantProfile(null))
+        .finally(() => setProfileLoading(false));
     }
   }, [role, userId]);
 
-  const isDeadlinePassed = new Date(job.deadline) < new Date();
+  const profileComplete = applicantProfile?.profileCompleted === true;
+
+  const jobOpen = isJobOpen(job);
 
   const handleApply = async () => {
+    if (!profileComplete || !applicantProfile?.id) {
+      toast.error("Complete your profile before applying");
+      return;
+    }
     setSubmitting(true);
     try {
       await axios.post("/api/applications", {
         jobId: job.id,
-        applicantId: applicantProfile?.id ?? userId,
+        applicantId: applicantProfile.id,
         applicationDate: new Date().toISOString(),
       });
       toast.success("Application submitted");
@@ -43,6 +55,33 @@ const Job = ({ deleteJob }) => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const onToggleOpen = () => {
+    const closing = jobOpen;
+    Swal.fire({
+      title: closing ? "Close this job?" : "Reopen this job?",
+      text: closing
+        ? "Applicants will no longer be able to apply, even before the deadline."
+        : "Applicants can apply again if the deadline has not passed.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#4f46e5",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: closing ? "Yes, close it" : "Yes, reopen it",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+      setTogglingOpen(true);
+      try {
+        await axios.patch(`/api/jobs/${job.id}`, { isOpen: !closing });
+        toast.success(closing ? "Job closed" : "Job reopened");
+        revalidate();
+      } catch {
+        toast.error("Failed to update job status");
+      } finally {
+        setTogglingOpen(false);
+      }
+    });
   };
 
   const onDelete = (jobId) => {
@@ -85,7 +124,7 @@ const Job = ({ deleteJob }) => {
                 <p className="text-xs font-medium text-gray-400 mb-1">{job.companyName}</p>
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{job.title}</h1>
               </div>
-              <Badge status={isDeadlinePassed ? "Rejected" : "Active"} />
+              <Badge status={jobOpen ? "Active" : "Closed"} />
             </div>
 
             {/* Meta chips */}
@@ -151,17 +190,32 @@ const Job = ({ deleteJob }) => {
           {/* Apply / Actions */}
           {role === "user" && (
             <Card>
-              {!isDeadlinePassed ? (
-                <button
-                  onClick={handleApply}
-                  disabled={submitting}
-                  className={Btn.full("primary", "py-3")}
-                >
-                  {submitting ? "Submitting…" : "Apply Now"}
-                </button>
+              {jobOpen ? (
+                profileLoading ? (
+                  <button disabled className={Btn.full("primary", "opacity-50 cursor-not-allowed py-3")}>
+                    Loading…
+                  </button>
+                ) : profileComplete ? (
+                  <button
+                    onClick={handleApply}
+                    disabled={submitting}
+                    className={Btn.full("primary", "py-3")}
+                  >
+                    {submitting ? "Submitting…" : "Apply Now"}
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Complete your profile — including education, experience, and CV — before applying.
+                    </p>
+                    <Link to="/profile" className={Btn.full("primary", "py-3")}>
+                      Complete profile
+                    </Link>
+                  </div>
+                )
               ) : (
                 <button disabled className={Btn.full("danger", "opacity-50 cursor-not-allowed py-3")}>
-                  Deadline Passed
+                  {job.isOpen === false ? "Applications Closed" : "Deadline Passed"}
                 </button>
               )}
             </Card>
@@ -173,6 +227,14 @@ const Job = ({ deleteJob }) => {
               <Link to={`/applicants/${job.id}`} className={Btn.full("success")}>
                 View Applicants
               </Link>
+              <button
+                type="button"
+                onClick={onToggleOpen}
+                disabled={togglingOpen}
+                className={Btn.full(jobOpen ? "warning" : "secondary")}
+              >
+                {togglingOpen ? "Updating…" : jobOpen ? "Close Job" : "Reopen Job"}
+              </button>
               <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
             </Card>
           )}
@@ -182,6 +244,14 @@ const Job = ({ deleteJob }) => {
               <Link to={`/applicants/${job.id}`} className={Btn.full("success")}>
                 View Applicants
               </Link>
+              <button
+                type="button"
+                onClick={onToggleOpen}
+                disabled={togglingOpen}
+                className={Btn.full(jobOpen ? "warning" : "secondary")}
+              >
+                {togglingOpen ? "Updating…" : jobOpen ? "Close Job" : "Reopen Job"}
+              </button>
               <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
             </Card>
           )}

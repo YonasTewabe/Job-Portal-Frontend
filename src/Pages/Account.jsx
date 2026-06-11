@@ -46,15 +46,37 @@ const Account = ({ deleteUser }) => {
             <Card>
               <SectionTitle>Personal</SectionTitle>
               <InfoRow label="Full Name" value={user.fullname} />
-              <InfoRow label="Age"       value={user.age} />
-              <InfoRow label="Sex"       value={user.sex} />
+              <InfoRow label="Date of Birth" value={user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "—"} />
+              <InfoRow label="Age" value={user.age ?? "—"} />
+              <InfoRow label="Sex" value={user.sex} />
             </Card>
 
             <Card>
               <SectionTitle>Education</SectionTitle>
-              <InfoRow label="Degree"     value={user.degree} />
-              <InfoRow label="University" value={user.university} />
-              <InfoRow label="Experience" value={user.experience} />
+              {(user.educations?.length ? user.educations : []).map((edu, i) => (
+                <InfoRow
+                  key={i}
+                  label={user.educations.length > 1 ? `Education ${i + 1}` : "Education"}
+                  value={`${edu.degree} — ${edu.university}${edu.startDate ? ` (${edu.startDate}${edu.endDate ? ` – ${edu.endDate}` : " – Present"})` : ""}`}
+                />
+              ))}
+              {(!user.educations || user.educations.length === 0) && (
+                <InfoRow label="Education" value="—" />
+              )}
+            </Card>
+
+            <Card>
+              <SectionTitle>Work Experience</SectionTitle>
+              {(user.experiences?.length ? user.experiences : []).map((exp, i) => (
+                <InfoRow
+                  key={i}
+                  label={user.experiences.length > 1 ? `Role ${i + 1}` : "Role"}
+                  value={`${exp.title} at ${exp.company}${exp.startDate ? ` (${exp.startDate}${exp.endDate ? ` – ${exp.endDate}` : " – Present"})` : ""}`}
+                />
+              ))}
+              {(!user.experiences || user.experiences.length === 0) && (
+                <InfoRow label="Experience" value="—" />
+              )}
               <div className="pt-4">
                 {user.cv ? (
                   <button
@@ -93,19 +115,19 @@ const Account = ({ deleteUser }) => {
           <div className="flex flex-col gap-3 pt-1">
             {(role === "user" || role === "hr") && (
               <Link
-                to={role === "user" ? `/UpdateUser/${user.id}` : `/CompanyInfo/${user.id}`}
+                to={role === "user" ? `/UpdateUser/${authUser.userId}` : `/CompanyInfo/${authUser.userId}`}
                 className={Btn.primary("gap-2")}
               >
                 <FaEdit size={13} /> Update Information
               </Link>
             )}
             {(role === "user" || role === "hr" || role === "admin") && (
-              <Link to={`/changepassword/${user.id}`} className={Btn.secondary("gap-2")}>
+              <Link to={`/changepassword/${authUser.userId}`} className={Btn.secondary("gap-2")}>
                 <FaKey size={13} /> Change Password
               </Link>
             )}
             {(role === "user" || role === "hr") && (
-              <button onClick={() => onDelete(user.id)} className={Btn.danger("gap-2")}>
+              <button onClick={() => onDelete(authUser.userId)} className={Btn.danger("gap-2")}>
                 <FaTrash size={13} /> Delete Account
               </button>
             )}
@@ -117,7 +139,7 @@ const Account = ({ deleteUser }) => {
 };
 
 const userLoader = async ({ params }) => {
-  const res = await axios.get(`/api/users/${params.id}`);
+  const res = await axios.get("/api/applicants/me");
   return res.data;
 };
 

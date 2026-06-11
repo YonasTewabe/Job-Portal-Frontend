@@ -69,6 +69,7 @@ const statusColors = {
   "Interview Scheduled": "bg-emerald-50 text-emerald-700 border border-emerald-200",
   Rejected:              "bg-red-50 text-red-700 border border-red-200",
   Active:                "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  Closed:                "bg-red-50 text-red-700 border border-red-200",
   Suspended:             "bg-red-50 text-red-700 border border-red-200",
 };
 
@@ -112,8 +113,12 @@ export const Table = ({ headers, children, empty }) => (
   </div>
 );
 
-export const Tr = ({ children, striped }) => (
-  <tr className={`transition-colors ${striped ? "bg-slate-50/40" : "bg-white"} hover:bg-brand-50/30`}>
+export const Tr = ({ children, striped, onClick, className = "" }) => (
+  <tr
+    onClick={onClick}
+    className={`transition-colors ${striped ? "bg-slate-50/40" : "bg-white"} hover:bg-brand-50/30
+      ${onClick ? "cursor-pointer" : ""} ${className}`}
+  >
     {children}
   </tr>
 );

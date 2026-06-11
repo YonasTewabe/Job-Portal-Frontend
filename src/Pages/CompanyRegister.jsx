@@ -22,7 +22,7 @@ const CompanyRegister = () => {
   const handleSubmit = async (form) => {
     setLoading(true);
     try {
-      await axios.post("/api/companies", form);
+      await axios.post("/api/companies/register", form);
       toast.success("Company registered — please log in with your admin account.");
       navigate("/login", { state: preserveFromPublic(location) });
     } catch (error) {

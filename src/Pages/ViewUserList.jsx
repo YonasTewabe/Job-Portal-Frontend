@@ -4,15 +4,16 @@ import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty } from "../Components/ui";
+import { formatEducationSummary, formatExperienceSummary } from "../Components/ProfileEducationExperience";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 
 const COLS = [
   { key: "fullname",   label: "Full Name" },
-  { key: "age",        label: "Age" },
+  { key: "dateOfBirth", label: "Date of Birth" },
+  { key: "age",         label: "Age" },
   { key: "sex",        label: "Sex" },
-  { key: "degree",     label: "Degree" },
-  { key: "university", label: "University" },
-  { key: "experience", label: "Experience" },
+  { key: "educations",  label: "Education" },
+  { key: "experiences", label: "Experience" },
 ];
 
 const ViewUserList = () => {
@@ -24,7 +25,7 @@ const ViewUserList = () => {
   const myRole = authUser?.role;
 
   useEffect(() => {
-    axios.get("/api/users?role=user")
+    axios.get("/api/applicants")
       .then((r) => setProfiles(Array.isArray(r.data) ? r.data : []))
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -35,9 +36,17 @@ const ViewUserList = () => {
     else { setSortKey(key); setSortOrder("asc"); }
   };
 
+  const sortValue = (profile, key) => {
+    if (key === "educations") return formatEducationSummary(profile.educations);
+    if (key === "experiences") return formatExperienceSummary(profile.experiences);
+    if (key === "dateOfBirth") return profile.dateOfBirth ?? "";
+    if (key === "age") return String(profile.age ?? "");
+    return String(profile[key] ?? "");
+  };
+
   const sorted = [...profiles].sort((a, b) => {
     if (!sortKey) return 0;
-    const cmp = String(a[sortKey] ?? "").localeCompare(String(b[sortKey] ?? ""));
+    const cmp = sortValue(a, sortKey).localeCompare(sortValue(b, sortKey));
     return sortOrder === "asc" ? cmp : -cmp;
   });
 
@@ -72,15 +81,11 @@ const ViewUserList = () => {
           {sorted.map((p, i) => (
             <Tr key={p.id ?? i} striped={i % 2 !== 0}>
               <Td className="font-semibold text-gray-900">{p.fullname}</Td>
-              <Td className="text-gray-500">{p.age}</Td>
+              <Td className="text-gray-500 text-xs">{p.dateOfBirth || "—"}</Td>
+              <Td className="text-gray-500">{p.age ?? "—"}</Td>
               <Td className="text-gray-500">{p.sex}</Td>
-              <Td className="text-gray-600">{p.degree}</Td>
-              <Td className="text-gray-600">{p.university}</Td>
-              <Td>
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
-                  {p.experience}
-                </span>
-              </Td>
+              <Td className="text-gray-600 text-xs max-w-xs">{formatEducationSummary(p.educations)}</Td>
+              <Td className="text-gray-600 text-xs max-w-xs">{formatExperienceSummary(p.experiences)}</Td>
             </Tr>
           ))}
         </Table>

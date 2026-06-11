@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
@@ -6,13 +6,16 @@ import NotFoundPage from "./NotFoundPage";
 import SuspendedAccount from "../Components/SuspendedAccount";
 import Spinner from "../Components/Spinner";
 import { useAuth } from "../context/AuthContext";
+import { usePayment } from "../context/PaymentContext";
 import { useCompany } from "../hooks/useCompany";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
+import { getMinDeadlineDate, isFutureDeadline } from "../utils/jobs";
 
-const AddJob = ({ addJobSubmit }) => {
+const AddJob = () => {
   const { user: authUser } = useAuth();
   const myRole    = authUser?.role;
   const navigate  = useNavigate();
+  const { setPendingJob } = usePayment();
 
   const [title,       setTitle]       = useState("");
   const [type,        setType]        = useState("Full-Time");
@@ -21,14 +24,23 @@ const AddJob = ({ addJobSubmit }) => {
   const [requirement, setRequirement] = useState("");
   const [salary,      setSalary]      = useState("Negotiable");
   const [deadline,    setDeadline]    = useState("");
-  const [loading,     setLoading]     = useState(false);
+  const [postingFee, setPostingFee] = useState(null);
 
   const { company, isSuspended, loading: companyLoading } = useCompany();
   const companyId = authUser?.companyId ?? company?.id;
 
+  useEffect(() => {
+    axios
+      .get("/api/pricing")
+      .then(({ data }) => setPostingFee(data))
+      .catch(() => toast.error("Failed to load posting fee"));
+  }, []);
+
   if (myRole !== "company_admin") return <NotFoundPage />;
   if (companyLoading) return <div className="py-24"><Spinner loading /></div>;
   if (isSuspended) return <SuspendedAccount />;
+
+  const minDeadline = getMinDeadlineDate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,22 +48,27 @@ const AddJob = ({ addJobSubmit }) => {
       toast.error("Company not found. Please log in again.");
       return;
     }
-    setLoading(true);
-    try {
-      const jobData = { title, type, location, description, requirement, salary, deadline, companyId };
-      if (addJobSubmit) await addJobSubmit(jobData);
-      else await axios.post("/api/jobs", jobData);
-      toast.success("Job posted successfully");
-      navigate("/company/dashboard");
-    } catch { toast.error("Failed to post job. Please try again."); }
-    finally { setLoading(false); }
+    if (!isFutureDeadline(deadline)) {
+      toast.error("Application deadline must be a future date.");
+      return;
+    }
+    const jobData = { title, type, location, description, requirement, salary, deadline, companyId };
+    setPendingJob(jobData, postingFee);
+    navigate("/pay");
   };
 
   const jobTypes   = ["Full-Time", "Part-Time", "Remote", "Internship"];
   const salaryOpts = ["Negotiable", "Under 10,000", "10,000 - 15,000", "15,000 - 20,000", "20,000 - 25,000", "Over 25,000"];
 
   return (
-    <FormCard title="Post a New Job" subtitle="Fill in the details below to publish a new listing.">
+    <FormCard
+      title="Post a New Job"
+      subtitle={
+        postingFee
+          ? `Fill in the details below. A posting fee of ${Number(postingFee.jobPostingPrice).toLocaleString()} ${postingFee.currency ?? "ETB"} applies.`
+          : "Fill in the details below to publish a new listing."
+      }
+    >
       <form onSubmit={handleSubmit} noValidate>
         <Field label="Job title" htmlFor="title">
           <input
@@ -82,7 +99,7 @@ const AddJob = ({ addJobSubmit }) => {
           </Field>
           <Field label="Application deadline" htmlFor="deadline">
             <input
-              id="deadline" type="date" required
+              id="deadline" type="date" required min={minDeadline}
               value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputCls()}
             />
           </Field>
@@ -103,8 +120,8 @@ const AddJob = ({ addJobSubmit }) => {
           />
         </Field>
 
-        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
-          {loading ? "Posting…" : "Post Job"}
+        <button type="submit" disabled={!postingFee} className={Btn.full("primary", "mt-2 py-3")}>
+          Continue to payment
         </button>
       </form>
     </FormCard>

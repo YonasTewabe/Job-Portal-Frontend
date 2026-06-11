@@ -5,6 +5,7 @@ import axios from "../axiosInterceptor";
 import NotFoundPage from "./NotFoundPage";
 import { useAuth } from "../context/AuthContext";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
+import { formatDeadlineForInput, getMinDeadlineDate, isFutureDeadline } from "../utils/jobs";
 
 const EditJob = ({ updateJobSubmit }) => {
   const job = useLoaderData();
@@ -14,7 +15,7 @@ const EditJob = ({ updateJobSubmit }) => {
   const [description, setDescription] = useState(job.description || "");
   const [requirement, setRequirement] = useState(job.requirement || "");
   const [salary,      setSalary]      = useState(job.salary      || "Negotiable");
-  const [deadline,    setDeadline]    = useState(job.deadline    || "");
+  const [deadline,    setDeadline]    = useState(formatDeadlineForInput(job.deadline));
   const [loading,     setLoading]     = useState(false);
 
   const { user: authUser } = useAuth();
@@ -23,8 +24,14 @@ const EditJob = ({ updateJobSubmit }) => {
 
   if (authUser?.role !== "company_admin") return <NotFoundPage />;
 
+  const minDeadline = getMinDeadlineDate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isFutureDeadline(deadline)) {
+      toast.error("Application deadline must be a future date.");
+      return;
+    }
     setLoading(true);
     try {
       await axios.patch(`/api/jobs/${id}`, { title, type, location, description, requirement, salary, deadline });
@@ -70,7 +77,7 @@ const EditJob = ({ updateJobSubmit }) => {
           </Field>
           <Field label="Application deadline" htmlFor="deadline">
             <input
-              id="deadline" type="date" required
+              id="deadline" type="date" required min={minDeadline}
               value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputCls()}
             />
           </Field>

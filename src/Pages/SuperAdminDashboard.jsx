@@ -110,11 +110,29 @@ const SuperAdminDashboard = () => {
             <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
+        <Link to="/superadmin/admins" className="group">
+          <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Super Admins</p>
+              <p className="text-xs text-gray-500 mt-0.5">View or add platform administrators</p>
+            </div>
+            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+          </Card>
+        </Link>
         <Link to="/jobs" className="group">
           <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
             <div>
               <p className="text-sm font-semibold text-gray-900">Browse All Jobs</p>
               <p className="text-xs text-gray-500 mt-0.5">View every listing on the platform</p>
+            </div>
+            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+          </Card>
+        </Link>
+        <Link to="/superadmin/pricing" className="group sm:col-span-3">
+          <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Job Posting Price</p>
+              <p className="text-xs text-gray-500 mt-0.5">Set the Chapa fee charged per job post</p>
             </div>
             <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>

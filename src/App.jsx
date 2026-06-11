@@ -21,6 +21,11 @@ import Account, { userLoader } from "./Pages/Account";
 import UpdateUser from "./Pages/UpdateUser";
 import SignUp from "./Pages/SignUp";
 import CompanyRegister from "./Pages/CompanyRegister";
+import PaymentCheckout from "./Pages/PaymentCheckout";
+import PaymentSuccess from "./Pages/PaymentSuccess";
+import SuperAdminPricing from "./Pages/SuperAdminPricing";
+import SuperAdminAdmins from "./Pages/SuperAdminAdmins";
+import AddSuperAdmin from "./Pages/AddSuperAdmin";
 import Login from "./Pages/Login";
 import ViewApplicants from "./Pages/ViewApplicants";
 import ContactUs from "./Pages/ContactUs";
@@ -56,6 +61,8 @@ const App = () => {
         <Route path="login"          element={<Login />} />
         <Route path="signup"           element={<SignUp />} />
         <Route path="register/company" element={<CompanyRegister />} />
+        <Route path="pay" element={<ProtectedRoute roles={["company_admin"]}><PaymentCheckout /></ProtectedRoute>} />
+        <Route path="payment-success" element={<ProtectedRoute roles={["company_admin"]}><PaymentSuccess /></ProtectedRoute>} />
         <Route path="forgotpassword"   element={<ForgotPassword />} />
         <Route path="contact"        element={<ContactUs />} />
         <Route path="about"          element={<AboutUs />} />
@@ -77,6 +84,18 @@ const App = () => {
         <Route
           path="superadmin/companies/:id"
           element={<ProtectedRoute roles={["superadmin"]}><SuperAdminCompanyDetail /></ProtectedRoute>}
+        />
+        <Route
+          path="superadmin/pricing"
+          element={<ProtectedRoute roles={["superadmin"]}><SuperAdminPricing /></ProtectedRoute>}
+        />
+        <Route
+          path="superadmin/admins"
+          element={<ProtectedRoute roles={["superadmin"]}><SuperAdminAdmins /></ProtectedRoute>}
+        />
+        <Route
+          path="superadmin/admins/new"
+          element={<ProtectedRoute roles={["superadmin"]}><AddSuperAdmin /></ProtectedRoute>}
         />
 
         {/* ── Company admin ───────────────────────────────────── */}
@@ -102,7 +121,7 @@ const App = () => {
 
         <Route
           path="add-job"
-          element={<ProtectedRoute><AddJob addJobSubmit={addJob} /></ProtectedRoute>}
+          element={<ProtectedRoute roles={["company_admin"]}><AddJob /></ProtectedRoute>}
         />
         <Route
           path="job/:id"

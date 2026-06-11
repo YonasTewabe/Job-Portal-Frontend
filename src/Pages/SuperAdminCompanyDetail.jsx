@@ -113,7 +113,7 @@ const SuperAdminCompanyDetail = () => {
                 {job.deadline ? new Date(job.deadline).toLocaleDateString() : "—"}
               </Td>
               <Td>
-                <Badge status={isJobOpen(job) ? "Active" : "Rejected"} />
+                <Badge status={isJobOpen(job) ? "Active" : "Closed"} />
               </Td>
               <Td>
                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700">

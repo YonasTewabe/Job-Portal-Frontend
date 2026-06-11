@@ -34,7 +34,9 @@ const menus = {
   superadmin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/superadmin/dashboard" },
     { icon: <FaBuilding />,      text: "Companies",  link: "/superadmin/companies" },
+    { icon: <FaUsers />,         text: "Super Admins", link: "/superadmin/admins" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
+    { icon: <FaList />,          text: "Job Pricing", link: "/superadmin/pricing" },
   ],
   hr: [
     { icon: <FaHome />,      text: "Home",       link: "/home" },

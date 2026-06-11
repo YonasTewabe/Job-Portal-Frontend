@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaMapMarkerAlt, FaClock, FaBriefcase, FaBuilding } from "react-icons/fa";
+import { isJobOpen } from "../utils/jobs";
 
 const JobListing = ({ job }) => {
   const [expanded, setExpanded] = useState(false);
@@ -8,7 +9,7 @@ const JobListing = ({ job }) => {
   const desc = expanded
     ? job.description
     : job.description?.substring(0, MAX) + (job.description?.length > MAX ? "…" : "");
-  const isExpired = new Date(job.deadline) < new Date();
+  const open = isJobOpen(job);
 
   return (
     <article className="group bg-white rounded-2xl border border-gray-100 shadow-card
@@ -29,10 +30,10 @@ const JobListing = ({ job }) => {
           </div>
 
           <span className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full border
-            ${isExpired
-              ? "bg-red-50 text-red-600 border-red-200"
-              : "bg-emerald-50 text-emerald-600 border-emerald-200"}`}>
-            {isExpired ? "Closed" : "Open"}
+            ${open
+              ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+              : "bg-red-50 text-red-600 border-red-200"}`}>
+            {open ? "Open" : "Closed"}
           </span>
         </div>
 

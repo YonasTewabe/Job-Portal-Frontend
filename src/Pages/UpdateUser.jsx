@@ -1,58 +1,85 @@
-import { useState } from "react";
-import { useParams, useNavigate, useLoaderData } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
-import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
 import NotFoundPage from "./NotFoundPage";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
+import { EducationFields, ExperienceFields } from "../Components/ProfileEducationExperience";
+import {
+  applicantProfileSchema,
+  calculateAge,
+  flattenYupErrors,
+  normalizeDateOfBirth,
+  normalizeEducations,
+  normalizeExperiences,
+} from "../utils/profileSchema";
 
-const schema = Yup.object().shape({
-  fullname:   Yup.string().matches(/^[A-Za-z ]*$/, "Letters only").required("Required"),
-  age:        Yup.number().typeError("Must be a number").required("Required").positive().integer(),
-  sex:        Yup.string().oneOf(["Male", "Female"], "Select one").required("Required"),
-  degree:     Yup.string().required("Required"),
-  university: Yup.string().required("Required"),
-  experience: Yup.string().required("Required"),
-  userPhone:  Yup.string().matches(/^[0-9]{9}$/, "9 digits required").required("Required"),
+const buildPayload = ({ fullname, email, dateOfBirth, sex, educations, experiences, userPhone }) => ({
+  fullname,
+  email,
+  dateOfBirth,
+  sex,
+  educations: educations.map(({ endDate, ...entry }) => ({
+    ...entry,
+    ...(endDate ? { endDate } : {}),
+  })),
+  experiences: experiences.map(({ endDate, ...entry }) => ({
+    ...entry,
+    ...(endDate ? { endDate } : {}),
+  })),
+  userPhone,
 });
 
 const UpdateUser = () => {
-  const user = useLoaderData();
-  const [fullname,   setFullname]   = useState(user.fullname   || "");
-  const [age,        setAge]        = useState(user.age        || "");
-  const [sex,        setSex]        = useState(user.sex        || "");
-  const [degree,     setDegree]     = useState(user.degree     || "");
-  const [university, setUniversity] = useState(user.university || "");
-  const [experience, setExperience] = useState(user.experience || "None");
-  const [cv,         setCv]         = useState(null);
-  const [userPhone,  setUserPhone]  = useState(user.userPhone  || "");
-  const [errors,     setErrors]     = useState({});
-  const [loading,    setLoading]    = useState(false);
+  const [fullname, setFullname]       = useState("");
+  const [email, setEmail]             = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [sex, setSex]                 = useState("");
+  const [educations, setEducations]   = useState([{ degree: "", university: "", startDate: "", endDate: "" }]);
+  const [experiences, setExperiences] = useState([{ title: "", company: "", startDate: "", endDate: "" }]);
+  const [cv, setCv]                   = useState(null);
+  const [userPhone, setUserPhone]     = useState("");
+  const [errors, setErrors]           = useState({});
+  const [loading, setLoading]         = useState(false);
+  const [fetching, setFetching]       = useState(true);
 
   const { user: authUser } = useAuth();
   const navigate = useNavigate();
-  const { id }   = useParams();
+  const { id } = useParams();
+
+  useEffect(() => {
+    axios.get("/api/applicants/me")
+      .then(({ data }) => {
+        setFullname(data.fullname ?? "");
+        setEmail(data.email ?? "");
+        setDateOfBirth(normalizeDateOfBirth(data));
+        setSex(data.sex ?? "");
+        setEducations(normalizeEducations(data));
+        setExperiences(normalizeExperiences(data));
+        setUserPhone(data.userPhone ?? data.phone ?? "");
+      })
+      .catch(() => toast.error("Failed to load profile"))
+      .finally(() => setFetching(false));
+  }, []);
 
   if (authUser?.role !== "user") return <NotFoundPage />;
+  if (fetching) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const form = { fullname, email, dateOfBirth, sex, educations, experiences, userPhone };
     try {
-      schema.validateSync({ fullname, age, sex, degree, university, experience, userPhone }, { abortEarly: false });
+      applicantProfileSchema.validateSync(form, { abortEarly: false });
       setErrors({});
     } catch (err) {
-      const fe = {};
-      err.inner.forEach((e) => { fe[e.path] = e.message; });
-      setErrors(fe);
+      setErrors(flattenYupErrors(err));
       return;
     }
 
     setLoading(true);
     try {
-      await axios.patch("/api/applicants/me", {
-        fullname, age, sex, degree, university, experience, userPhone,
-      });
+      await axios.patch("/api/applicants/me", buildPayload(form));
       if (cv) {
         const fd = new FormData();
         fd.append("file", cv);
@@ -62,8 +89,12 @@ const UpdateUser = () => {
       }
       toast.success("Profile updated");
       navigate(`/account/${id}`);
-    } catch { toast.error("Failed to update. Please try again."); }
-    finally { setLoading(false); }
+    } catch (error) {
+      if (error.response?.status === 409) toast.error("Email already in use");
+      else toast.error("Failed to update. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,10 +105,30 @@ const UpdateUser = () => {
             value={fullname} onChange={(e) => setFullname(e.target.value)} className={inputCls(errors.fullname)} />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Age" htmlFor="age" error={errors.age}>
-            <input id="age" type="text" placeholder="e.g. 25"
-              value={age} onChange={(e) => setAge(e.target.value)} maxLength={2} className={inputCls(errors.age)} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Email" htmlFor="email" error={errors.email}>
+            <input id="email" type="email" placeholder="you@example.com"
+              value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls(errors.email)} />
+          </Field>
+
+          <Field label="Phone number" htmlFor="userPhone" error={errors.userPhone}>
+            <div className="flex">
+              <span className="flex items-center px-3.5 rounded-l-xl border border-r-0 border-gray-200
+                bg-gray-50 text-sm text-gray-500 font-medium">
+                +251
+              </span>
+              <input id="userPhone" type="tel" placeholder="9-digit number" maxLength={9}
+                value={userPhone} onChange={(e) => setUserPhone(e.target.value)}
+                className={inputCls(errors.userPhone) + " rounded-l-none"} />
+            </div>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Date of birth" htmlFor="dateOfBirth" error={errors.dateOfBirth}
+            hint={dateOfBirth ? `Age: ${calculateAge(dateOfBirth) ?? "—"}` : undefined}>
+            <input id="dateOfBirth" type="date" value={dateOfBirth} max={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => setDateOfBirth(e.target.value)} className={inputCls(errors.dateOfBirth)} />
           </Field>
 
           <Field label="Sex" error={errors.sex}>
@@ -95,35 +146,8 @@ const UpdateUser = () => {
           </Field>
         </div>
 
-        <Field label="Degree" htmlFor="degree" error={errors.degree}>
-          <input id="degree" type="text" placeholder="e.g. BSc Computer Science"
-            value={degree} onChange={(e) => setDegree(e.target.value)} className={inputCls(errors.degree)} />
-        </Field>
-
-        <Field label="University" htmlFor="university" error={errors.university}>
-          <input id="university" type="text" placeholder="Institution name"
-            value={university} onChange={(e) => setUniversity(e.target.value)} className={inputCls(errors.university)} />
-        </Field>
-
-        <Field label="Experience" htmlFor="experience" error={errors.experience}>
-          <select id="experience" value={experience} onChange={(e) => setExperience(e.target.value)} className={inputCls(errors.experience)}>
-            {["None", "Less than 1 Year", "1 - 3 years", "3 - 5 years", "5+ years"].map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="Phone number" htmlFor="userPhone" error={errors.userPhone}>
-          <div className="flex">
-            <span className="flex items-center px-3.5 rounded-l-xl border border-r-0 border-gray-200
-              bg-gray-50 text-sm text-gray-500 font-medium">
-              +251
-            </span>
-            <input id="userPhone" type="tel" placeholder="9-digit number" maxLength={9}
-              value={userPhone} onChange={(e) => setUserPhone(e.target.value)}
-              className={inputCls(errors.userPhone) + " rounded-l-none"} />
-          </div>
-        </Field>
+        <EducationFields educations={educations} setEducations={setEducations} errors={errors} />
+        <ExperienceFields experiences={experiences} setExperiences={setExperiences} errors={errors} />
 
         <Field label="CV (PDF)" htmlFor="cv">
           <input id="cv" type="file" accept="application/pdf"
