@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import Donut from "./ViewReport";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Badge, Btn, Field, inputCls, Empty } from "../Components/ui";
 import { FaSort, FaSortUp, FaSortDown, FaFilePdf, FaSync } from "react-icons/fa";
 
@@ -82,7 +82,7 @@ const ViewApplicants = () => {
   );
 
   if (loading) return <div className="py-24"><Spinner loading /></div>;
-  if (myRole !== "hr" && myRole !== "company_admin") return <UnauthorizedAccess />;
+  if (myRole !== "hr" && myRole !== "company_admin") return <NotFoundPage />;
 
   return (
     <Page className="max-w-7xl">

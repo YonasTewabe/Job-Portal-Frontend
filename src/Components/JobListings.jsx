@@ -4,6 +4,7 @@ import JobListing from "./JobListing";
 import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import PostJobLink from "./PostJobLink";
 import { FaSearch, FaPlus } from "react-icons/fa";
 
 const JobListings = ({ isHome = false }) => {
@@ -65,13 +66,12 @@ const JobListings = ({ isHome = false }) => {
 
           {/* Post job button for company admin */}
           {!isHome && role === "company_admin" && (
-            <Link
-              to="/add-job"
+            <PostJobLink
               className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
                 font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
             >
               <FaPlus size={11} /> Post a Job
-            </Link>
+            </PostJobLink>
           )}
         </div>
 

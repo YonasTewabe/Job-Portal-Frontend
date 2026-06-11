@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
+import SuspendedAccount from "../Components/SuspendedAccount";
+import Spinner from "../Components/Spinner";
 import { useAuth } from "../context/AuthContext";
+import { useCompany } from "../hooks/useCompany";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 
 const AddJob = ({ addJobSubmit }) => {
@@ -21,7 +24,11 @@ const AddJob = ({ addJobSubmit }) => {
   const [deadline,    setDeadline]    = useState("");
   const [loading,     setLoading]     = useState(false);
 
-  if (myRole !== "company_admin") return <UnauthorizedAccess />;
+  const { isSuspended, loading: companyLoading } = useCompany();
+
+  if (myRole !== "company_admin") return <NotFoundPage />;
+  if (companyLoading) return <div className="py-24"><Spinner loading /></div>;
+  if (isSuspended) return <SuspendedAccount />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

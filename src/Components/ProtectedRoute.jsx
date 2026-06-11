@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { readSession } from "../utils/session";
-import UnauthorizedAccess from "./UnauthorizedAccess";
+import NotFoundPage from "../Pages/NotFoundPage";
 
 const ProtectedRoute = ({ children, roles }) => {
   const { user: ctxUser } = useAuth();
@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children, roles }) => {
   }
 
   if (roles && roles.length > 0 && !roles.includes(user.role)) {
-    return <UnauthorizedAccess />;
+    return <NotFoundPage />;
   }
 
   return children;

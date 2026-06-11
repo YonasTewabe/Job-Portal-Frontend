@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLoaderData } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import * as Yup from "yup";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 
@@ -27,7 +27,7 @@ const CompanyInfo = () => {
   const { id }   = useParams();
   const { user: authUser } = useAuth();
 
-  if (authUser?.role !== "hr") return <UnauthorizedAccess />;
+  if (authUser?.role !== "hr") return <NotFoundPage />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

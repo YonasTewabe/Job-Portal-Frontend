@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import { useAuth } from "../context/AuthContext";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 
@@ -21,7 +21,7 @@ const EditJob = ({ updateJobSubmit }) => {
   const navigate = useNavigate();
   const { id }   = useParams();
 
-  if (authUser?.role !== "company_admin") return <UnauthorizedAccess />;
+  if (authUser?.role !== "company_admin") return <NotFoundPage />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

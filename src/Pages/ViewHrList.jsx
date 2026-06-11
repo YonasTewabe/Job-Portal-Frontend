@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn } from "../Components/ui";
 
 const ViewHrList = () => {
@@ -46,7 +46,7 @@ const ViewHrList = () => {
   };
 
   if (loading) return <div className="py-24"><Spinner loading /></div>;
-  if (myRole !== "admin") return <UnauthorizedAccess />;
+  if (myRole !== "admin") return <NotFoundPage />;
 
   const headers = [
     { label: "Company",     key: "company" },

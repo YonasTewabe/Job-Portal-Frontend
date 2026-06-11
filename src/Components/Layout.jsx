@@ -1,12 +1,21 @@
 import Navbar from "./Navbar";
+import PublicNavbar from "./PublicNavbar";
 import Footer from "./Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 
-const Layout = () => (
+const AUTH_PATHS = ["/login", "/signup", "/register/company", "/forgotpassword"];
+
+const Layout = () => {
+  const { user } = useAuth();
+  const { pathname } = useLocation();
+  const showPublicNav = !user && !AUTH_PATHS.includes(pathname);
+
+  return (
   <div className="min-h-screen flex flex-col bg-slate-50">
-    <Navbar />
+    {user ? <Navbar /> : showPublicNav && <PublicNavbar />}
     <div className="flex-1">
       <Outlet />
     </div>
@@ -17,6 +26,7 @@ const Layout = () => (
       toastClassName="!rounded-xl !shadow-card-hover !text-sm !font-medium"
     />
   </div>
-);
+  );
+};
 
 export default Layout;

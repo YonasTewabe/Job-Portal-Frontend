@@ -1,14 +1,18 @@
 import { useState } from "react";
 import * as Yup from "yup";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { getDefaultRoute } from "../utils/routes";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
+import { preserveFromPublic } from "../utils/authNavigation";
 import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
 const schema = Yup.object().shape({
+  name: Yup.string().trim().required("Name is required").min(2, "Name must be at least 2 characters"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string().required("Password is required")
     .matches(passwordRegex, "Must include upper, lower, number & special char")
@@ -35,6 +39,7 @@ const PasswordInput = ({ id, label, value, onChange, show, onToggle, error, auto
 );
 
 const SignUp = () => {
+  const [name, setName]                       = useState("");
   const [email, setEmail]                     = useState("");
   const [password, setPassword]               = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,10 +48,16 @@ const SignUp = () => {
   const [errors, setErrors]                   = useState({});
   const [loading, setLoading]                 = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  if (user) {
+    return <Navigate to={getDefaultRoute(user.role)} replace />;
+  }
 
   const validate = () => {
     try {
-      schema.validateSync({ email, password, confirmPassword }, { abortEarly: false });
+      schema.validateSync({ name, email, password, confirmPassword }, { abortEarly: false });
       setErrors({});
       return true;
     } catch (err) {
@@ -62,9 +73,9 @@ const SignUp = () => {
     if (!validate()) return;
     setLoading(true);
     try {
-      await axios.post("/api/auth/signup", { email, password, role: "user" });
+      await axios.post("/api/auth/signup", { name: name.trim(), email, password, role: "user" });
       toast.success("Account created — please log in.");
-      navigate("/login");
+      navigate("/login", { state: preserveFromPublic(location) });
     } catch (error) {
       if (error.response?.status === 409) toast.error("Email already in use");
       else toast.error("Sign up failed. Please try again.");
@@ -76,6 +87,14 @@ const SignUp = () => {
   return (
     <AuthCard title="Create an account" subtitle="Start tracking your job applications today">
       <form onSubmit={handleSubmit} noValidate className="space-y-1">
+        <Field label="Full name" htmlFor="name" error={errors.name}>
+          <input
+            id="name" type="text" autoComplete="name" placeholder="Jane Smith"
+            value={name} onChange={(e) => setName(e.target.value)}
+            className={inputCls(errors.name)}
+          />
+        </Field>
+
         <Field label="Email" htmlFor="email" error={errors.email}>
           <input
             id="email" type="email" autoComplete="email" placeholder="you@example.com"
@@ -103,10 +122,16 @@ const SignUp = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+      <div className="mt-6 pt-6 border-t border-gray-100 text-center space-y-2">
+        <p className="text-sm text-gray-500">
+          Hiring talent?{" "}
+          <Link to="/register/company" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+            Register your company
+          </Link>
+        </p>
         <p className="text-sm text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">Sign in</Link>
+          <Link to="/login" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">Sign in</Link>
         </p>
       </div>
     </AuthCard>

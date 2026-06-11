@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import { toast } from "react-toastify";
 import { Page, Card, Badge, Table, Tr, Td, Empty } from "../Components/ui";
-import { FaBriefcase, FaEnvelope, FaPlus, FaChevronRight } from "react-icons/fa";
+import { FaBriefcase, FaEnvelope, FaPlus } from "react-icons/fa";
+import PostJobLink from "../Components/PostJobLink";
 
 const StatCard = ({ icon, label, value, color = { bg: "bg-brand-50", text: "text-brand-600" } }) => (
   <Card className="flex items-center gap-4">
@@ -34,7 +35,7 @@ const CompanyDashboard = () => {
       .finally(() => setLoading(false));
   }, [authUser]);
 
-  if (authUser?.role !== "company_admin") return <UnauthorizedAccess />;
+  if (authUser?.role !== "company_admin") return <NotFoundPage />;
   if (loading) return <div className="py-24"><Spinner loading /></div>;
 
   const headers = [
@@ -55,13 +56,12 @@ const CompanyDashboard = () => {
             <p className="text-sm text-gray-500 mt-1.5 max-w-lg leading-relaxed">{company.description}</p>
           )}
         </div>
-        <Link
-          to="/add-job"
+        <PostJobLink
           className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
             font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
         >
           <FaPlus size={11} /> Post a Job
-        </Link>
+        </PostJobLink>
       </div>
 
       {/* Stats */}

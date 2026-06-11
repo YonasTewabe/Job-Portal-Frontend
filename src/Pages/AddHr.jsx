@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import { useAuth } from "../context/AuthContext";
 import axios from "../axiosInterceptor";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
@@ -32,7 +32,7 @@ const AddHr = () => {
   const { user: authUser } = useAuth();
   const myRole = authUser?.role;
 
-  if (myRole !== "superadmin") return <UnauthorizedAccess />;
+  if (myRole !== "superadmin") return <NotFoundPage />;
 
   const validate = () => {
     try {

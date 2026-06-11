@@ -9,6 +9,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import axios from "./axiosInterceptor";
 
 // Pages
+import LandingPage from "./Pages/LandingPage";
 import HomePage from "./Pages/HomePage";
 import NotFoundPage from "./Pages/NotFoundPage";
 import Jobs from "./Pages/Jobs";
@@ -19,6 +20,7 @@ import ViewReport from "./Pages/ViewReport";
 import Account, { userLoader } from "./Pages/Account";
 import UpdateUser from "./Pages/UpdateUser";
 import SignUp from "./Pages/SignUp";
+import CompanyRegister from "./Pages/CompanyRegister";
 import Login from "./Pages/Login";
 import ViewApplicants from "./Pages/ViewApplicants";
 import ContactUs from "./Pages/ContactUs";
@@ -33,6 +35,7 @@ import ViewUserList from "./Pages/ViewUserList";
 
 // New role-based dashboards
 import SuperAdminDashboard from "./Pages/SuperAdminDashboard";
+import SuperAdminCompanies from "./Pages/SuperAdminCompanies";
 import AddCompany from "./Pages/AddCompany";
 import CompanyDashboard from "./Pages/CompanyDashboard";
 import UserDashboard from "./Pages/UserDashboard";
@@ -47,9 +50,11 @@ const App = () => {
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
         {/* Public */}
+        <Route index element={<LandingPage />} />
         <Route path="login"          element={<Login />} />
-        <Route path="signup"         element={<SignUp />} />
-        <Route path="forgotpassword" element={<ForgotPassword />} />
+        <Route path="signup"           element={<SignUp />} />
+        <Route path="register/company" element={<CompanyRegister />} />
+        <Route path="forgotpassword"   element={<ForgotPassword />} />
         <Route path="contact"        element={<ContactUs />} />
         <Route path="about"          element={<AboutUs />} />
         <Route path="*"              element={<NotFoundPage />} />
@@ -58,6 +63,10 @@ const App = () => {
         <Route
           path="superadmin/dashboard"
           element={<ProtectedRoute roles={["superadmin"]}><SuperAdminDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="superadmin/companies"
+          element={<ProtectedRoute roles={["superadmin"]}><SuperAdminCompanies /></ProtectedRoute>}
         />
         <Route
           path="superadmin/companies/new"
@@ -77,7 +86,7 @@ const App = () => {
         />
 
         {/* ── Shared protected routes ─────────────────────────── */}
-        <Route index element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="home"       element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path="jobs"       element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
         <Route path="report"     element={<ProtectedRoute><ViewReport /></ProtectedRoute>} />
         <Route path="status"     element={<ProtectedRoute><ViewStatus /></ProtectedRoute>} />

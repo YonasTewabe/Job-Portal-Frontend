@@ -131,11 +131,28 @@ export const Empty = ({ message = "No data found.", icon = "📭" }) => (
 );
 
 // ─── Auth card wrapper ────────────────────────────────────────────────────────
+import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo";
+
+export const AuthBackHome = () => {
+  const { state } = useLocation();
+  if (!state?.fromPublic) return null;
+
+  return (
+    <Link
+      to="/"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500
+        hover:text-gray-900 transition-colors mb-4"
+    >
+      <span aria-hidden>←</span> Back to home
+    </Link>
+  );
+};
 
 export const AuthCard = ({ title, subtitle, children }) => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
     <div className="w-full max-w-md">
+      <AuthBackHome />
       {/* Card */}
       <div className="bg-white rounded-3xl shadow-float border border-gray-100 px-8 py-10">
         <div className="flex flex-col items-center mb-8 gap-3">

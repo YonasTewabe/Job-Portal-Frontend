@@ -28,7 +28,7 @@ const Account = ({ deleteUser }) => {
           await deleteUser(userId);
           toast.success("Account deleted");
           logout();
-          navigate("/login");
+          navigate("/");
         } catch { toast.error("Unable to delete account."); }
       }
     });

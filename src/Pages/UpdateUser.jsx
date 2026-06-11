@@ -4,7 +4,7 @@ import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
-import UnauthorizedAccess from "../Components/UnauthorizedAccess";
+import NotFoundPage from "./NotFoundPage";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 
 const schema = Yup.object().shape({
@@ -34,7 +34,7 @@ const UpdateUser = () => {
   const navigate = useNavigate();
   const { id }   = useParams();
 
-  if (authUser?.role !== "user") return <UnauthorizedAccess />;
+  if (authUser?.role !== "user") return <NotFoundPage />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -1,10 +1,12 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
+import { getDefaultRoute } from "../utils/routes";
+import { preserveFromPublic } from "../utils/authNavigation";
 import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
 
 const schema = Yup.object().shape({
@@ -19,9 +21,13 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading]           = useState(false);
 
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate  = useNavigate();
   const location  = useLocation();
+
+  if (user) {
+    return <Navigate to={getDefaultRoute(user.role)} replace />;
+  }
 
   const validate = () => {
     try {
@@ -43,7 +49,8 @@ const Login = () => {
     try {
       const { data } = await axios.post("/api/auth/login", { email, password });
       login(data);
-      navigate(location.state?.from?.pathname ?? "/", { replace: true });
+      const destination = location.state?.from?.pathname ?? getDefaultRoute(data.role);
+      navigate(destination, { replace: true });
     } catch {
       toast.error("Invalid email or password");
     } finally {
@@ -91,11 +98,17 @@ const Login = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+      <div className="mt-6 pt-6 border-t border-gray-100 text-center space-y-2">
         <p className="text-sm text-gray-500">
           No account?{" "}
-          <Link to="/signup" className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
-            Create one
+          <Link to="/signup" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+            Sign up as job seeker
+          </Link>
+        </p>
+        <p className="text-sm text-gray-500">
+          Hiring?{" "}
+          <Link to="/register/company" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+            Register your company
           </Link>
         </p>
       </div>

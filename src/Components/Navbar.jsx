@@ -8,11 +8,14 @@ import { CiLogout } from "react-icons/ci";
 import { MdOutlineAccountCircle } from "react-icons/md";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
+import { getDefaultRoute } from "../utils/routes";
+import { useCompany } from "../hooks/useCompany";
+import { APP_NAME } from "../constants/brand";
 import Logo from "./Logo";
 
 const menus = {
   user: [
-    { icon: <FaHome />,      text: "Home",            link: "/" },
+    { icon: <FaHome />,      text: "Home",            link: "/home" },
     { icon: <FaBriefcase />, text: "Browse Jobs",      link: "/jobs" },
     { icon: <FaList />,      text: "My Applications",  link: "/status" },
   ],
@@ -22,7 +25,7 @@ const menus = {
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
   ],
   admin: [
-    { icon: <FaHome />,      text: "Home",             link: "/" },
+    { icon: <FaHome />,      text: "Home",             link: "/home" },
     { icon: <FaUserPlus />,  text: "Add HR",            link: "/add-hr" },
     { icon: <FaList />,      text: "Registered HR",     link: "/view-hr" },
     { icon: <FaUsers />,     text: "Registered Users",  link: "/view-users" },
@@ -30,31 +33,49 @@ const menus = {
   ],
   superadmin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/superadmin/dashboard" },
-    { icon: <FaBuilding />,      text: "Companies",  link: "/superadmin/companies/new" },
+    { icon: <FaBuilding />,      text: "Companies",  link: "/superadmin/companies" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
   ],
   hr: [
-    { icon: <FaHome />,      text: "Home",       link: "/" },
+    { icon: <FaHome />,      text: "Home",       link: "/home" },
     { icon: <FaUserPlus />,  text: "Post Job",   link: "/add-job" },
     { icon: <FaBriefcase />, text: "Your Jobs",  link: "/jobs" },
   ],
 };
 
-const NavItem = ({ icon, text, link, onClick }) => (
-  <NavLink
-    to={link}
-    onClick={onClick}
-    className={({ isActive }) =>
-      `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
-       ${isActive
-         ? "nav-item-active shadow-sm"
-         : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`
-    }
-  >
-    <span className="text-base opacity-80">{icon}</span>
-    {text}
-  </NavLink>
-);
+const NavItem = ({ icon, text, link, onClick, disabled }) => {
+  const baseCls =
+    "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150";
+
+  if (disabled) {
+    return (
+      <span
+        className={`${baseCls} text-gray-400 opacity-60 cursor-not-allowed`}
+        title="Posting is disabled while your company account is suspended"
+        aria-disabled="true"
+      >
+        <span className="text-base opacity-80">{icon}</span>
+        {text}
+      </span>
+    );
+  }
+
+  return (
+    <NavLink
+      to={link}
+      onClick={onClick}
+      className={({ isActive }) =>
+        `${baseCls}
+         ${isActive
+           ? "nav-item-active shadow-sm"
+           : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`
+      }
+    >
+      <span className="text-base opacity-80">{icon}</span>
+      {text}
+    </NavLink>
+  );
+};
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -63,11 +84,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const role = user?.role;
   const menuItems = menus[role] ?? [];
+  const { isSuspended } = useCompany();
 
   const handleLogout = async () => {
     try { await axios.post("/api/auth/logout", { withCredentials: true }); }
     catch { /* ignore */ }
-    finally { logout(); navigate("/login", { replace: true }); }
+    finally { logout(); navigate("/", { replace: true }); }
   };
 
   useEffect(() => {
@@ -81,6 +103,7 @@ const Navbar = () => {
   if (!user) return null;
 
   const profilePath = user.userId ? `/account/${user.userId}` : "/";
+  const dashboardPath = getDefaultRoute(role);
 
   return (
     <>
@@ -91,19 +114,23 @@ const Navbar = () => {
         <button
           onClick={() => setOpen(true)}
           aria-label="Open menu"
-          className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all"
+          className="shrink-0 p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all"
         >
           <FaBars size={18} />
         </button>
 
-        <Link to="/" className="flex items-center gap-2 font-bold text-gray-900 flex-1 truncate">
-          <Logo size={26} variant="color" />
-          <span className="hidden sm:inline text-sm font-semibold text-gray-800 tracking-tight">
-            Application Tracker
-          </span>
-        </Link>
+        <div className="flex flex-1 items-center min-w-0">
+          <Link
+            to={dashboardPath}
+            className="inline-flex items-center rounded-xl px-1 py-1
+              hover:bg-gray-50/80 transition-colors"
+            aria-label={`${APP_NAME} dashboard`}
+          >
+            <Logo size={28} variant="color" showText />
+          </Link>
+        </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <Link
             to={profilePath}
             className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900
@@ -140,10 +167,15 @@ const Navbar = () => {
       >
         {/* Header */}
         <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100">
-          <div className="flex items-center gap-2.5">
-            <Logo size={28} variant="color" />
-            <span className="text-sm font-bold text-gray-900 tracking-tight">Application Tracker</span>
-          </div>
+          <Link
+            to={dashboardPath}
+            onClick={() => setOpen(false)}
+            className="inline-flex items-center rounded-xl -ml-1 px-1 py-0.5
+              hover:bg-gray-50 transition-colors"
+            aria-label={`${APP_NAME} dashboard`}
+          >
+            <Logo size={28} variant="color" showText />
+          </Link>
           <button
             onClick={() => setOpen(false)}
             aria-label="Close menu"
@@ -169,7 +201,14 @@ const Navbar = () => {
         {/* Nav items */}
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
           {menuItems.map(({ icon, text, link }) => (
-            <NavItem key={link} icon={icon} text={text} link={link} onClick={() => setOpen(false)} />
+            <NavItem
+              key={link}
+              icon={icon}
+              text={text}
+              link={link}
+              onClick={() => setOpen(false)}
+              disabled={link === "/add-job" && isSuspended}
+            />
           ))}
         </nav>
 
