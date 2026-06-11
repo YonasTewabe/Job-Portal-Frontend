@@ -64,43 +64,47 @@ const AddHr = () => {
       if (error.response?.status === 409) toast.error("Email already in use");
       else toast.error("Failed to create account. Please try again.");
     } finally {
-      setLoading(false); }
+      setLoading(false);
+    }
   };
 
   return (
-    <FormCard title="Add Company Admin" onSubmit={handleSubmit}>
-      <Field label="Email" htmlFor="email" error={errors.email}>
-        <input id="email" type="email" autoComplete="off" placeholder="admin@company.com"
-          value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls(errors.email)} />
-      </Field>
+    <FormCard title="Add Company Admin" subtitle="Create a new admin account for a company.">
+      <form onSubmit={handleSubmit} noValidate>
+        <Field label="Email" htmlFor="email" error={errors.email}>
+          <input id="email" type="email" autoComplete="off" placeholder="admin@company.com"
+            value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls(errors.email)} />
+        </Field>
 
-      <Field label="Password" htmlFor="password" error={errors.password}>
-        <div className="relative">
-          <input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••"
-            value={password} onChange={(e) => setPassword(e.target.value)}
-            className={inputCls(errors.password) + " pr-10"} />
-          <button type="button" onClick={() => setShowPassword((v) => !v)}
-            className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-            {showPassword ? <BiHide size={18} /> : <BiShow size={18} />}
-          </button>
-        </div>
-      </Field>
+        <Field label="Password" htmlFor="password" error={errors.password}
+          hint="Min 8 chars with upper, lower, number & symbol">
+          <div className="relative">
+            <input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••"
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className={inputCls(errors.password) + " pr-10"} />
+            <button type="button" onClick={() => setShowPassword((v) => !v)}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+              {showPassword ? <BiHide size={18} /> : <BiShow size={18} />}
+            </button>
+          </div>
+        </Field>
 
-      <Field label="Confirm password" htmlFor="confirmPassword" error={errors.confirmPassword}>
-        <div className="relative">
-          <input id="confirmPassword" type={showConfirm ? "text" : "password"} placeholder="••••••••"
-            value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-            className={inputCls(errors.confirmPassword) + " pr-10"} />
-          <button type="button" onClick={() => setShowConfirm((v) => !v)}
-            className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-            {showConfirm ? <BiHide size={18} /> : <BiShow size={18} />}
-          </button>
-        </div>
-      </Field>
+        <Field label="Confirm password" htmlFor="confirmPassword" error={errors.confirmPassword}>
+          <div className="relative">
+            <input id="confirmPassword" type={showConfirm ? "text" : "password"} placeholder="••••••••"
+              value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+              className={inputCls(errors.confirmPassword) + " pr-10"} />
+            <button type="button" onClick={() => setShowConfirm((v) => !v)}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+              {showConfirm ? <BiHide size={18} /> : <BiShow size={18} />}
+            </button>
+          </div>
+        </Field>
 
-      <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
-        {loading ? "Creating…" : "Create account"}
-      </button>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
+          {loading ? "Creating…" : "Create Account"}
+        </button>
+      </form>
     </FormCard>
   );
 };

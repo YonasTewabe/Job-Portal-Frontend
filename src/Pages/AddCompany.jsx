@@ -6,7 +6,7 @@ import { BiShow, BiHide } from "react-icons/bi";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import UnauthorizedAccess from "../Components/UnauthorizedAccess";
-import { Page, Card, Field, inputCls, Btn } from "../Components/ui";
+import { Page, Card, Field, inputCls, Btn, Divider } from "../Components/ui";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
@@ -65,11 +65,15 @@ const AddCompany = () => {
 
   return (
     <Page className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Add New Company</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Add New Company</h1>
+        <p className="text-sm text-gray-500 mt-1.5">Create a company account with an admin user.</p>
+      </div>
 
       <form onSubmit={handleSubmit} noValidate>
+        {/* Company details */}
         <Card className="mb-5">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Company Details</h2>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-5">Company Details</h2>
 
           <Field label="Company name" htmlFor="name" error={errors.name}>
             <input id="name" type="text" placeholder="Acme Corp"
@@ -94,8 +98,9 @@ const AddCompany = () => {
           </div>
         </Card>
 
-        <Card className="mb-5">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Admin Account</h2>
+        {/* Admin account */}
+        <Card className="mb-6">
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-5">Admin Account</h2>
 
           <Field label="Admin full name" htmlFor="adminName" error={errors.adminName}>
             <input id="adminName" type="text" placeholder="Jane Smith"
@@ -107,10 +112,11 @@ const AddCompany = () => {
               value={form.adminEmail} onChange={set("adminEmail")} className={inputCls(errors.adminEmail)} />
           </Field>
 
-          <Field label="Admin password" htmlFor="adminPassword" error={errors.adminPassword}>
+          <Field label="Admin password" htmlFor="adminPassword" error={errors.adminPassword}
+            hint="Min 8 chars with upper, lower, number & symbol">
             <div className="relative">
               <input id="adminPassword" type={showPass ? "text" : "password"}
-                placeholder="Min 8 chars with upper, lower, number & symbol"
+                placeholder="••••••••"
                 value={form.adminPassword} onChange={set("adminPassword")}
                 className={inputCls(errors.adminPassword) + " pr-10"} />
               <button type="button" onClick={() => setShowPass((v) => !v)}
@@ -123,7 +129,7 @@ const AddCompany = () => {
         </Card>
 
         <div className="flex gap-3">
-          <button type="submit" disabled={loading} className={Btn.primary("flex-1")}>
+          <button type="submit" disabled={loading} className={Btn.primary("flex-1 py-3")}>
             {loading ? "Creating…" : "Create Company"}
           </button>
           <button type="button" onClick={() => navigate("/superadmin/dashboard")}

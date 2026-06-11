@@ -52,45 +52,53 @@ const Login = () => {
   };
 
   return (
-    <AuthCard title="Welcome back">
+    <AuthCard title="Welcome back" subtitle="Sign in to your account to continue">
       <form onSubmit={handleSubmit} noValidate className="space-y-1">
         <Field label="Email" htmlFor="email" error={errors.email}>
-          <input id="email" type="email" autoComplete="email" placeholder="you@example.com"
+          <input
+            id="email" type="email" autoComplete="email" placeholder="you@example.com"
             value={email} onChange={(e) => setEmail(e.target.value)}
-            className={inputCls(errors.email)} />
+            className={inputCls(errors.email)}
+          />
         </Field>
 
         <Field label="Password" htmlFor="password" error={errors.password}>
           <div className="relative">
-            <input id="password" type={showPassword ? "text" : "password"}
+            <input
+              id="password" type={showPassword ? "text" : "password"}
               autoComplete="current-password" placeholder="••••••••"
               value={password} onChange={(e) => setPassword(e.target.value)}
-              className={inputCls(errors.password) + " pr-10"} />
-            <button type="button" aria-label="Toggle password"
+              className={inputCls(errors.password) + " pr-10"}
+            />
+            <button
+              type="button" aria-label="Toggle password"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
               {showPassword ? <BiHide size={18} /> : <BiShow size={18} />}
             </button>
           </div>
         </Field>
 
-        <div className="flex justify-end mb-4">
-          <Link to="/forgotpassword" className="text-xs text-blue-600 hover:underline">
+        <div className="flex justify-end mb-2">
+          <Link to="/forgotpassword" className="text-xs text-brand-600 hover:text-brand-700 font-medium hover:underline">
             Forgot password?
           </Link>
         </div>
 
-        <button type="submit" disabled={loading} className={Btn.full("primary")}>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-1 py-3")}>
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
-        No account?{" "}
-        <Link to="/signup" className="text-blue-600 font-medium hover:underline">
-          Create one
-        </Link>
-      </p>
+      <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+        <p className="text-sm text-gray-500">
+          No account?{" "}
+          <Link to="/signup" className="text-brand-600 font-semibold hover:underline">
+            Create one
+          </Link>
+        </p>
+      </div>
     </AuthCard>
   );
 };

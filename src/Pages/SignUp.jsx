@@ -20,10 +20,12 @@ const schema = Yup.object().shape({
 const PasswordInput = ({ id, label, value, onChange, show, onToggle, error, autoComplete }) => (
   <Field label={label} htmlFor={id} error={error}>
     <div className="relative">
-      <input id={id} name={id} type={show ? "text" : "password"}
+      <input
+        id={id} name={id} type={show ? "text" : "password"}
         autoComplete={autoComplete} placeholder="••••••••"
         value={value} onChange={onChange}
-        className={inputCls(error) + " pr-10"} />
+        className={inputCls(error) + " pr-10"}
+      />
       <button type="button" aria-label="Toggle password" onClick={onToggle}
         className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
         {show ? <BiHide size={18} /> : <BiShow size={18} />}
@@ -33,13 +35,13 @@ const PasswordInput = ({ id, label, value, onChange, show, onToggle, error, auto
 );
 
 const SignUp = () => {
-  const [email, setEmail]                         = useState("");
-  const [password, setPassword]                   = useState("");
-  const [confirmPassword, setConfirmPassword]     = useState("");
-  const [showPassword, setShowPassword]           = useState(false);
-  const [showConfirm, setShowConfirm]             = useState(false);
-  const [errors, setErrors]                       = useState({});
-  const [loading, setLoading]                     = useState(false);
+  const [email, setEmail]                     = useState("");
+  const [password, setPassword]               = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword]       = useState(false);
+  const [showConfirm, setShowConfirm]         = useState(false);
+  const [errors, setErrors]                   = useState({});
+  const [loading, setLoading]                 = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
@@ -72,33 +74,41 @@ const SignUp = () => {
   };
 
   return (
-    <AuthCard title="Create an account">
+    <AuthCard title="Create an account" subtitle="Start tracking your job applications today">
       <form onSubmit={handleSubmit} noValidate className="space-y-1">
         <Field label="Email" htmlFor="email" error={errors.email}>
-          <input id="email" type="email" autoComplete="email" placeholder="you@example.com"
+          <input
+            id="email" type="email" autoComplete="email" placeholder="you@example.com"
             value={email} onChange={(e) => setEmail(e.target.value)}
-            className={inputCls(errors.email)} />
+            className={inputCls(errors.email)}
+          />
         </Field>
 
-        <PasswordInput id="password" label="Password" value={password}
+        <PasswordInput
+          id="password" label="Password" value={password}
           onChange={(e) => setPassword(e.target.value)}
           show={showPassword} onToggle={() => setShowPassword((v) => !v)}
-          error={errors.password} autoComplete="new-password" />
+          error={errors.password} autoComplete="new-password"
+        />
 
-        <PasswordInput id="confirmPassword" label="Confirm password" value={confirmPassword}
+        <PasswordInput
+          id="confirmPassword" label="Confirm password" value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           show={showConfirm} onToggle={() => setShowConfirm((v) => !v)}
-          error={errors.confirmPassword} autoComplete="new-password" />
+          error={errors.confirmPassword} autoComplete="new-password"
+        />
 
-        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
           {loading ? "Creating account…" : "Create account"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
-        Already have an account?{" "}
-        <Link to="/login" className="text-blue-600 font-medium hover:underline">Sign in</Link>
-      </p>
+      <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+        <p className="text-sm text-gray-500">
+          Already have an account?{" "}
+          <Link to="/login" className="text-brand-600 font-semibold hover:underline">Sign in</Link>
+        </p>
+      </div>
     </AuthCard>
   );
 };

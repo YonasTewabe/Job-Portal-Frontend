@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useLoaderData, Link, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaMapMarkerAlt, FaClock, FaDollarSign, FaBuilding } from "react-icons/fa";
+import { FaArrowLeft, FaMapMarkerAlt, FaClock, FaDollarSign, FaBuilding, FaPhone, FaEnvelope } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "../axiosInterceptor";
 import { toast } from "react-toastify";
@@ -54,7 +54,7 @@ const Job = ({ deleteJob }) => {
       text: "This cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#dc2626",
+      confirmButtonColor: "#4f46e5",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, delete",
     }).then(async (result) => {
@@ -69,65 +69,101 @@ const Job = ({ deleteJob }) => {
   return (
     <Page>
       {/* Back link */}
-      <Link to="/jobs" className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline mb-6">
-        <FaArrowLeft size={12} /> Back to listings
+      <Link
+        to="/jobs"
+        className="inline-flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700
+          font-medium mb-6 group"
+      >
+        <FaArrowLeft size={11} className="group-hover:-translate-x-0.5 transition-transform" />
+        Back to listings
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main */}
+        {/* ── Main content ──────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-5">
+          {/* Title card */}
           <Card>
             <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
-                <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-500">
-                  <span className="flex items-center gap-1"><FaMapMarkerAlt className="text-orange-500" />{job.location}</span>
-                  <span className="flex items-center gap-1"><FaDollarSign className="text-green-600" />{job.salary}</span>
-                  <span className="flex items-center gap-1"><FaClock className="text-blue-500" />Deadline: {job.deadline}</span>
-                </div>
+                <p className="text-xs font-medium text-gray-400 mb-1">{job.companyName}</p>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{job.title}</h1>
               </div>
               <Badge status={isDeadlinePassed ? "Rejected" : "Active"} />
             </div>
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">
-              {job.type}
-            </span>
-          </Card>
 
-          <Card>
-            <h2 className="text-base font-semibold text-gray-700 mb-2">Description</h2>
-            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{job.description}</p>
-          </Card>
-
-          <Card>
-            <h2 className="text-base font-semibold text-gray-700 mb-2">Requirements</h2>
-            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{job.requirement}</p>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-5">
-          <Card>
-            <h2 className="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <FaBuilding className="text-blue-500" /> Company
-            </h2>
-            <p className="font-semibold text-gray-900 mb-1">{job.companyName}</p>
-            <p className="text-sm text-gray-500 mb-4">{job.companyDescription}</p>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p><span className="font-medium">Email:</span> {job.contactEmail}</p>
-              <p><span className="font-medium">Phone:</span> +251 {job.companyPhone}</p>
+            {/* Meta chips */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                border border-gray-100 px-3 py-1 rounded-full">
+                <FaMapMarkerAlt className="text-orange-400" size={10} />{job.location}
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                border border-gray-100 px-3 py-1 rounded-full">
+                <FaDollarSign className="text-emerald-500" size={10} />{job.salary}
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                border border-gray-100 px-3 py-1 rounded-full">
+                <FaClock className="text-brand-400" size={10} />Deadline: {job.deadline}
+              </span>
+              <span className="inline-flex items-center text-xs font-semibold bg-brand-50 text-brand-700
+                border border-brand-100 px-3 py-1 rounded-full">
+                {job.type}
+              </span>
             </div>
           </Card>
 
-          {/* Actions */}
+          {/* Description */}
+          <Card>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Description</h2>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{job.description}</p>
+          </Card>
+
+          {/* Requirements */}
+          <Card>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Requirements</h2>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{job.requirement}</p>
+          </Card>
+        </div>
+
+        {/* ── Sidebar ────────────────────────────────────────── */}
+        <div className="space-y-5">
+          {/* Company info */}
+          <Card>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-brand-50 flex items-center justify-center">
+                <FaBuilding className="text-brand-500" size={15} />
+              </div>
+              <h2 className="text-sm font-semibold text-gray-700">Company</h2>
+            </div>
+
+            <p className="font-semibold text-gray-900 mb-0.5">{job.companyName}</p>
+            <p className="text-xs text-gray-500 mb-4 leading-relaxed">{job.companyDescription}</p>
+
+            <div className="space-y-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2">
+                <FaEnvelope className="text-gray-400 shrink-0" size={11} />
+                <span>{job.contactEmail}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaPhone className="text-gray-400 shrink-0" size={11} />
+                <span>+251 {job.companyPhone}</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Apply / Actions */}
           {role === "user" && (
             <Card>
               {!isDeadlinePassed ? (
-                <button onClick={handleApply} disabled={submitting}
-                  className={Btn.full("primary")}>
+                <button
+                  onClick={handleApply}
+                  disabled={submitting}
+                  className={Btn.full("primary", "py-3")}
+                >
                   {submitting ? "Submitting…" : "Apply Now"}
                 </button>
               ) : (
-                <button disabled className={Btn.full("danger", "opacity-50 cursor-not-allowed")}>
+                <button disabled className={Btn.full("danger", "opacity-50 cursor-not-allowed py-3")}>
                   Deadline Passed
                 </button>
               )}
@@ -137,8 +173,9 @@ const Job = ({ deleteJob }) => {
           {role === "company_admin" && (
             <Card className="space-y-3">
               <Link to={`/edit-job/${job.id}`} className={Btn.full("primary")}>Edit Job</Link>
-              <Link to={`/applicants/${job.id}`} onClick={handleViewApplicants}
-                className={Btn.full("success")}>View Applicants</Link>
+              <Link to={`/applicants/${job.id}`} onClick={handleViewApplicants} className={Btn.full("success")}>
+                View Applicants
+              </Link>
               <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
             </Card>
           )}

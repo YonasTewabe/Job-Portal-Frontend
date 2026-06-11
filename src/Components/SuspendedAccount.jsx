@@ -1,18 +1,23 @@
 import { Link } from "react-router-dom";
-import { FaExclamationTriangle } from "react-icons/fa";
 
 const SuspendedAccount = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-    <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mb-5">
-      <FaExclamationTriangle className="text-yellow-500 text-3xl" />
+    <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center mb-6">
+      <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round"
+          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
     </div>
-    <h1 className="text-2xl font-bold text-gray-900 mb-2">Account Suspended</h1>
-    <p className="text-sm text-gray-500 max-w-sm mb-6">
+    <h1 className="text-xl font-bold text-gray-900 mb-2 tracking-tight">Account Suspended</h1>
+    <p className="text-sm text-gray-500 max-w-sm mb-8 leading-relaxed">
       Your account has been temporarily suspended from posting jobs.
       If you believe this is a mistake, please reach out to us.
     </p>
-    <Link to="/contact"
-      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition">
+    <Link
+      to="/contact"
+      className="bg-brand-600 hover:bg-brand-700 text-white font-semibold
+        px-6 py-2.5 rounded-xl text-sm transition-all shadow-sm"
+    >
       Contact Support
     </Link>
   </div>

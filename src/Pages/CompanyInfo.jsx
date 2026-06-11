@@ -44,10 +44,10 @@ const CompanyInfo = () => {
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append("companyname", companyname);
+      fd.append("companyname",        companyname);
       fd.append("companydescription", companydescription);
-      fd.append("companyPhone", companyPhone);
-      fd.append("contactemail", contactemail);
+      fd.append("companyPhone",       companyPhone);
+      fd.append("contactemail",       contactemail);
       await axios.patch(`/api/users/${id}`, fd, { headers: { "Content-Type": "multipart/form-data" } });
       toast.success("Company info updated");
       navigate(`/account/${id}`);
@@ -56,35 +56,40 @@ const CompanyInfo = () => {
   };
 
   return (
-    <FormCard title="Company information" onSubmit={handleSubmit}>
-      <Field label="Company name" htmlFor="companyname" error={errors.companyname}>
-        <input id="companyname" type="text" placeholder="Your company name"
-          value={companyname} onChange={(e) => setName(e.target.value)} className={inputCls(errors.companyname)} />
-      </Field>
+    <FormCard title="Company Information" subtitle="Update your company's profile details.">
+      <form onSubmit={handleSubmit} noValidate>
+        <Field label="Company name" htmlFor="companyname" error={errors.companyname}>
+          <input id="companyname" type="text" placeholder="Your company name"
+            value={companyname} onChange={(e) => setName(e.target.value)} className={inputCls(errors.companyname)} />
+        </Field>
 
-      <Field label="Company description" htmlFor="companydescription" error={errors.companydescription}>
-        <textarea id="companydescription" rows={4} placeholder="What does your company do?"
-          value={companydescription} onChange={(e) => setDesc(e.target.value)}
-          className={inputCls(errors.companydescription) + " resize-none"} />
-      </Field>
+        <Field label="Company description" htmlFor="companydescription" error={errors.companydescription}>
+          <textarea id="companydescription" rows={4} placeholder="What does your company do?"
+            value={companydescription} onChange={(e) => setDesc(e.target.value)}
+            className={inputCls(errors.companydescription) + " resize-none"} />
+        </Field>
 
-      <Field label="Contact email" htmlFor="contactemail" error={errors.contactemail}>
-        <input id="contactemail" type="email" placeholder="contact@company.com"
-          value={contactemail} onChange={(e) => setEmail(e.target.value)} className={inputCls(errors.contactemail)} />
-      </Field>
+        <Field label="Contact email" htmlFor="contactemail" error={errors.contactemail}>
+          <input id="contactemail" type="email" placeholder="contact@company.com"
+            value={contactemail} onChange={(e) => setEmail(e.target.value)} className={inputCls(errors.contactemail)} />
+        </Field>
 
-      <Field label="Phone number" htmlFor="companyPhone" error={errors.companyPhone}>
-        <div className="flex">
-          <span className="flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 text-sm text-gray-600">+251</span>
-          <input id="companyPhone" type="tel" placeholder="9-digit number" maxLength={9}
-            value={companyPhone} onChange={(e) => setPhone(e.target.value)}
-            className={inputCls(errors.companyPhone) + " rounded-l-none"} />
-        </div>
-      </Field>
+        <Field label="Phone number" htmlFor="companyPhone" error={errors.companyPhone}>
+          <div className="flex">
+            <span className="flex items-center px-3.5 rounded-l-xl border border-r-0 border-gray-200
+              bg-gray-50 text-sm text-gray-500 font-medium">
+              +251
+            </span>
+            <input id="companyPhone" type="tel" placeholder="9-digit number" maxLength={9}
+              value={companyPhone} onChange={(e) => setPhone(e.target.value)}
+              className={inputCls(errors.companyPhone) + " rounded-l-none"} />
+          </div>
+        </Field>
 
-      <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
-        {loading ? "Saving…" : "Save changes"}
-      </button>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
+          {loading ? "Saving…" : "Save Changes"}
+        </button>
+      </form>
     </FormCard>
   );
 };

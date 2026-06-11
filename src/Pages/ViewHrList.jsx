@@ -16,7 +16,6 @@ const ViewHrList = () => {
       try {
         const [profilesRes, jobsRes] = await Promise.all([
           axios.get("/api/users?role=hr"),
-          // Jobs fetched without companyId to count all postings across all HR companies
           axios.get("/api/jobs"),
         ]);
         const hrs  = Array.isArray(profilesRes.data) ? profilesRes.data : [];
@@ -24,12 +23,10 @@ const ViewHrList = () => {
 
         const enriched = hrs.map((p) => ({
           ...p,
-          // Handle both old (companyname) and new (companyName) API shapes
           displayName: p.companyName ?? p.companyname ?? p.name ?? p.email,
           jobsPosted:  jobs.filter((j) =>
             (j.companyName ?? j.companyname) === (p.companyName ?? p.companyname)
           ).length,
-          // Use status/hrStatus already on the user object; avoid extra fetches
           hrStatus: String(p.hrStatus ?? p.status ?? "false"),
         }));
 
@@ -48,38 +45,51 @@ const ViewHrList = () => {
     } catch (e) { console.error(e); }
   };
 
-  if (loading) return <div className="py-20"><Spinner loading /></div>;
+  if (loading) return <div className="py-24"><Spinner loading /></div>;
   if (myRole !== "admin") return <UnauthorizedAccess />;
 
   const headers = [
-    { label: "Company",      key: "company" },
-    { label: "Email",        key: "email" },
-    { label: "Jobs Posted",  key: "jobs" },
-    { label: "Status",       key: "status" },
-    { label: "Action",       key: "action" },
+    { label: "Company",     key: "company" },
+    { label: "Email",       key: "email" },
+    { label: "Jobs Posted", key: "jobs" },
+    { label: "Status",      key: "status" },
+    { label: "Action",      key: "action" },
   ];
 
   return (
     <Page>
-      <PageTitle>Registered HR</PageTitle>
+      <div className="mb-8">
+        <PageTitle>Registered HR</PageTitle>
+        <p className="text-sm text-gray-500 mt-1">{profiles.length} account{profiles.length !== 1 ? "s" : ""}</p>
+      </div>
+
       <Card className="p-0 overflow-hidden">
-        <Table headers={headers}
-          empty={profiles.length === 0 ? <Empty message="No HR accounts found." /> : null}>
+        <Table
+          headers={headers}
+          empty={profiles.length === 0 ? <Empty message="No HR accounts found." icon="👔" /> : null}
+        >
           {profiles.map((p, i) => (
             <Tr key={p.id} striped={i % 2 !== 0}>
-              <Td className="font-medium text-gray-900">{p.displayName}</Td>
-              <Td>{p.email}</Td>
-              <Td className="text-center">{p.jobsPosted}</Td>
+              <Td className="font-semibold text-gray-900">{p.displayName}</Td>
+              <Td className="text-gray-500">{p.email}</Td>
+              <Td className="text-center">
+                <span className="text-sm font-semibold text-gray-700">{p.jobsPosted}</span>
+              </Td>
               <Td>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-                  ${p.hrStatus === "true" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border
+                  ${p.hrStatus === "true"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-red-50 text-red-700 border-red-200"}`}>
                   {p.hrStatus === "true" ? "Active" : "Suspended"}
                 </span>
               </Td>
               <Td>
                 <button
                   onClick={() => toggleStatus(p.id, p.hrStatus)}
-                  className={p.hrStatus === "true" ? Btn.danger("text-xs py-1.5 px-3") : Btn.success("text-xs py-1.5 px-3")}>
+                  className={p.hrStatus === "true"
+                    ? Btn.warning("text-xs py-1.5 px-3")
+                    : Btn.success("text-xs py-1.5 px-3")}
+                >
                   {p.hrStatus === "true" ? "Suspend" : "Activate"}
                 </button>
               </Td>

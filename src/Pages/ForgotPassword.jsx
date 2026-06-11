@@ -9,8 +9,8 @@ const schema = Yup.object().shape({
 });
 
 const ForgotPassword = () => {
-  const [email, setEmail]   = useState("");
-  const [errors, setErrors] = useState({});
+  const [email, setEmail]     = useState("");
+  const [errors, setErrors]   = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -28,8 +28,6 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      // No dedicated forgot-password endpoint in the current API.
-      // Show guidance to contact support.
       toast.info("Please contact support to reset your password.");
       navigate("/login");
     } finally {
@@ -38,25 +36,29 @@ const ForgotPassword = () => {
   };
 
   return (
-    <AuthCard title="Reset your password">
-      <p className="text-sm text-gray-500 mb-6 text-center">
-        Enter your email and we'll send you a reset link.
-      </p>
+    <AuthCard
+      title="Reset your password"
+      subtitle="Enter your email and we'll help you get back in."
+    >
       <form onSubmit={handleSubmit} noValidate>
         <Field label="Email address" htmlFor="email" error={errors.email}>
-          <input id="email" type="email" autoComplete="email" placeholder="you@example.com"
+          <input
+            id="email" type="email" autoComplete="email" placeholder="you@example.com"
             value={email} onChange={(e) => setEmail(e.target.value)}
-            className={inputCls(errors.email)} />
+            className={inputCls(errors.email)}
+          />
         </Field>
 
-        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-1 py-3")}>
           {loading ? "Sending…" : "Send reset link"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
-        <Link to="/login" className="text-blue-600 hover:underline">← Back to login</Link>
-      </p>
+      <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+        <Link to="/login" className="text-sm text-brand-600 hover:underline font-medium">
+          ← Back to login
+        </Link>
+      </div>
     </AuthCard>
   );
 };

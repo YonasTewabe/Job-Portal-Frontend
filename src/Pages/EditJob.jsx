@@ -36,52 +36,65 @@ const EditJob = ({ updateJobSubmit }) => {
   };
 
   const jobTypes   = ["Full-Time", "Part-Time", "Remote", "Internship"];
-  const salaryOpts = ["Negotiable","Under 10,000","10,000 - 15,000","15,000 - 20,000","20,000 - 25,000","Over 25,000"];
+  const salaryOpts = ["Negotiable", "Under 10,000", "10,000 - 15,000", "15,000 - 20,000", "20,000 - 25,000", "Over 25,000"];
 
   return (
-    <FormCard title="Edit job" onSubmit={handleSubmit}>
-      <Field label="Job title" htmlFor="title">
-        <input id="title" type="text" required value={title}
-          onChange={(e) => setTitle(e.target.value)} className={inputCls()} />
-      </Field>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Job type" htmlFor="type">
-          <select id="type" value={type} onChange={(e) => setType(e.target.value)} className={inputCls()}>
-            {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
+    <FormCard title="Edit Job" subtitle="Update the details for this listing.">
+      <form onSubmit={handleSubmit} noValidate>
+        <Field label="Job title" htmlFor="title">
+          <input
+            id="title" type="text" required
+            value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls()}
+          />
         </Field>
-        <Field label="Salary range" htmlFor="salary">
-          <select id="salary" value={salary} onChange={(e) => setSalary(e.target.value)} className={inputCls()}>
-            {salaryOpts.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Job type" htmlFor="type">
+            <select id="type" value={type} onChange={(e) => setType(e.target.value)} className={inputCls()}>
+              {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </Field>
+          <Field label="Salary range" htmlFor="salary">
+            <select id="salary" value={salary} onChange={(e) => setSalary(e.target.value)} className={inputCls()}>
+              {salaryOpts.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Location" htmlFor="location">
+            <input
+              id="location" type="text" required
+              value={location} onChange={(e) => setLocation(e.target.value)} className={inputCls()}
+            />
+          </Field>
+          <Field label="Application deadline" htmlFor="deadline">
+            <input
+              id="deadline" type="date" required
+              value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputCls()}
+            />
+          </Field>
+        </div>
+
+        <Field label="Job description" htmlFor="description">
+          <textarea
+            id="description" rows={5}
+            value={description} onChange={(e) => setDescription(e.target.value)}
+            className={inputCls() + " resize-none"}
+          />
         </Field>
-      </div>
 
-      <Field label="Location" htmlFor="location">
-        <input id="location" type="text" required value={location}
-          onChange={(e) => setLocation(e.target.value)} className={inputCls()} />
-      </Field>
+        <Field label="Requirements" htmlFor="requirement">
+          <input
+            id="requirement" type="text" required
+            value={requirement} onChange={(e) => setRequirement(e.target.value)} className={inputCls()}
+          />
+        </Field>
 
-      <Field label="Application deadline" htmlFor="deadline">
-        <input id="deadline" type="date" required value={deadline}
-          onChange={(e) => setDeadline(e.target.value)} className={inputCls()} />
-      </Field>
-
-      <Field label="Job description" htmlFor="description">
-        <textarea id="description" rows={4} value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className={inputCls() + " resize-none"} />
-      </Field>
-
-      <Field label="Requirements" htmlFor="requirement">
-        <input id="requirement" type="text" required value={requirement}
-          onChange={(e) => setRequirement(e.target.value)} className={inputCls()} />
-      </Field>
-
-      <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
-        {loading ? "Saving…" : "Save changes"}
-      </button>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
+          {loading ? "Saving…" : "Save Changes"}
+        </button>
+      </form>
     </FormCard>
   );
 };

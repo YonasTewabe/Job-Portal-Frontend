@@ -10,11 +10,11 @@ import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
 const schema = Yup.object().shape({
-  currentPassword:  Yup.string().required("Current password is required"),
-  newPassword:      Yup.string().required("New password is required")
+  currentPassword: Yup.string().required("Current password is required"),
+  newPassword:     Yup.string().required("New password is required")
     .matches(passwordRegex, "Must include upper, lower, number & special char")
     .min(8, "At least 8 characters"),
-  confirmPassword:  Yup.string().required("Please confirm your password")
+  confirmPassword: Yup.string().required("Please confirm your password")
     .oneOf([Yup.ref("newPassword")], "Passwords must match"),
 });
 
@@ -32,14 +32,14 @@ const PwdField = ({ id, label, value, onChange, show, onToggle, error }) => (
 );
 
 const ChangePassword = () => {
-  const [currentPassword, setCurrent]       = useState("");
-  const [newPassword, setNew]               = useState("");
-  const [confirmPassword, setConfirm]       = useState("");
-  const [showCurrent, setShowCurrent]       = useState(false);
-  const [showNew, setShowNew]               = useState(false);
-  const [showConfirm, setShowConfirm]       = useState(false);
-  const [errors, setErrors]                 = useState({});
-  const [loading, setLoading]               = useState(false);
+  const [currentPassword, setCurrent]   = useState("");
+  const [newPassword,     setNew]        = useState("");
+  const [confirmPassword, setConfirm]    = useState("");
+  const [showCurrent,     setShowCurrent] = useState(false);
+  const [showNew,         setShowNew]     = useState(false);
+  const [showConfirm,     setShowConfirm] = useState(false);
+  const [errors,          setErrors]      = useState({});
+  const [loading,         setLoading]     = useState(false);
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const id = authUser?.userId;
@@ -70,22 +70,24 @@ const ChangePassword = () => {
   };
 
   return (
-    <FormCard title="Change password" onSubmit={handleSubmit}>
-      <PwdField id="currentPassword" label="Current password"
-        value={currentPassword} onChange={(e) => setCurrent(e.target.value)}
-        show={showCurrent} onToggle={() => setShowCurrent((v) => !v)} error={errors.currentPassword} />
+    <FormCard title="Change Password" subtitle="Choose a strong new password for your account.">
+      <form onSubmit={handleSubmit} noValidate>
+        <PwdField id="currentPassword" label="Current password"
+          value={currentPassword} onChange={(e) => setCurrent(e.target.value)}
+          show={showCurrent} onToggle={() => setShowCurrent((v) => !v)} error={errors.currentPassword} />
 
-      <PwdField id="newPassword" label="New password"
-        value={newPassword} onChange={(e) => setNew(e.target.value)}
-        show={showNew} onToggle={() => setShowNew((v) => !v)} error={errors.newPassword} />
+        <PwdField id="newPassword" label="New password"
+          value={newPassword} onChange={(e) => setNew(e.target.value)}
+          show={showNew} onToggle={() => setShowNew((v) => !v)} error={errors.newPassword} />
 
-      <PwdField id="confirmPassword" label="Confirm new password"
-        value={confirmPassword} onChange={(e) => setConfirm(e.target.value)}
-        show={showConfirm} onToggle={() => setShowConfirm((v) => !v)} error={errors.confirmPassword} />
+        <PwdField id="confirmPassword" label="Confirm new password"
+          value={confirmPassword} onChange={(e) => setConfirm(e.target.value)}
+          show={showConfirm} onToggle={() => setShowConfirm((v) => !v)} error={errors.confirmPassword} />
 
-      <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2")}>
-        {loading ? "Saving…" : "Change password"}
-      </button>
+        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
+          {loading ? "Saving…" : "Change Password"}
+        </button>
+      </form>
     </FormCard>
   );
 };

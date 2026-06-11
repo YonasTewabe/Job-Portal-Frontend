@@ -16,10 +16,10 @@ const COLS = [
 ];
 
 const ViewUserList = () => {
-  const [profiles,   setProfiles]  = useState([]);
-  const [loading,    setLoading]   = useState(true);
-  const [sortKey,    setSortKey]   = useState(null);
-  const [sortOrder,  setSortOrder] = useState("asc");
+  const [profiles,  setProfiles]  = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [sortKey,   setSortKey]   = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
   const { user: authUser } = useAuth();
   const myRole = authUser?.role;
 
@@ -42,13 +42,13 @@ const ViewUserList = () => {
   });
 
   const SortIcon = ({ col }) => {
-    if (col !== sortKey) return <FaSort className="ml-1 inline opacity-30" size={10} />;
+    if (col !== sortKey) return <FaSort className="ml-1 inline opacity-25" size={9} />;
     return sortOrder === "asc"
-      ? <FaSortUp className="ml-1 inline text-blue-500" size={10} />
-      : <FaSortDown className="ml-1 inline text-blue-500" size={10} />;
+      ? <FaSortUp className="ml-1 inline text-brand-500" size={9} />
+      : <FaSortDown className="ml-1 inline text-brand-500" size={9} />;
   };
 
-  if (loading) return <div className="py-20"><Spinner loading /></div>;
+  if (loading) return <div className="py-24"><Spinner loading /></div>;
   if (myRole !== "admin") return <UnauthorizedAccess />;
 
   const headers = COLS.map((c) => ({
@@ -59,18 +59,28 @@ const ViewUserList = () => {
 
   return (
     <Page>
-      <PageTitle>Registered Users</PageTitle>
+      <div className="mb-8">
+        <PageTitle>Registered Users</PageTitle>
+        <p className="text-sm text-gray-500 mt-1">{sorted.length} user{sorted.length !== 1 ? "s" : ""}</p>
+      </div>
+
       <Card className="p-0 overflow-hidden">
-        <Table headers={headers}
-          empty={sorted.length === 0 ? <Empty message="No registered users." /> : null}>
+        <Table
+          headers={headers}
+          empty={sorted.length === 0 ? <Empty message="No registered users." icon="👥" /> : null}
+        >
           {sorted.map((p, i) => (
             <Tr key={p.id ?? i} striped={i % 2 !== 0}>
-              <Td className="font-medium text-gray-900">{p.fullname}</Td>
-              <Td>{p.age}</Td>
-              <Td>{p.sex}</Td>
-              <Td>{p.degree}</Td>
-              <Td>{p.university}</Td>
-              <Td>{p.experience}</Td>
+              <Td className="font-semibold text-gray-900">{p.fullname}</Td>
+              <Td className="text-gray-500">{p.age}</Td>
+              <Td className="text-gray-500">{p.sex}</Td>
+              <Td className="text-gray-600">{p.degree}</Td>
+              <Td className="text-gray-600">{p.university}</Td>
+              <Td>
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
+                  {p.experience}
+                </span>
+              </Td>
             </Tr>
           ))}
         </Table>
