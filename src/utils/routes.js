@@ -7,10 +7,6 @@ export const getDefaultRoute = (role) => {
       return "/company/dashboard";
     case "user":
       return "/dashboard";
-    case "admin":
-      return "/home";
-    case "hr":
-      return "/home";
     default:
       return "/home";
   }

@@ -12,8 +12,7 @@ const JobListing = ({ job }) => {
   const open = isJobOpen(job);
 
   return (
-    <article className="group bg-white rounded-2xl border border-gray-100 shadow-card
-      hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
+    <article className="group surface-card-interactive flex flex-col">
       <div className="p-5 flex-1">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
@@ -72,9 +71,7 @@ const JobListing = ({ job }) => {
       <div className="px-5 pb-5">
         <Link
           to={`/job/${job.id}`}
-          className="btn-primary block w-full text-center bg-brand-600 hover:bg-brand-700 text-white
-            text-xs font-semibold py-2.5 rounded-xl transition-all duration-150
-            shadow-sm hover:shadow group-hover:shadow-md"
+          className="btn-primary w-full text-xs py-2.5"
         >
           View Details →
         </Link>

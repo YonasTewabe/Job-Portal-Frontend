@@ -69,7 +69,7 @@ const ViewStatus = () => {
               </Td>
               <Td>
                 <Badge status={app.status} />
-                {app.interviewDate && (
+                {app.status === "Interview Scheduled" && app.interviewDate && (
                   <p className="text-xs text-gray-400 mt-1">
                     {new Date(app.interviewDate).toLocaleString([], {
                       dateStyle: "short",

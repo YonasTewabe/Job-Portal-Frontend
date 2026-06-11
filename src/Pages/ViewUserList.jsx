@@ -58,7 +58,7 @@ const ViewUserList = () => {
   };
 
   if (loading) return <div className="py-24"><Spinner loading /></div>;
-  if (myRole !== "admin") return <NotFoundPage />;
+  if (myRole !== "superadmin") return <NotFoundPage />;
 
   const headers = COLS.map((c) => ({
     key:     c.key,

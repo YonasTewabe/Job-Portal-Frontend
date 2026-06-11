@@ -2,14 +2,14 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   safelist: [
-    // Ensure brand palette utilities are always generated
+    "btn-primary", "btn-secondary", "btn-outline-brand", "btn-ghost", "btn-danger", "btn-success", "btn-warning",
+    "link-brand", "link-muted", "link-nav", "nav-item-active", "hero-surface", "surface-card-interactive",
     "bg-brand-50", "bg-brand-100", "bg-brand-600", "bg-brand-700",
-    "text-brand-600", "text-brand-700", "text-brand-800", "text-brand-900",
-    "border-brand-200", "border-brand-600",
-    "hover:bg-brand-50", "hover:bg-brand-100", "hover:bg-brand-600", "hover:bg-brand-700",
-    "hover:text-brand-700", "hover:text-brand-800", "hover:text-white",
-    "from-brand-50", "from-brand-100", "via-brand-100", "to-slate-50",
-    "ring-brand-200", "focus:ring-brand-500",
+    "text-brand-100", "text-brand-600", "text-brand-700", "text-brand-800", "text-brand-900",
+    "border-brand-100", "border-brand-200", "border-brand-600",
+    "hover:bg-brand-50", "hover:bg-brand-100", "hover:bg-brand-700",
+    "hover:text-brand-700", "hover:text-brand-800",
+    "focus:ring-brand-400", "focus:ring-brand-500",
   ],
   theme: {
     extend: {
@@ -32,7 +32,6 @@ export default {
           800: "var(--brand-800)",
           900: "var(--brand-900)",
         },
-        background: "var(--brand-600)",
       },
       borderRadius: {
         xl:  "0.75rem",

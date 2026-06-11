@@ -5,8 +5,7 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
-import { getDefaultRoute } from "../utils/routes";
-import { preserveFromPublic } from "../utils/authNavigation";
+import { preserveAuthRedirect, resolvePostAuthPath } from "../utils/authNavigation";
 import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
 
 const schema = Yup.object().shape({
@@ -26,7 +25,7 @@ const Login = () => {
   const location  = useLocation();
 
   if (user) {
-    return <Navigate to={getDefaultRoute(user.role)} replace />;
+    return <Navigate to={resolvePostAuthPath(location, user.role)} replace />;
   }
 
   const validate = () => {
@@ -49,8 +48,7 @@ const Login = () => {
     try {
       const { data } = await axios.post("/api/auth/login", { email, password });
       login(data);
-      const destination = location.state?.from?.pathname ?? getDefaultRoute(data.role);
-      navigate(destination, { replace: true });
+      navigate(resolvePostAuthPath(location, data.role), { replace: true });
     } catch {
       toast.error("Invalid email or password");
     } finally {
@@ -88,7 +86,7 @@ const Login = () => {
         </Field>
 
         <div className="flex justify-end mb-2">
-          <Link to="/forgotpassword" className="text-xs text-brand-700 hover:text-brand-800 font-medium hover:underline">
+          <Link to="/forgotpassword" className="text-xs link-brand">
             Forgot password?
           </Link>
         </div>
@@ -101,13 +99,13 @@ const Login = () => {
       <div className="mt-6 pt-6 border-t border-gray-100 text-center space-y-2">
         <p className="text-sm text-gray-500">
           No account?{" "}
-          <Link to="/signup" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+          <Link to="/signup" state={preserveAuthRedirect(location)} className="link-brand">
             Sign up as job seeker
           </Link>
         </p>
         <p className="text-sm text-gray-500">
           Hiring?{" "}
-          <Link to="/register/company" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+          <Link to="/register/company" state={preserveAuthRedirect(location)} className="link-brand">
             Register your company
           </Link>
         </p>

@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useLoaderData, Link, useNavigate, useRevalidator } from "react-router-dom";
+import { loginRedirectState } from "../utils/authNavigation";
 import { FaArrowLeft, FaMapMarkerAlt, FaClock, FaDollarSign, FaBuilding, FaPhone, FaEnvelope } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "../axiosInterceptor";
@@ -7,13 +8,15 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, Badge, Btn, Page } from "../Components/ui";
-import { isJobOpen } from "../utils/jobs";
+import { isJobOpen, normalizeJob } from "../utils/jobs";
+import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
 
 const Job = ({ deleteJob }) => {
   const navigate = useNavigate();
   const { revalidate } = useRevalidator();
   const job = useLoaderData();
   const [applicantProfile, setApplicantProfile] = useState(null);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [togglingOpen, setTogglingOpen] = useState(false);
@@ -23,20 +26,46 @@ const Job = ({ deleteJob }) => {
   const userId = authUser?.userId;
 
   useEffect(() => {
-    if (role === "user" && userId) {
-      setProfileLoading(true);
-      axios.get("/api/applicants/me")
-        .then((r) => setApplicantProfile(r.data))
-        .catch(() => setApplicantProfile(null))
-        .finally(() => setProfileLoading(false));
-    }
-  }, [role, userId]);
+    if (role !== "user" || !userId) return;
+
+    let cancelled = false;
+    setProfileLoading(true);
+
+    const load = async () => {
+      try {
+        const { data: profile } = await axios.get("/api/applicants/me");
+        if (cancelled) return;
+        setApplicantProfile(profile);
+
+        if (profile?.id) {
+          const { data: apps } = await axios.get(`/api/applications?applicantId=${profile.id}`);
+          if (cancelled) return;
+          const list = Array.isArray(apps) ? apps : [];
+          const applied = list.some(
+            (app) => (app.job?.id ?? app.jobId) === job.id
+          );
+          setAlreadyApplied(applied);
+        }
+      } catch {
+        if (!cancelled) {
+          setApplicantProfile(null);
+          setAlreadyApplied(false);
+        }
+      } finally {
+        if (!cancelled) setProfileLoading(false);
+      }
+    };
+
+    load();
+    return () => { cancelled = true; };
+  }, [role, userId, job.id]);
 
   const profileComplete = applicantProfile?.profileCompleted === true;
 
   const jobOpen = isJobOpen(job);
 
   const handleApply = async () => {
+    if (alreadyApplied) return;
     if (!profileComplete || !applicantProfile?.id) {
       toast.error("Complete your profile before applying");
       return;
@@ -49,7 +78,8 @@ const Job = ({ deleteJob }) => {
         applicationDate: new Date().toISOString(),
       });
       toast.success("Application submitted");
-      navigate("/jobs");
+      setAlreadyApplied(true);
+      navigate("/status");
     } catch (error) {
       toast.error(error.response?.data?.message ?? "Failed to submit application");
     } finally {
@@ -66,8 +96,8 @@ const Job = ({ deleteJob }) => {
         : "Applicants can apply again if the deadline has not passed.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#4f46e5",
-      cancelButtonColor: "#6b7280",
+      confirmButtonColor: SWAL_CONFIRM,
+      cancelButtonColor: SWAL_CANCEL,
       confirmButtonText: closing ? "Yes, close it" : "Yes, reopen it",
     }).then(async (result) => {
       if (!result.isConfirmed) return;
@@ -90,8 +120,8 @@ const Job = ({ deleteJob }) => {
       text: "This cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#4f46e5",
-      cancelButtonColor: "#6b7280",
+      confirmButtonColor: SWAL_CONFIRM,
+      cancelButtonColor: SWAL_CANCEL,
       confirmButtonText: "Yes, delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -107,8 +137,7 @@ const Job = ({ deleteJob }) => {
       {/* Back link */}
       <Link
         to="/jobs"
-        className="inline-flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700
-          font-medium mb-6 group"
+        className="inline-flex items-center gap-2 text-sm link-brand mb-6 group"
       >
         <FaArrowLeft size={11} className="group-hover:-translate-x-0.5 transition-transform" />
         Back to listings
@@ -121,7 +150,6 @@ const Job = ({ deleteJob }) => {
           <Card>
             <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
               <div>
-                <p className="text-xs font-medium text-gray-400 mb-1">{job.companyName}</p>
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{job.title}</h1>
               </div>
               <Badge status={jobOpen ? "Active" : "Closed"} />
@@ -178,16 +206,46 @@ const Job = ({ deleteJob }) => {
             <div className="space-y-2 text-xs text-gray-600">
               <div className="flex items-center gap-2">
                 <FaEnvelope className="text-gray-400 shrink-0" size={11} />
-                <span>{job.contactEmail}</span>
+                <span>{job.contactEmail || "—"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <FaPhone className="text-gray-400 shrink-0" size={11} />
-                <span>+251 {job.companyPhone}</span>
+                <span>{job.companyPhone ? `+251 ${job.companyPhone}` : "—"}</span>
               </div>
             </div>
           </Card>
 
           {/* Apply / Actions */}
+          {!authUser && jobOpen && (
+            <Card>
+              <Link
+                to="/login"
+                state={loginRedirectState(`/job/${job.id}`)}
+                className={Btn.full("primary", "py-3 text-center block")}
+              >
+                Apply Now
+              </Link>
+              <p className="text-xs text-gray-500 text-center mt-3">
+                Don&apos;t have an account?{" "}
+                <Link
+                  to="/signup"
+                  state={loginRedirectState(`/job/${job.id}`)}
+                  className="link-brand text-xs"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </Card>
+          )}
+
+          {!authUser && !jobOpen && (
+            <Card>
+              <button disabled className={Btn.full("danger", "opacity-50 cursor-not-allowed py-3")}>
+                {job.isOpen === false ? "Applications Closed" : "Deadline Passed"}
+              </button>
+            </Card>
+          )}
+
           {role === "user" && (
             <Card>
               {jobOpen ? (
@@ -195,6 +253,19 @@ const Job = ({ deleteJob }) => {
                   <button disabled className={Btn.full("primary", "opacity-50 cursor-not-allowed py-3")}>
                     Loading…
                   </button>
+                ) : alreadyApplied ? (
+                  <div className="space-y-3">
+                    <button
+                      type="button"
+                      disabled
+                      className={Btn.full("secondary", "opacity-60 cursor-not-allowed py-3")}
+                    >
+                      Already Applied
+                    </button>
+                    <Link to="/status" className={Btn.ghost("w-full py-2.5 text-center block")}>
+                      View application status
+                    </Link>
+                  </div>
                 ) : profileComplete ? (
                   <button
                     onClick={handleApply}
@@ -206,7 +277,7 @@ const Job = ({ deleteJob }) => {
                 ) : (
                   <div className="space-y-3">
                     <p className="text-sm text-gray-600 leading-relaxed">
-                      Complete your profile — including education, experience, and CV — before applying.
+                      Complete your profile before applying.
                     </p>
                     <Link to="/profile" className={Btn.full("primary", "py-3")}>
                       Complete profile
@@ -263,7 +334,7 @@ const Job = ({ deleteJob }) => {
 
 const jobLoader = async ({ params }) => {
   const res = await axios.get(`/api/jobs/${params.id}`);
-  return res.data;
+  return normalizeJob(res.data);
 };
 
 export { Job, jobLoader };

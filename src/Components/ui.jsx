@@ -1,3 +1,5 @@
+import { Children } from "react";
+
 // ─── Input ────────────────────────────────────────────────────────────────────
 export const inputCls = (error) =>
   `w-full rounded-xl border px-3.5 py-2.5 text-sm text-gray-900 bg-white
@@ -22,19 +24,14 @@ export const Field = ({ label, htmlFor, error, hint, children }) => (
   </div>
 );
 
-// ─── Buttons ──────────────────────────────────────────────────────────────────
-const base =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold " +
-  "transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 " +
-  "disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]";
-
+// ─── Buttons (styles defined in index.css) ────────────────────────────────────
 export const Btn = {
-  primary:   (cls = "") => `${base} btn-primary bg-brand-600 text-white hover:bg-brand-700 shadow-sm focus:ring-brand-500 ${cls}`,
-  secondary: (cls = "") => `${base} bg-white text-gray-800 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 shadow-sm focus:ring-gray-400 ${cls}`,
-  danger:    (cls = "") => `${base} bg-red-600 text-white hover:bg-red-700 shadow-sm focus:ring-red-500 ${cls}`,
-  success:   (cls = "") => `${base} bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm focus:ring-emerald-500 ${cls}`,
-  ghost:     (cls = "") => `${base} text-brand-700 hover:bg-brand-50 hover:text-brand-800 focus:ring-brand-400 ${cls}`,
-  warning:   (cls = "") => `${base} bg-amber-500 text-white hover:bg-amber-600 shadow-sm focus:ring-amber-400 ${cls}`,
+  primary:   (cls = "") => `btn-primary ${cls}`,
+  secondary: (cls = "") => `btn-secondary ${cls}`,
+  danger:    (cls = "") => `btn-danger ${cls}`,
+  success:   (cls = "") => `btn-success ${cls}`,
+  ghost:     (cls = "") => `btn-ghost ${cls}`,
+  warning:   (cls = "") => `btn-warning ${cls}`,
   full:      (variant, cls = "") => Btn[variant](`w-full ${cls}`),
 };
 
@@ -88,30 +85,34 @@ export const StatTile = ({ label, value, color = "text-brand-600" }) => (
 );
 
 // ─── Table ────────────────────────────────────────────────────────────────────
-export const Table = ({ headers, children, empty }) => (
-  <div className="overflow-x-auto">
-    <table className="min-w-full divide-y divide-gray-100 text-sm">
-      <thead>
-        <tr className="bg-gray-50/80">
-          {headers.map((h) => (
-            <th
-              key={h.key ?? h.label}
-              onClick={h.onClick}
-              className={`px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider
-                ${h.onClick ? "cursor-pointer select-none hover:text-gray-600 transition-colors" : ""}`}
-            >
-              {h.label}{h.sort}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-50 bg-white">
-        {children}
-      </tbody>
-    </table>
-    {empty}
-  </div>
-);
+export const Table = ({ headers, children, empty }) => {
+  const hasRows = Children.count(children) > 0;
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-100 text-sm">
+        <thead>
+          <tr className="bg-gray-50/80">
+            {headers.map((h) => (
+              <th
+                key={h.key ?? h.label}
+                onClick={h.onClick}
+                className={`px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider
+                  ${h.onClick ? "cursor-pointer select-none hover:text-gray-600 transition-colors" : ""}`}
+              >
+                {h.label}{h.sort}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-50 bg-white">
+          {hasRows ? children : null}
+        </tbody>
+      </table>
+      {!hasRows && empty}
+    </div>
+  );
+};
 
 export const Tr = ({ children, striped, onClick, className = "" }) => (
   <tr
@@ -146,8 +147,7 @@ export const AuthBackHome = () => {
   return (
     <Link
       to="/"
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500
-        hover:text-gray-900 transition-colors mb-4"
+      className="inline-flex items-center gap-1.5 text-sm font-medium link-muted mb-4"
     >
       <span aria-hidden>←</span> Back to home
     </Link>

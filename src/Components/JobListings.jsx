@@ -5,6 +5,7 @@ import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PostJobLink from "./PostJobLink";
+import { normalizeJobs, isJobOpen } from "../utils/jobs";
 import { FaSearch, FaPlus } from "react-icons/fa";
 
 const JobListings = ({ isHome = false }) => {
@@ -22,7 +23,7 @@ const JobListings = ({ isHome = false }) => {
   useEffect(() => {
     const url = companyId ? `/api/jobs?companyId=${companyId}` : "/api/jobs";
     axios.get(url)
-      .then((r) => setJobs(Array.isArray(r.data) ? r.data : []))
+      .then((r) => setJobs(normalizeJobs(r.data)))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [companyId]);
@@ -30,7 +31,9 @@ const JobListings = ({ isHome = false }) => {
   if (loading) return <div className="py-24"><Spinner loading /></div>;
   if (error)   return <p className="text-center py-24 text-red-500 text-sm">Failed to load jobs.</p>;
 
-  const filtered = jobs.filter((job) =>
+  const visibleJobs = !authUser ? jobs.filter(isJobOpen) : jobs;
+
+  const filtered = visibleJobs.filter((job) =>
     [job.title, job.requirement, job.companyName, job.description]
       .some((f) => f?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -66,10 +69,7 @@ const JobListings = ({ isHome = false }) => {
 
           {/* Post job button for company admin */}
           {!isHome && role === "company_admin" && (
-            <PostJobLink
-              className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
-                font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
-            >
+            <PostJobLink className="btn-primary px-4 py-2.5">
               <FaPlus size={11} /> Post a Job
             </PostJobLink>
           )}
@@ -130,7 +130,9 @@ const JobListings = ({ isHome = false }) => {
         ) : (
           <div className="py-24 text-center">
             <p className="text-4xl mb-4">🔍</p>
-            <p className="text-sm text-gray-500 font-medium">No jobs match your search.</p>
+            <p className="text-sm text-gray-500 font-medium">
+              {!authUser ? "No open positions right now." : "No jobs match your search."}
+            </p>
           </div>
         )}
       </div>

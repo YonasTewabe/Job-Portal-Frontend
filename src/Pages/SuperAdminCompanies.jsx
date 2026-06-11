@@ -100,7 +100,7 @@ const SuperAdminCompanies = () => {
               <Td>
                 <Link
                   to={`/superadmin/companies/${company.id}`}
-                  className="text-xs text-brand-600 hover:text-brand-700 font-semibold hover:underline"
+                  className="text-xs link-brand"
                 >
                   View jobs →
                 </Link>

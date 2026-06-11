@@ -3,6 +3,8 @@ import { FaBriefcase, FaClipboardList, FaBuilding, FaChartLine } from "react-ico
 import { useAuth } from "../context/AuthContext";
 import { getDefaultRoute } from "../utils/routes";
 import { publicAuthState } from "../utils/authNavigation";
+import JobListings from "../Components/JobListings";
+import ViewAllJobs from "../Components/ViewAllJobs";
 
 const features = [
   {
@@ -56,27 +58,29 @@ const LandingPage = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
+              to="/jobs"
+              className="btn-primary w-full sm:w-auto px-8 py-3.5 rounded-2xl shadow-float"
+            >
+              Browse jobs
+            </Link>
+            <Link
               to="/login"
               state={publicAuthState}
-              className="btn-outline-brand w-full sm:w-auto inline-flex items-center justify-center
-                font-semibold px-8 py-3.5 rounded-2xl text-sm transition-all"
+              className="btn-outline-brand w-full sm:w-auto px-8 py-3.5 rounded-2xl"
             >
               Log in
             </Link>
             <Link
               to="/signup"
               state={publicAuthState}
-              className="btn-primary w-full sm:w-auto inline-flex items-center justify-center
-                font-bold px-8 py-3.5 rounded-2xl shadow-float text-sm transition-all"
+              className="btn-primary w-full sm:w-auto px-8 py-3.5 rounded-2xl shadow-float"
             >
               Sign up
             </Link>
             <Link
               to="/register/company"
               state={publicAuthState}
-              className="w-full sm:w-auto inline-flex items-center justify-center font-semibold
-                text-brand-700 hover:text-brand-800 px-8 py-3.5 rounded-2xl text-sm
-                hover:bg-brand-50 border border-brand-200 transition-all"
+              className="btn-ghost w-full sm:w-auto px-8 py-3.5 rounded-2xl border border-brand-200"
             >
               Register company
             </Link>
@@ -87,6 +91,10 @@ const LandingPage = () => {
           </p>
         </div>
       </section>
+
+      {/* Open positions */}
+      <JobListings isHome />
+      <ViewAllJobs />
 
       {/* Features */}
       <section className="py-16 sm:py-20 px-4 sm:px-6">
@@ -104,7 +112,7 @@ const LandingPage = () => {
             {features.map(({ icon, title, desc }) => (
               <div
                 key={title}
-                className="bg-white rounded-2xl border border-gray-100 shadow-card p-6 flex gap-4"
+                className="surface-card-interactive p-6 flex gap-4 hover:translate-y-0"
               >
                 <div className="shrink-0 w-11 h-11 rounded-2xl bg-brand-50 border border-brand-100
                   flex items-center justify-center text-brand-600">

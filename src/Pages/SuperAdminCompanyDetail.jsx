@@ -125,7 +125,7 @@ const SuperAdminCompanyDetail = () => {
                 <div className="flex items-center gap-3">
                   <Link
                     to={`/job/${job.id}`}
-                    className="text-xs text-brand-600 hover:text-brand-700 font-semibold hover:underline"
+                    className="text-xs link-brand"
                   >
                     View
                   </Link>

@@ -128,7 +128,16 @@ const SuperAdminDashboard = () => {
             <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
-        <Link to="/superadmin/pricing" className="group sm:col-span-3">
+        <Link to="/superadmin/payments" className="group">
+          <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Payment History</p>
+              <p className="text-xs text-gray-500 mt-0.5">View job posting payments by company and date</p>
+            </div>
+            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+          </Card>
+        </Link>
+        <Link to="/superadmin/pricing" className="group sm:col-span-2">
           <Card className="flex items-center justify-between hover:shadow-card-hover transition-shadow">
             <div>
               <p className="text-sm font-semibold text-gray-900">Job Posting Price</p>
@@ -145,7 +154,7 @@ const SuperAdminDashboard = () => {
           <h2 className="text-sm font-semibold text-gray-900">Recent Companies</h2>
           <Link
             to="/superadmin/companies"
-            className="text-xs text-brand-600 hover:text-brand-700 font-semibold hover:underline"
+            className="text-xs link-brand"
           >
             View all →
           </Link>

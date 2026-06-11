@@ -12,6 +12,7 @@ import { getDefaultRoute } from "../utils/routes";
 import { useCompany } from "../hooks/useCompany";
 import { APP_NAME } from "../constants/brand";
 import Logo from "./Logo";
+import NotificationBell from "./NotificationBell";
 
 const menus = {
   user: [
@@ -23,25 +24,16 @@ const menus = {
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/company/dashboard" },
     { icon: <FaUserPlus />,      text: "Post a Job", link: "/add-job" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
-  ],
-  admin: [
-    { icon: <FaHome />,      text: "Home",             link: "/home" },
-    { icon: <FaUserPlus />,  text: "Add HR",            link: "/add-hr" },
-    { icon: <FaList />,      text: "Registered HR",     link: "/view-hr" },
-    { icon: <FaUsers />,     text: "Registered Users",  link: "/view-users" },
-    { icon: <FaBriefcase />, text: "All Jobs",          link: "/jobs" },
+    { icon: <FaList />,          text: "Payments",   link: "/company/payments" },
   ],
   superadmin: [
     { icon: <FaTachometerAlt />, text: "Dashboard", link: "/superadmin/dashboard" },
     { icon: <FaBuilding />,      text: "Companies",  link: "/superadmin/companies" },
     { icon: <FaUsers />,         text: "Super Admins", link: "/superadmin/admins" },
+    { icon: <FaUsers />,         text: "Job Seekers", link: "/superadmin/applicants" },
     { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
     { icon: <FaList />,          text: "Job Pricing", link: "/superadmin/pricing" },
-  ],
-  hr: [
-    { icon: <FaHome />,      text: "Home",       link: "/home" },
-    { icon: <FaUserPlus />,  text: "Post Job",   link: "/add-job" },
-    { icon: <FaBriefcase />, text: "Your Jobs",  link: "/jobs" },
+    { icon: <FaList />,          text: "Payments",    link: "/superadmin/payments" },
   ],
 };
 
@@ -70,7 +62,7 @@ const NavItem = ({ icon, text, link, onClick, disabled }) => {
         `${baseCls}
          ${isActive
            ? "nav-item-active shadow-sm"
-           : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`
+           : "text-gray-700 hover:bg-brand-50 hover:text-brand-800"}`
       }
     >
       <span className="text-base opacity-80">{icon}</span>
@@ -133,10 +125,10 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
+          <NotificationBell />
           <Link
             to={profilePath}
-            className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900
-              px-3 py-1.5 rounded-xl hover:bg-gray-100 transition-all"
+            className="flex items-center gap-1.5 text-sm font-medium link-nav px-3 py-1.5 rounded-xl"
           >
             <MdOutlineAccountCircle size={20} className="text-gray-500" />
             <span className="hidden sm:inline">{user.name || "Profile"}</span>

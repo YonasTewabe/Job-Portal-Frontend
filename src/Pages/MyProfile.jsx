@@ -19,13 +19,6 @@ import {
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
-const hrSchema = Yup.object().shape({
-  companyname:        Yup.string().required("Company name is required"),
-  companydescription: Yup.string().required("Description is required"),
-  contactemail:       Yup.string().email("Invalid email").required("Email is required"),
-  companyPhone:       Yup.string().matches(/^[0-9]{9}$/, "9 digits required").required("Required"),
-});
-
 const companyProfileSchema = Yup.object().shape({
   coName:         Yup.string().required("Company name is required"),
   coDescription:  Yup.string().required("Description is required"),
@@ -111,12 +104,6 @@ const MyProfile = () => {
   const [cv, setCv]                   = useState(null);
   const [email, setEmail]             = useState("");
 
-  // HR (legacy user-embedded company fields)
-  const [companyname, setCompanyname]             = useState("");
-  const [companydescription, setCompanydescription] = useState("");
-  const [contactemail, setContactemail]           = useState("");
-  const [companyPhone, setCompanyPhone]           = useState("");
-
   // Company admin
   const [name, setName]               = useState("");
   const [companyId, setCompanyId]     = useState(null);
@@ -166,12 +153,6 @@ const MyProfile = () => {
           const { data } = await axios.get(`/api/users/${userId}`);
           setName(data.name ?? authUser.name ?? "");
           setEmail(data.email ?? "");
-          if (role === "hr") {
-            setCompanyname(data.companyname ?? "");
-            setCompanydescription(data.companydescription ?? "");
-            setContactemail(data.contactemail ?? "");
-            setCompanyPhone(data.companyPhone ?? "");
-          }
         }
       } catch {
         toast.error("Failed to load profile");
@@ -193,8 +174,6 @@ const MyProfile = () => {
           { fullname, email, dateOfBirth, sex, educations, experiences, userPhone },
           { abortEarly: false }
         );
-      } else if (role === "hr") {
-        hrSchema.validateSync({ companyname, companydescription, contactemail, companyPhone }, { abortEarly: false });
       } else if (role === "company_admin") {
         adminProfileSchema.validateSync({ name, email }, { abortEarly: false });
         companyProfileSchema.validateSync(
@@ -236,15 +215,6 @@ const MyProfile = () => {
           });
         }
         patchSession({ name: fullname });
-      } else if (role === "hr") {
-        const fd = new FormData();
-        fd.append("companyname", companyname);
-        fd.append("companydescription", companydescription);
-        fd.append("companyPhone", companyPhone);
-        fd.append("contactemail", contactemail);
-        await axios.patch(`/api/users/${userId}`, fd, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
       } else if (role === "company_admin") {
         if (!companyId) {
           toast.error("Company not found");
@@ -301,9 +271,7 @@ const MyProfile = () => {
   const roleLabel = {
     user:          "Job Seeker",
     company_admin: "Company Admin",
-    hr:            "HR",
     superadmin:    "Super Admin",
-    admin:         "Admin",
   }[role] ?? role;
 
   if (loading) return <div className="py-24"><Spinner loading /></div>;
@@ -381,26 +349,6 @@ const MyProfile = () => {
               </>
             )}
 
-            {role === "hr" && (
-              <>
-                <Field label="Company name" htmlFor="companyname" error={errors.companyname}>
-                  <input id="companyname" type="text" value={companyname}
-                    onChange={(e) => setCompanyname(e.target.value)} className={inputCls(errors.companyname)} />
-                </Field>
-                <Field label="Company description" htmlFor="companydescription" error={errors.companydescription}>
-                  <textarea id="companydescription" rows={4} value={companydescription}
-                    onChange={(e) => setCompanydescription(e.target.value)}
-                    className={inputCls(errors.companydescription) + " resize-none"} />
-                </Field>
-                <Field label="Contact email" htmlFor="contactemail" error={errors.contactemail}>
-                  <input id="contactemail" type="email" value={contactemail}
-                    onChange={(e) => setContactemail(e.target.value)} className={inputCls(errors.contactemail)} />
-                </Field>
-                <PhoneInput id="companyPhone" value={companyPhone}
-                  onChange={(e) => setCompanyPhone(e.target.value)} error={errors.companyPhone} />
-              </>
-            )}
-
             {role === "company_admin" && (
               <>
                 <Field label="Your name" htmlFor="name" error={errors.name}>
@@ -430,7 +378,7 @@ const MyProfile = () => {
               </>
             )}
 
-            {(role === "superadmin" || role === "admin") && (
+            {role === "superadmin" && (
               <>
                 <Field label="Name" htmlFor="name" error={errors.name}>
                   <input id="name" type="text" value={name}

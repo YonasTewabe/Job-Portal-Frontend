@@ -1,3 +1,5 @@
+import { BRAND } from "../constants/theme";
+
 /**
  * AppLogo — SVG logo for the Application Tracker platform.
  *
@@ -10,8 +12,8 @@
  *   showText — render the wordmark beside the mark, default false
  */
 const Logo = ({ size = 32, variant = "color", showText = false }) => {
-  const mark  = variant === "white" ? "#ffffff" : variant === "dark" ? "#111827" : "#2563eb";
-  const accent = variant === "white" ? "#ffffff" : "#60a5fa";
+  const mark  = variant === "white" ? "#ffffff" : variant === "dark" ? "#111827" : BRAND[600];
+  const accent = variant === "white" ? "#ffffff" : BRAND[400];
   const text  = variant === "white" ? "#ffffff" : "#111827";
 
   return (

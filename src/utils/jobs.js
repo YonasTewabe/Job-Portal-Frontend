@@ -1,3 +1,19 @@
+/** Map nested `company` relation to flat fields used across the UI. */
+export const normalizeJob = (job) => {
+  if (!job) return job;
+  const company = job.company ?? {};
+  return {
+    ...job,
+    companyName: job.companyName ?? company.name ?? "",
+    companyDescription: job.companyDescription ?? company.description ?? "",
+    contactEmail: job.contactEmail ?? company.contactEmail ?? "",
+    companyPhone: job.companyPhone ?? company.phone ?? "",
+  };
+};
+
+export const normalizeJobs = (jobs) =>
+  (Array.isArray(jobs) ? jobs : []).map(normalizeJob);
+
 export const isJobOpen = (job) => {
   if (job?.isOpen === false) return false;
   if (!job?.deadline) return true;

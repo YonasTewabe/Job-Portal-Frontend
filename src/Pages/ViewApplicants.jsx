@@ -1,6 +1,7 @@
 import axios from "../axiosInterceptor";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Donut from "./ViewReport";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
@@ -8,6 +9,13 @@ import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Badge, Btn, inputCls, Empty, Table, Tr, Td, Field, SectionTitle, InfoRow } from "../Components/ui";
 import { FaSortUp, FaSortDown, FaFilePdf, FaSync, FaTimes } from "react-icons/fa";
 import { calculateAge } from "../utils/profileSchema";
+
+const mergeApplication = (current, data) => ({
+  ...current,
+  ...data,
+  applicant: data?.applicant ?? current?.applicant,
+  job: data?.job ?? current?.job,
+});
 
 const formatDate = (raw) => {
   if (!raw) return "—";
@@ -31,14 +39,27 @@ const ApplicantActions = ({
   rescheduleMode,
   onRescheduleSave,
   onRescheduleCancel,
+  actionLoading,
 }) => {
+  const busy = actionLoading === applicant.id;
+
   if (applicant.status === "Pending") {
     return (
       <div className="flex gap-2">
-        <button type="button" onClick={() => accept(applicant)} className={Btn.success("text-sm py-2 px-4")}>
-          Accept
+        <button
+          type="button"
+          disabled={busy}
+          onClick={(e) => { e.stopPropagation(); accept(applicant); }}
+          className={Btn.success("text-sm py-2 px-4 disabled:opacity-50")}
+        >
+          {busy ? "Updating…" : "Accept"}
         </button>
-        <button type="button" onClick={() => reject(applicant)} className={Btn.danger("text-sm py-2 px-4")}>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={(e) => { e.stopPropagation(); reject(applicant); }}
+          className={Btn.danger("text-sm py-2 px-4 disabled:opacity-50")}
+        >
           Reject
         </button>
       </div>
@@ -82,13 +103,18 @@ const ApplicantActions = ({
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => schedule(applicant)}
-            disabled={!fields.interviewDate || !fields.interviewTime || !fields.interviewLocation}
+            onClick={(e) => { e.stopPropagation(); schedule(applicant); }}
+            disabled={busy || !fields.interviewDate || !fields.interviewTime || !fields.interviewLocation}
             className={Btn.primary("flex-1 text-sm py-2 disabled:opacity-40")}
           >
-            Schedule interview
+            {busy ? "Updating…" : "Schedule interview"}
           </button>
-          <button type="button" onClick={() => reject(applicant)} className={Btn.danger("text-sm py-2 px-4")}>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={(e) => { e.stopPropagation(); reject(applicant); }}
+            className={Btn.danger("text-sm py-2 px-4 disabled:opacity-50")}
+          >
             Reject
           </button>
         </div>
@@ -177,6 +203,7 @@ const ApplicantDetailModal = ({
   schedule,
   reschedule,
   getApplicantCv,
+  actionLoading,
 }) => {
   const [rescheduleMode, setRescheduleMode] = useState(false);
 
@@ -307,6 +334,7 @@ const ApplicantDetailModal = ({
                   rescheduleMode={rescheduleMode}
                   onRescheduleSave={handleRescheduleSave}
                   onRescheduleCancel={() => setRescheduleMode(false)}
+                  actionLoading={actionLoading}
                 />
               </div>
             )}
@@ -336,6 +364,7 @@ const ViewApplicants = () => {
   const [refreshKey,    setRefreshKey]    = useState(0);
   const [interviewData, setInterviewData]     = useState({});
   const [selectedApplicant, setSelectedApplicant] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const { id: jobId } = useParams();
   const { user: authUser } = useAuth();
@@ -352,19 +381,28 @@ const ViewApplicants = () => {
   const updateInterview = (id, field, value) =>
     setInterviewData((prev) => ({ ...prev, [id]: { ...(prev[id] ?? {}), [field]: value } }));
 
-  const patchStatus = async (applicant, patch) => {
+  const patchStatus = async (applicant, patch, successMessage) => {
+    setActionLoading(applicant.id);
     try {
-      await axios.patch(`/api/applications/${applicant.id}`, patch);
-      const updated = { ...applicant, ...patch };
+      const { data } = await axios.patch(`/api/applications/${applicant.id}`, patch);
+      const updated = mergeApplication(applicant, data);
       setApplicants((prev) =>
         prev.map((a) => (a.id === applicant.id ? updated : a))
       );
       setSelectedApplicant((prev) => (prev?.id === applicant.id ? updated : prev));
-    } catch (e) { console.error(e); }
+      if (successMessage) toast.success(successMessage);
+    } catch (e) {
+      const message = e.response?.data?.message ?? "Failed to update application";
+      toast.error(Array.isArray(message) ? message[0] : message);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
-  const accept   = (a) => patchStatus(a, { status: "Under Consideration" });
-  const reject   = (a) => patchStatus(a, { status: "Rejected" });
+  const accept = (a) =>
+    patchStatus(a, { status: "Under Consideration" }, "Applicant accepted");
+  const reject = (a) =>
+    patchStatus(a, { status: "Rejected" }, "Applicant rejected");
 
   const getInterviewFields = (applicant) => {
     const idata = interviewData[applicant.id] ?? {};
@@ -380,14 +418,22 @@ const ViewApplicants = () => {
     const { interviewDate, interviewTime, interviewLocation } = getInterviewFields(a);
     if (!interviewDate || !interviewTime || !interviewLocation) return;
     const interviewDateTime = new Date(`${interviewDate}T${interviewTime}`).toISOString();
-    patchStatus(a, { status: "Interview Scheduled", interviewDate: interviewDateTime, interviewLocation });
+    patchStatus(
+      a,
+      { status: "Interview Scheduled", interviewDate: interviewDateTime, interviewLocation },
+      "Interview scheduled"
+    );
   };
 
   const reschedule = async (a) => {
     const { interviewDate, interviewTime, interviewLocation } = getInterviewFields(a);
     if (!interviewDate || !interviewTime || !interviewLocation) return;
     const interviewDateTime = new Date(`${interviewDate}T${interviewTime}`).toISOString();
-    await patchStatus(a, { interviewDate: interviewDateTime, interviewLocation });
+    await patchStatus(
+      a,
+      { interviewDate: interviewDateTime, interviewLocation },
+      "Interview rescheduled"
+    );
   };
 
   const getApplicantProfile = (app) => {
@@ -443,7 +489,7 @@ const ViewApplicants = () => {
     }
   });
 
-  const canManage = myRole === "hr" || myRole === "company_admin";
+  const canManage = myRole === "company_admin" || myRole === "superadmin";
   const canView   = canManage || myRole === "superadmin";
 
   const sortIcon = (key) => {
@@ -549,6 +595,7 @@ const ViewApplicants = () => {
           schedule={schedule}
           reschedule={reschedule}
           getApplicantCv={getApplicantCv}
+          actionLoading={actionLoading}
         />
       )}
     </Page>

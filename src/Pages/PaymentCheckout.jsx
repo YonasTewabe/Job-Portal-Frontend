@@ -14,7 +14,7 @@ const PaymentCheckout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { company, loading: companyLoading } = useCompany();
-  const { amount, currency, pendingJob, payerInfo, setPayerInfo } = usePayment();
+  const { amount, currency, pendingJob, payerInfo, setPayerInfo, setTxRef } = usePayment();
   const [loading, setLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -84,6 +84,7 @@ const PaymentCheckout = () => {
       first_name: paymentPersonName,
       last_name: "",
       phone: paymentPersonPhoneNumber,
+      onTxRef: setTxRef,
     });
 
     if (!result.success) {
@@ -165,7 +166,7 @@ const PaymentCheckout = () => {
         />
         <span className="text-sm text-gray-600">
           I agree to the{" "}
-          <Link to="/about" className="text-brand-700 font-semibold hover:underline">
+          <Link to="/about" className="link-brand">
             Terms &amp; Conditions
           </Link>
         </span>

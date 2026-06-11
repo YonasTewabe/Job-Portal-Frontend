@@ -63,8 +63,7 @@ const UserDashboard = () => {
         </div>
         <Link
           to="/jobs"
-          className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
-            font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
+          className="btn-primary px-4 py-2.5"
         >
           <FaBriefcase size={13} /> Browse Jobs
         </Link>
@@ -115,7 +114,7 @@ const UserDashboard = () => {
               </Td>
               <Td><Badge status={app.status} /></Td>
               <Td className="text-xs text-gray-400">
-                {app.interviewDate
+                {app.status === "Interview Scheduled" && app.interviewDate
                   ? `${new Date(app.interviewDate).toLocaleDateString()} — ${app.interviewLocation ?? ""}`
                   : "—"}
               </Td>

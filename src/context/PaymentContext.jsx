@@ -69,6 +69,11 @@ export const PaymentProvider = ({ children }) => {
     [updateState]
   );
 
+  const setTxRef = useCallback(
+    (txRef) => updateState({ txRef }),
+    [updateState]
+  );
+
   const setPaymentVerified = useCallback(
     (paymentVerified, txRef = null) => updateState({ paymentVerified, txRef }),
     [updateState]
@@ -84,10 +89,11 @@ export const PaymentProvider = ({ children }) => {
       ...state,
       setPendingJob,
       setPayerInfo,
+      setTxRef,
       setPaymentVerified,
       resetPaymentStore,
     }),
-    [state, setPendingJob, setPayerInfo, setPaymentVerified, resetPaymentStore]
+    [state, setPendingJob, setPayerInfo, setTxRef, setPaymentVerified, resetPaymentStore]
   );
 
   return <PaymentContext.Provider value={value}>{children}</PaymentContext.Provider>;

@@ -23,6 +23,7 @@ import SignUp from "./Pages/SignUp";
 import CompanyRegister from "./Pages/CompanyRegister";
 import PaymentCheckout from "./Pages/PaymentCheckout";
 import PaymentSuccess from "./Pages/PaymentSuccess";
+import PaymentHistory from "./Pages/PaymentHistory";
 import SuperAdminPricing from "./Pages/SuperAdminPricing";
 import SuperAdminAdmins from "./Pages/SuperAdminAdmins";
 import AddSuperAdmin from "./Pages/AddSuperAdmin";
@@ -31,11 +32,8 @@ import ViewApplicants from "./Pages/ViewApplicants";
 import ContactUs from "./Pages/ContactUs";
 import AboutUs from "./Pages/AboutUs";
 import ViewStatus from "./Pages/ViewStatus";
-import AddHr from "./Pages/AddHr";
 import ChangePassword from "./Pages/ChangePassword";
 import ForgotPassword from "./Pages/ForgotPassword";
-import ViewHrList from "./Pages/ViewHrList";
-import CompanyInfo from "./Pages/CompanyInfo";
 import ViewUserList from "./Pages/ViewUserList";
 
 // New role-based dashboards
@@ -66,6 +64,12 @@ const App = () => {
         <Route path="forgotpassword"   element={<ForgotPassword />} />
         <Route path="contact"        element={<ContactUs />} />
         <Route path="about"          element={<AboutUs />} />
+        <Route path="jobs"           element={<Jobs />} />
+        <Route
+          path="job/:id"
+          element={<Job deleteJob={deleteJob} />}
+          loader={jobLoader}
+        />
         <Route path="*"              element={<NotFoundPage />} />
 
         {/* ── Superadmin ─────────────────────────────────────── */}
@@ -90,6 +94,10 @@ const App = () => {
           element={<ProtectedRoute roles={["superadmin"]}><SuperAdminPricing /></ProtectedRoute>}
         />
         <Route
+          path="superadmin/payments"
+          element={<ProtectedRoute roles={["superadmin"]}><PaymentHistory /></ProtectedRoute>}
+        />
+        <Route
           path="superadmin/admins"
           element={<ProtectedRoute roles={["superadmin"]}><SuperAdminAdmins /></ProtectedRoute>}
         />
@@ -97,11 +105,19 @@ const App = () => {
           path="superadmin/admins/new"
           element={<ProtectedRoute roles={["superadmin"]}><AddSuperAdmin /></ProtectedRoute>}
         />
+        <Route
+          path="superadmin/applicants"
+          element={<ProtectedRoute roles={["superadmin"]}><ViewUserList /></ProtectedRoute>}
+        />
 
         {/* ── Company admin ───────────────────────────────────── */}
         <Route
           path="company/dashboard"
           element={<ProtectedRoute roles={["company_admin"]}><CompanyDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="company/payments"
+          element={<ProtectedRoute roles={["company_admin"]}><PaymentHistory /></ProtectedRoute>}
         />
 
         {/* ── Regular user ────────────────────────────────────── */}
@@ -112,21 +128,12 @@ const App = () => {
 
         {/* ── Shared protected routes ─────────────────────────── */}
         <Route path="home"       element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-        <Route path="jobs"       element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
         <Route path="report"     element={<ProtectedRoute><ViewReport /></ProtectedRoute>} />
         <Route path="status"     element={<ProtectedRoute><ViewStatus /></ProtectedRoute>} />
-        <Route path="add-hr"     element={<ProtectedRoute><AddHr /></ProtectedRoute>} />
-        <Route path="view-hr"    element={<ProtectedRoute><ViewHrList /></ProtectedRoute>} />
-        <Route path="view-users" element={<ProtectedRoute><ViewUserList /></ProtectedRoute>} />
 
         <Route
           path="add-job"
           element={<ProtectedRoute roles={["company_admin"]}><AddJob /></ProtectedRoute>}
-        />
-        <Route
-          path="job/:id"
-          element={<ProtectedRoute><Job deleteJob={deleteJob} /></ProtectedRoute>}
-          loader={jobLoader}
         />
         <Route
           path="edit-job/:id"
@@ -145,11 +152,6 @@ const App = () => {
         <Route
           path="UpdateUser/:id"
           element={<ProtectedRoute><UpdateUser /></ProtectedRoute>}
-          loader={userLoader}
-        />
-        <Route
-          path="CompanyInfo/:id"
-          element={<ProtectedRoute><CompanyInfo /></ProtectedRoute>}
           loader={userLoader}
         />
         <Route

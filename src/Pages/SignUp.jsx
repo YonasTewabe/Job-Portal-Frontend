@@ -2,11 +2,10 @@ import { useState } from "react";
 import * as Yup from "yup";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getDefaultRoute } from "../utils/routes";
+import { preserveAuthRedirect, resolvePostAuthPath } from "../utils/authNavigation";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
-import { preserveFromPublic } from "../utils/authNavigation";
 import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -52,7 +51,7 @@ const SignUp = () => {
   const { user } = useAuth();
 
   if (user) {
-    return <Navigate to={getDefaultRoute(user.role)} replace />;
+    return <Navigate to={resolvePostAuthPath(location, user.role)} replace />;
   }
 
   const validate = () => {
@@ -75,7 +74,7 @@ const SignUp = () => {
     try {
       await axios.post("/api/auth/signup", { name: name.trim(), email, password, role: "user" });
       toast.success("Account created — please log in.");
-      navigate("/login", { state: preserveFromPublic(location) });
+      navigate("/login", { state: preserveAuthRedirect(location) });
     } catch (error) {
       if (error.response?.status === 409) toast.error("Email already in use");
       else toast.error("Sign up failed. Please try again.");
@@ -125,13 +124,13 @@ const SignUp = () => {
       <div className="mt-6 pt-6 border-t border-gray-100 text-center space-y-2">
         <p className="text-sm text-gray-500">
           Hiring talent?{" "}
-          <Link to="/register/company" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+          <Link to="/register/company" state={preserveAuthRedirect(location)} className="link-brand">
             Register your company
           </Link>
         </p>
         <p className="text-sm text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">Sign in</Link>
+          <Link to="/login" state={preserveAuthRedirect(location)} className="link-brand">Sign in</Link>
         </p>
       </div>
     </AuthCard>

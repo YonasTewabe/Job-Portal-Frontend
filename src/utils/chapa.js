@@ -12,8 +12,10 @@ export const initializeChapaPayment = async ({
   first_name,
   last_name,
   phone,
+  onTxRef,
 }) => {
   const tx_ref = `tx-${Date.now()}`;
+  onTxRef?.(tx_ref);
   const callback_url = `${window.location.origin}/payment-success?tx_ref=${tx_ref}`;
 
   const payload = {

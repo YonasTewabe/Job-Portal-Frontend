@@ -12,8 +12,7 @@ const NotFoundPage = () => (
     </p>
     <Link
       to="/"
-      className="btn-primary inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
-        font-semibold px-6 py-3 rounded-xl transition-all text-sm shadow-sm"
+      className="btn-primary px-6 py-3"
     >
       Back to Home
     </Link>

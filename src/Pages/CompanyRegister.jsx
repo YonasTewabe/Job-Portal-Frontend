@@ -58,13 +58,13 @@ const CompanyRegister = () => {
         <div className="mt-8 pt-6 border-t border-gray-200 text-center space-y-2">
           <p className="text-sm text-gray-500">
             Looking for a job?{" "}
-            <Link to="/signup" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+            <Link to="/signup" state={preserveFromPublic(location)} className="link-brand">
               Sign up as a job seeker
             </Link>
           </p>
           <p className="text-sm text-gray-500">
             Already have an account?{" "}
-            <Link to="/login" state={preserveFromPublic(location)} className="text-brand-700 font-semibold hover:text-brand-800 hover:underline">
+            <Link to="/login" state={preserveFromPublic(location)} className="link-brand">
               Log in
             </Link>
           </p>

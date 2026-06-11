@@ -19,16 +19,6 @@ const content = {
     sub: "Manage companies, monitor activity, and keep the platform running smoothly.",
     cta: { label: "Go to Dashboard", to: "/superadmin/dashboard" },
   },
-  admin: {
-    heading: "Platform Administration",
-    sub: "Oversee HR accounts, registered users, and job listings across the platform.",
-    cta: { label: "View Users", to: "/view-users" },
-  },
-  hr: {
-    heading: "Find Your Next Employee",
-    sub: "Post jobs and track your applicants with ease.",
-    cta: { label: "Post a Job", to: "/add-job" },
-  },
 };
 
 const Hero = () => {
@@ -37,8 +27,7 @@ const Hero = () => {
   const c = content[user?.role] ?? content.user;
   const isPostJobCta = c.cta.to === "/add-job";
 
-  const ctaClassName =
-    "btn-primary inline-flex items-center gap-2 font-bold px-7 py-3.5 rounded-2xl shadow-float hover:shadow-lg transition-all duration-200 text-sm";
+  const ctaClassName = "btn-primary px-7 py-3.5 rounded-2xl shadow-float hover:shadow-lg";
 
   return (
     <section className="relative overflow-hidden hero-surface pt-14">

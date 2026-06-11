@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 
-const COMPANY_ROLES = ["company_admin", "hr"];
+const COMPANY_ROLES = ["company_admin"];
 
 export const useCompany = () => {
   const { user } = useAuth();

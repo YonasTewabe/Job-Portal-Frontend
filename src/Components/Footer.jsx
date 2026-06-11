@@ -13,10 +13,10 @@ const Footer = () => (
 
         {/* Links */}
         <nav className="flex items-center gap-6">
-          <Link to="/contact" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          <Link to="/contact" className="text-sm link-muted">
             Contact
           </Link>
-          <Link to="/about" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          <Link to="/about" className="text-sm link-muted">
             About
           </Link>
         </nav>

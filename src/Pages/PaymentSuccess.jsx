@@ -13,50 +13,79 @@ const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const { pendingJob, setPaymentVerified, resetPaymentStore } = usePayment();
+  const {
+    pendingJob,
+    amount,
+    currency,
+    payerInfo,
+    txRef: storedTxRef,
+    setPaymentVerified,
+    resetPaymentStore,
+  } = usePayment();
 
   const [paymentStatus, setPaymentStatus] = useState("Processing...");
   const [paymentSuccess, setPaymentSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [posting, setPosting] = useState(false);
 
+  const recordPayment = async (txRef) => {
+    if (!txRef || !pendingJob?.title) return;
+    try {
+      await api.post("/api/payments/record", {
+        txRef,
+        amount: Number(amount),
+        currency: currency || "ETB",
+        jobTitle: pendingJob.title,
+        payerName: payerInfo.paymentPersonName,
+        payerEmail: payerInfo.paymentPersonEmail,
+        payerPhone: payerInfo.paymentPersonPhoneNumber,
+      });
+    } catch {
+      // Idempotent on retry; job publish may still proceed
+    }
+  };
+
   useEffect(() => {
     const redirectStatus = searchParams.get("redirect_status");
     const txRef = searchParams.get("tx_ref");
 
-    if (redirectStatus) {
+    const onVerified = async (ref) => {
       setPaymentStatus("Payment Verification Successful");
       setPaymentSuccess(true);
-      setPaymentVerified(true, txRef);
+      setPaymentVerified(true, ref);
+      await recordPayment(ref);
       setIsLoading(false);
+    };
+
+    if (redirectStatus) {
+      onVerified(txRef || storedTxRef);
       return;
     }
 
     if (txRef) {
       api
         .get(`/api/chapa/verify?tx_ref=${encodeURIComponent(txRef)}`)
-        .then(({ data }) => {
+        .then(async ({ data }) => {
           if (data.status === "success") {
-            setPaymentStatus("Payment Verification Successful");
-            setPaymentSuccess(true);
-            setPaymentVerified(true, txRef);
+            await onVerified(txRef);
           } else {
             setPaymentStatus("Payment Verification Failed");
             setPaymentSuccess(false);
+            setIsLoading(false);
           }
         })
         .catch(() => {
           setPaymentStatus("Error verifying payment");
           setPaymentSuccess(false);
-        })
-        .finally(() => setIsLoading(false));
+          setIsLoading(false);
+        });
       return;
     }
 
     setPaymentStatus("Payment Verification Failed. Please contact support.");
     setPaymentSuccess(false);
     setIsLoading(false);
-  }, [searchParams, setPaymentVerified]);
+  }, [searchParams, setPaymentVerified]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (user && user.role !== "company_admin") return <NotFoundPage />;
 
@@ -67,9 +96,14 @@ const PaymentSuccess = () => {
       return;
     }
 
+    const txRef = searchParams.get("tx_ref") || storedTxRef;
+
     setPosting(true);
     try {
-      await api.post("/api/jobs", pendingJob);
+      const { data: job } = await api.post("/api/jobs", pendingJob);
+      if (txRef && job?.id) {
+        await api.patch(`/api/payments/${encodeURIComponent(txRef)}/job/${job.id}`);
+      }
       toast.success("Job posted successfully");
       resetPaymentStore();
       navigate("/company/dashboard");

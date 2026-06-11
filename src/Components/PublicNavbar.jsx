@@ -16,6 +16,9 @@ const PublicNavbar = () => (
     </Link>
 
     <div className="flex items-center gap-2 shrink-0">
+      <Link to="/jobs" className="hidden sm:inline text-sm font-semibold link-nav px-3 py-2 rounded-xl">
+        Browse jobs
+      </Link>
       <Link
         to="/register/company"
         state={publicAuthState}
@@ -24,19 +27,10 @@ const PublicNavbar = () => (
       >
         For companies
       </Link>
-      <Link
-        to="/login"
-        state={publicAuthState}
-        className="text-sm font-semibold text-gray-700 hover:text-gray-900
-          px-3.5 py-2 rounded-xl hover:bg-gray-100 transition-all"
-      >
+      <Link to="/login" state={publicAuthState} className="text-sm font-semibold link-nav px-3.5 py-2 rounded-xl">
         Log in
       </Link>
-      <Link
-        to="/signup"
-        state={publicAuthState}
-        className="btn-primary text-sm font-semibold px-3.5 py-2 rounded-xl shadow-sm transition-all"
-      >
+      <Link to="/signup" state={publicAuthState} className="btn-primary text-sm px-3.5 py-2">
         Sign up
       </Link>
     </div>

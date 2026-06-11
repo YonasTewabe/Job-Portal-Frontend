@@ -6,6 +6,7 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { Page, Card, SectionTitle, InfoRow, Btn } from "../Components/ui";
 import { FaEdit, FaKey, FaTrash, FaFilePdf } from "react-icons/fa";
+import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
 
 const Account = ({ deleteUser }) => {
   const user = useLoaderData();
@@ -19,8 +20,8 @@ const Account = ({ deleteUser }) => {
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#4f46e5",
-      cancelButtonColor: "#6b7280",
+      confirmButtonColor: SWAL_CONFIRM,
+      cancelButtonColor: SWAL_CANCEL,
       confirmButtonText: "Yes, delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -99,34 +100,21 @@ const Account = ({ deleteUser }) => {
           </>
         )}
 
-        {role === "hr" && (
-          <Card>
-            <SectionTitle>Company</SectionTitle>
-            <InfoRow label="Company Name"  value={user.companyname} />
-            <InfoRow label="Description"   value={user.companydescription} />
-            <InfoRow label="Contact Email" value={user.contactemail} />
-            <InfoRow label="Phone"         value={`+251 ${user.companyPhone}`} />
-          </Card>
-        )}
-
         {/* Actions */}
         <Card>
           <SectionTitle>Account Actions</SectionTitle>
           <div className="flex flex-col gap-3 pt-1">
-            {(role === "user" || role === "hr") && (
-              <Link
-                to={role === "user" ? `/UpdateUser/${authUser.userId}` : `/CompanyInfo/${authUser.userId}`}
-                className={Btn.primary("gap-2")}
-              >
+            {role === "user" && (
+              <Link to={`/UpdateUser/${authUser.userId}`} className={Btn.primary("gap-2")}>
                 <FaEdit size={13} /> Update Information
               </Link>
             )}
-            {(role === "user" || role === "hr" || role === "admin") && (
+            {role === "user" && (
               <Link to={`/changepassword/${authUser.userId}`} className={Btn.secondary("gap-2")}>
                 <FaKey size={13} /> Change Password
               </Link>
             )}
-            {(role === "user" || role === "hr") && (
+            {role === "user" && (
               <button onClick={() => onDelete(authUser.userId)} className={Btn.danger("gap-2")}>
                 <FaTrash size={13} /> Delete Account
               </button>
