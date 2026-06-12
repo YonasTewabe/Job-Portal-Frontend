@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { CheckCircleIcon, XCircleIcon } from "../Components/icons";
+import { toast } from "../utils/toast";
 import api from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { usePayment } from "../context/PaymentContext";
@@ -138,10 +138,10 @@ const PaymentSuccess = () => {
         ) : (
           <>
             {paymentSuccess === true && (
-              <FaCheckCircle className="text-5xl text-emerald-500" />
+              <CheckCircleIcon className="text-5xl text-emerald-500" size={48} />
             )}
             {paymentSuccess === false && (
-              <FaTimesCircle className="text-5xl text-red-500" />
+              <XCircleIcon className="text-5xl text-red-500" size={48} />
             )}
 
             <h1

@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { MailIcon, PhoneIcon, MapPinIcon } from "../Components/icons";
+import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { Page, Card, Field, inputCls, Btn } from "../Components/ui";
 
 const INFO = [
-  { icon: <FaEnvelope />,    label: "Email",   value: "contact@apptracker.com", color: "bg-brand-50 text-brand-500" },
-  { icon: <FaPhone />,       label: "Phone",   value: "+251 919 37 05 44",       color: "bg-emerald-50 text-emerald-500" },
-  { icon: <FaMapMarkerAlt />, label: "Address", value: "123 Main Street, Addis Ababa, Ethiopia", color: "bg-orange-50 text-orange-500" },
+  { icon: <MailIcon />,    label: "Email",   value: "contact@apptracker.com", color: "bg-brand-50 text-brand-500" },
+  { icon: <PhoneIcon />,       label: "Phone",   value: "+251 919 37 05 44",       color: "bg-emerald-50 text-emerald-500" },
+  { icon: <MapPinIcon />, label: "Address", value: "123 Main Street, Addis Ababa, Ethiopia", color: "bg-orange-50 text-orange-500" },
 ];
 
 const ContactUs = () => {

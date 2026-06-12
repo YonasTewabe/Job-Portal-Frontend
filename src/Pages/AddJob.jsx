@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import NotFoundPage from "./NotFoundPage";
 import SuspendedAccount from "../Components/SuspendedAccount";

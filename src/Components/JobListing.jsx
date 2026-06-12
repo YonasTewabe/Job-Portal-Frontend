@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaMapMarkerAlt, FaClock, FaBriefcase, FaBuilding } from "react-icons/fa";
+import { MapPinIcon, ClockIcon, BriefcaseIcon, BuildingIcon } from "./icons";
 import { isJobOpen } from "../utils/jobs";
 
 const JobListing = ({ job }) => {
@@ -15,13 +15,11 @@ const JobListing = ({ job }) => {
     <article className="group surface-card-interactive flex flex-col overflow-hidden">
       <div className="h-1 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="p-5 flex-1">
-        {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
-          {/* Company initial avatar */}
           <div className="flex items-start gap-3 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200/80 flex items-center
               justify-center text-brand-600 font-bold text-sm shrink-0 shadow-inner-soft">
-              {job.companyName?.charAt(0)?.toUpperCase() ?? <FaBuilding size={14} />}
+              {job.companyName?.charAt(0)?.toUpperCase() ?? <BuildingIcon size={14} />}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-400 truncate">{job.companyName}</p>
@@ -37,23 +35,21 @@ const JobListing = ({ job }) => {
           </span>
         </div>
 
-        {/* Meta chips */}
         <div className="flex flex-wrap gap-1.5 mb-3">
           <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100
             px-2 py-0.5 rounded-full">
-            <FaBriefcase className="text-brand-400" size={10} />{job.type}
+            <BriefcaseIcon className="text-brand-400" size={10} />{job.type}
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100
             px-2 py-0.5 rounded-full">
-            <FaMapMarkerAlt className="text-orange-400" size={10} />{job.location}
+            <MapPinIcon className="text-orange-400" size={10} />{job.location}
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-50 border border-gray-100
             px-2 py-0.5 rounded-full">
-            <FaClock size={10} />{job.deadline}
+            <ClockIcon size={10} />{job.deadline}
           </span>
         </div>
 
-        {/* Description */}
         {job.description && (
           <>
             <p className="text-xs text-gray-500 leading-relaxed">{desc}</p>

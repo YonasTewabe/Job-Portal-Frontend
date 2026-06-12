@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaBullseye, FaUsers, FaEnvelope } from "react-icons/fa";
+import { TargetIcon, UsersIcon, MailIcon } from "../Components/icons";
 import { Page, Card } from "../Components/ui";
 
 const Section = ({ icon, title, children }) => (
@@ -23,17 +23,17 @@ const AboutUs = () => (
     </div>
 
     <div className="space-y-4">
-      <Section icon={<FaBullseye size={18} />} title="Our Mission">
+      <Section icon={<TargetIcon size={18} />} title="Our Mission">
         We connect job seekers with the right opportunities and help companies find the best talent —
         making the hiring process efficient and rewarding for everyone.
       </Section>
 
-      <Section icon={<FaUsers size={18} />} title="Our Team">
+      <Section icon={<UsersIcon size={18} />} title="Our Team">
         Our team of experienced professionals is dedicated to delivering exceptional value.
         Every member — from engineers to support — plays a crucial role in our success.
       </Section>
 
-      <Section icon={<FaEnvelope size={18} />} title="Get in Touch">
+      <Section icon={<MailIcon size={18} />} title="Get in Touch">
         <p>
           Questions or feedback? Reach out through our{" "}
           <Link to="/contact" className="text-brand-600 font-medium hover:underline">

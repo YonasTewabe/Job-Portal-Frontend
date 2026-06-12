@@ -1,5 +1,11 @@
 import { Link, Navigate } from "react-router-dom";
-import { FaBriefcase, FaClipboardList, FaBuilding, FaChartLine, FaArrowRight } from "react-icons/fa";
+import {
+  BriefcaseIcon,
+  ClipboardIcon,
+  BuildingIcon,
+  TrendingUpIcon,
+  ArrowRightIcon,
+} from "../Components/icons";
 import { useAuth } from "../context/AuthContext";
 import { getDefaultRoute } from "../utils/routes";
 import { publicAuthState } from "../utils/authNavigation";
@@ -9,22 +15,22 @@ import { APP_NAME, APP_TAGLINE } from "../constants/brand";
 
 const features = [
   {
-    icon: <FaBriefcase size={20} />,
+    icon: <BriefcaseIcon size={20} />,
     title: "Browse open roles",
     desc: "Explore job listings from companies across the platform in one place.",
   },
   {
-    icon: <FaClipboardList size={20} />,
+    icon: <ClipboardIcon size={20} />,
     title: "Track every application",
     desc: "Keep all your applications organized — status, deadlines, and follow-ups.",
   },
   {
-    icon: <FaBuilding size={20} />,
+    icon: <BuildingIcon size={20} />,
     title: "Hire with confidence",
     desc: "Companies post jobs, review applicants, and manage hiring in one dashboard.",
   },
   {
-    icon: <FaChartLine size={20} />,
+    icon: <TrendingUpIcon size={20} />,
     title: "Stay on top of progress",
     desc: "Real-time updates so job seekers and recruiters always know what's next.",
   },
@@ -79,7 +85,7 @@ const LandingPage = () => {
               className="w-full sm:w-auto btn-primary px-8 py-3.5 rounded-2xl text-sm shadow-glow"
             >
               Get started free
-              <FaArrowRight size={12} />
+              <ArrowRightIcon size={12} />
             </Link>
             <Link
               to="/jobs"

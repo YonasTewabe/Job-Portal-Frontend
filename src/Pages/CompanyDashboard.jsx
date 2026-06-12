@@ -4,9 +4,9 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { Page, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
-import { FaBriefcase, FaEnvelope, FaPlus } from "react-icons/fa";
+import { BriefcaseIcon, PlusIcon, BuildingIcon } from "../Components/icons";
 import PostJobLink from "../Components/PostJobLink";
 import { getJobListingStatus, isJobDraft, sortJobsByPostedDate } from "../utils/jobs";
 
@@ -83,26 +83,26 @@ const CompanyDashboard = () => {
           )}
         </div>
         <PostJobLink className="btn-primary px-4 py-2.5">
-          <FaPlus size={11} /> Post a Job
+          <PlusIcon size={11} /> Post a Job
         </PostJobLink>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
         <StatCard
-          icon={<FaBriefcase size={18} />}
+          icon={<BriefcaseIcon size={18} />}
           label="Published Jobs"
           value={publishedCount}
           color={{ bg: "bg-brand-50", text: "text-brand-600" }}
         />
         <StatCard
-          icon={<FaBriefcase size={18} />}
+          icon={<BriefcaseIcon size={18} />}
           label="Draft Jobs"
           value={draftCount}
           color={{ bg: "bg-violet-50", text: "text-violet-600" }}
         />
         <Card className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0">
-            <span className="text-lg">🏢</span>
+            <BuildingIcon size={20} className="text-gray-500" />
           </div>
           <div>
             <p className="text-xs text-gray-400 font-medium mb-1">Account Status</p>
@@ -127,7 +127,7 @@ const CompanyDashboard = () => {
       <Card className="p-0 overflow-hidden">
         <Table
           headers={headers}
-          empty={sortedJobs.length === 0 ? <Empty message="No jobs posted yet." icon="📝" /> : null}
+          empty={sortedJobs.length === 0 ? <Empty message="No jobs posted yet." icon={BriefcaseIcon} /> : null}
         >
           {sortedJobs.map((job, i) => {
             const draft = isJobDraft(job);

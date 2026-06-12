@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as Yup from "yup";
-import { BiShow, BiHide } from "react-icons/bi";
+import { EyeIcon, EyeOffIcon } from "./icons";
 import { Card, Field, inputCls, Btn } from "./ui";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -116,7 +116,7 @@ const CompanyForm = ({
               <button type="button" onClick={() => setShowPass((v) => !v)}
                 aria-label="Toggle password"
                 className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-                {showPass ? <BiHide size={18} /> : <BiShow size={18} />}
+                {showPass ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
               </button>
             </div>
           </Field>

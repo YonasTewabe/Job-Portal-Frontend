@@ -4,9 +4,15 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { Page, PageTitle, Card, Badge } from "../Components/ui";
-import { FaBuilding, FaBriefcase, FaUsers, FaCheckCircle, FaChevronRight } from "react-icons/fa";
+import {
+  BuildingIcon,
+  BriefcaseIcon,
+  UsersIcon,
+  CheckCircleIcon,
+  ChevronRightIcon,
+} from "../Components/icons";
 import { countOpenJobs, isJobOpen, sortJobsByPostedDate, getJobPostedDate } from "../utils/jobs";
 
 const RECENT_LIMIT = 5;
@@ -76,25 +82,25 @@ const SuperAdminDashboard = () => {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <StatCard
-          icon={<FaBuilding size={18} />}
+          icon={<BuildingIcon size={18} />}
           label="Total Companies"
           value={companies.length}
           color={{ bg: "bg-brand-50", text: "text-brand-600" }}
         />
         <StatCard
-          icon={<FaCheckCircle size={18} />}
+          icon={<CheckCircleIcon size={18} />}
           label="Active Companies"
           value={activeCompanies}
           color={{ bg: "bg-emerald-50", text: "text-emerald-600" }}
         />
         <StatCard
-          icon={<FaBriefcase size={18} />}
+          icon={<BriefcaseIcon size={18} />}
           label="Open Jobs"
           value={openJobsCount}
           color={{ bg: "bg-sky-50", text: "text-sky-600" }}
         />
         <StatCard
-          icon={<FaUsers size={18} />}
+          icon={<UsersIcon size={18} />}
           label="Job Seekers"
           value={users.length}
           color={{ bg: "bg-violet-50", text: "text-violet-600" }}
@@ -109,7 +115,7 @@ const SuperAdminDashboard = () => {
               <p className="text-sm font-semibold text-gray-900">Manage Companies</p>
               <p className="text-xs text-gray-500 mt-0.5">View, suspend, or add companies</p>
             </div>
-            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+            <ChevronRightIcon className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
 
@@ -119,7 +125,7 @@ const SuperAdminDashboard = () => {
               <p className="text-sm font-semibold text-gray-900">Browse All Jobs</p>
               <p className="text-xs text-gray-500 mt-0.5">View every listing on the platform</p>
             </div>
-            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+            <ChevronRightIcon className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
         <Link to="/superadmin/payments" className="group">
@@ -128,7 +134,7 @@ const SuperAdminDashboard = () => {
               <p className="text-sm font-semibold text-gray-900">Payment History</p>
               <p className="text-xs text-gray-500 mt-0.5">View job posting payments</p>
             </div>
-            <FaChevronRight className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+            <ChevronRightIcon className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
           </Card>
         </Link>
       </div>

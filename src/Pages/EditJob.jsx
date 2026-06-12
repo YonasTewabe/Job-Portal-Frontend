@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useLoaderData, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import NotFoundPage from "./NotFoundPage";
 import { useAuth } from "../context/AuthContext";

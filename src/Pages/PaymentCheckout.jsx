@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { useAuth } from "../context/AuthContext";
 import { usePayment } from "../context/PaymentContext";
 import { useCompany } from "../hooks/useCompany";

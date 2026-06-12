@@ -1,12 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { useLoaderData, Link, useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { Page, Card, SectionTitle, InfoRow, Btn } from "../Components/ui";
-import { FaEdit, FaKey, FaTrash } from "react-icons/fa";
-import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
+import { EditIcon, KeyIcon, TrashIcon } from "../Components/icons";
+import { confirmDelete } from "../utils/confirm";
 import CvFileActions from "../Components/CvFileActions";
 
 const Account = ({ deleteUser }) => {
@@ -15,25 +14,18 @@ const Account = ({ deleteUser }) => {
   const { user: authUser, logout } = useAuth();
   const role = authUser?.role;
 
-  const onDelete = (userId) => {
-    Swal.fire({
+  const onDelete = async (userId) => {
+    const result = await confirmDelete({
       title: "Delete account?",
       text: "This action cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: SWAL_CONFIRM,
-      cancelButtonColor: SWAL_CANCEL,
-      confirmButtonText: "Yes, delete",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteUser(userId);
-          toast.success("Account deleted");
-          logout();
-          navigate("/");
-        } catch { toast.error("Unable to delete account."); }
-      }
     });
+    if (!result.isConfirmed) return;
+    try {
+      await deleteUser(userId);
+      toast.success("Account deleted");
+      logout();
+      navigate("/");
+    } catch { toast.error("Unable to delete account."); }
   };
 
   return (
@@ -102,17 +94,17 @@ const Account = ({ deleteUser }) => {
           <div className="flex flex-col gap-3 pt-1">
             {role === "user" && (
               <Link to={`/UpdateUser/${authUser.userId}`} className={Btn.primary("gap-2")}>
-                <FaEdit size={13} /> Update Information
+                <EditIcon size={13} /> Update Information
               </Link>
             )}
             {role === "user" && (
               <Link to={`/changepassword/${authUser.userId}`} className={Btn.secondary("gap-2")}>
-                <FaKey size={13} /> Change Password
+                <KeyIcon size={13} /> Change Password
               </Link>
             )}
             {role === "user" && (
               <button onClick={() => onDelete(authUser.userId)} className={Btn.danger("gap-2")}>
-                <FaTrash size={13} /> Delete Account
+                <TrashIcon size={13} /> Delete Account
               </button>
             )}
           </div>

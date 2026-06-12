@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { toast } from "./toast";
 import axios from "../axiosInterceptor";
 
 /** Strip the storage UUID prefix for display, e.g. "abc-...-resume.pdf" → "resume.pdf" */

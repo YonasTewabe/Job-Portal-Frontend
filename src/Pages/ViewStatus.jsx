@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaComments } from "react-icons/fa";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
+import { MessageIcon, ClipboardIcon } from "../Components/icons";
 
 const ViewStatus = () => {
   const [applications, setApplications] = useState([]);
@@ -53,7 +53,7 @@ const ViewStatus = () => {
         <Table
           headers={headers}
           empty={applications.length === 0
-            ? <Empty message="You haven't applied to any jobs yet." icon="📋" />
+            ? <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
             : null}
         >
           {applications.map((app, i) => (
@@ -90,7 +90,7 @@ const ViewStatus = () => {
                   to={`/messages?applicationId=${app.id}`}
                   className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
                 >
-                  <FaComments size={12} /> Message
+                  <MessageIcon size={12} /> Message
                 </Link>
               </Td>
             </Tr>

@@ -1,4 +1,7 @@
 import { Children } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { ClipboardIcon, EmptyStateIcon } from "./icons";
+import Logo from "./Logo";
 
 // ─── Input ────────────────────────────────────────────────────────────────────
 export const inputCls = (error) =>
@@ -130,19 +133,14 @@ export const Td = ({ children, className = "" }) => (
 );
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
-export const Empty = ({ message = "No data found.", icon = "📭" }) => (
+export const Empty = ({ message = "No data found.", icon: Icon = ClipboardIcon }) => (
   <div className="py-20 text-center">
-    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-2xl">
-      {icon}
-    </div>
+    <EmptyStateIcon icon={Icon} />
     <p className="text-sm text-slate-500 font-medium">{message}</p>
   </div>
 );
 
 // ─── Auth card wrapper ────────────────────────────────────────────────────────
-import { Link, useLocation } from "react-router-dom";
-import Logo from "./Logo";
-
 export const AuthBackHome = () => {
   const { state } = useLocation();
   if (!state?.fromPublic) return null;

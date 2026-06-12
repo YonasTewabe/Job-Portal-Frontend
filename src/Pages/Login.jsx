@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useState } from "react";
-import { BiShow, BiHide } from "react-icons/bi";
-import { toast } from "react-toastify";
+import { EyeIcon, EyeOffIcon } from "../Components/icons";
+import { toast } from "../utils/toast";
 import * as Yup from "yup";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
@@ -80,7 +80,7 @@ const Login = () => {
               onClick={() => setShowPassword((v) => !v)}
               className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <BiHide size={18} /> : <BiShow size={18} />}
+              {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
         </Field>

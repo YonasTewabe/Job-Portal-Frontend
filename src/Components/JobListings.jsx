@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PostJobLink from "./PostJobLink";
 import { normalizeJobs, isJobOpen, isJobDraft, getJobPostedDate } from "../utils/jobs";
-import { FaSearch, FaPlus } from "react-icons/fa";
+import { SearchIcon, PlusIcon } from "./icons";
 
 const JobListings = ({ isHome = false }) => {
   const [jobs,         setJobs]         = useState([]);
@@ -80,7 +80,7 @@ const JobListings = ({ isHome = false }) => {
           {/* Post job button for company admin */}
           {!isHome && role === "company_admin" && (
             <PostJobLink className="btn-primary px-4 py-2.5">
-              <FaPlus size={11} /> Post a Job
+              <PlusIcon size={11} /> Post a Job
             </PostJobLink>
           )}
         </div>
@@ -90,7 +90,7 @@ const JobListings = ({ isHome = false }) => {
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
             {/* Search */}
             <div className="relative flex-1">
-              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={13} />
+              <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={13} />
               <input
                 type="text"
                 placeholder="Search by title, company, or skills…"

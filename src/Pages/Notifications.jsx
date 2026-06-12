@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { resolveNotificationLink } from "../utils/notificationLinks";
 import Spinner from "../Components/Spinner";
 import { Page, PageTitle, Card, Empty, Btn } from "../Components/ui";
+import { BellIcon } from "../Components/icons";
 
 const formatWhen = (iso) => {
   if (!iso) return "";
@@ -46,7 +47,7 @@ const Notifications = () => {
         {loading && notifications.length === 0 ? (
           <div className="py-16"><Spinner loading /></div>
         ) : notifications.length === 0 ? (
-          <Empty message="No notifications yet." icon="🔔" />
+          <Empty message="No notifications yet." icon={BellIcon} />
         ) : (
           <ul className="divide-y divide-gray-50">
             {notifications.map((n) => (

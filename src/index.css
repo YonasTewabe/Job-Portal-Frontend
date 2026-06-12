@@ -342,3 +342,163 @@
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50%      { opacity: 0.8; transform: scale(1.05); }
 }
+
+/* ── Toast notifications ───────────────────────────────────────────────────── */
+.Toastify__toast-container {
+  padding: 0.75rem;
+  width: min(22rem, calc(100vw - 1.5rem));
+}
+
+.app-toast.Toastify__toast {
+  font-family: Inter, system-ui, sans-serif;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-float);
+  padding: 0.875rem 1rem;
+  min-height: unset;
+  color: var(--text-primary);
+  background: var(--surface-card);
+}
+
+.app-toast .Toastify__toast-body {
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.app-toast .Toastify__toast-icon {
+  width: 1.35rem;
+  margin-inline-end: 0.65rem;
+}
+
+.app-toast-progress {
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-400), var(--brand-600));
+}
+
+.Toastify__toast--success.app-toast {
+  border-color: #bbf7d0;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.Toastify__toast--error.app-toast {
+  border-color: #fecaca;
+  background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%);
+}
+
+.Toastify__toast--info.app-toast {
+  border-color: #bfdbfe;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.Toastify__toast--warning.app-toast {
+  border-color: #fde68a;
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.Toastify__close-button {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}
+
+/* ── Confirmation dialogs (SweetAlert2) ──────────────────────────────────── */
+.app-dialog-container {
+  z-index: 20000;
+}
+
+.app-dialog {
+  border-radius: 1.25rem !important;
+  border: 1px solid var(--border-default) !important;
+  box-shadow: var(--shadow-float) !important;
+  padding: 1.75rem 1.5rem 1.25rem !important;
+  width: min(26rem, calc(100vw - 2rem)) !important;
+  font-family: Inter, system-ui, sans-serif !important;
+}
+
+.app-dialog-title {
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  padding: 0 !important;
+}
+
+.app-dialog-text {
+  font-size: 0.9rem !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.55 !important;
+  margin-top: 0.5rem !important;
+}
+
+.app-dialog-icon {
+  margin: 0 auto 0.75rem !important;
+  border: none !important;
+  transform: scale(0.9);
+}
+
+.app-dialog-actions {
+  gap: 0.625rem !important;
+  margin-top: 1.25rem !important;
+  width: 100%;
+}
+
+.app-dialog-btn {
+  border-radius: 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  padding: 0.625rem 1.125rem !important;
+  margin: 0 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.app-dialog-btn-confirm {
+  background: linear-gradient(180deg, var(--brand-600) 0%, var(--brand-700) 100%) !important;
+  color: #fff !important;
+}
+
+.app-dialog-btn-confirm:hover {
+  background: linear-gradient(180deg, var(--brand-500) 0%, var(--brand-600) 100%) !important;
+}
+
+.app-dialog-btn-danger {
+  background: var(--danger-600) !important;
+  color: #fff !important;
+}
+
+.app-dialog-btn-danger:hover {
+  background: var(--danger-700) !important;
+}
+
+.app-dialog-btn-cancel {
+  background: var(--surface-card) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-default) !important;
+}
+
+.app-dialog-btn-cancel:hover {
+  background: var(--surface-muted) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-dialog-input {
+  border-radius: 0.75rem !important;
+  border: 1px solid var(--border-default) !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.75rem !important;
+  padding: 0.625rem 0.75rem !important;
+}
+
+.app-dialog-input:focus {
+  border-color: var(--brand-500) !important;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.2) !important;
+}
+
+.app-dialog-validation {
+  font-size: 0.8rem !important;
+  color: var(--danger-600) !important;
+}

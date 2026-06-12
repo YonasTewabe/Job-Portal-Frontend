@@ -2,7 +2,7 @@ import Navbar from "./Navbar";
 import PublicNavbar from "./PublicNavbar";
 import Footer from "./Footer";
 import { Outlet, useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, Slide } from "../utils/toast";
 import { useAuth } from "../context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -22,8 +22,16 @@ const Layout = () => {
     <Footer />
     <ToastContainer
       position="top-right"
-      autoClose={3000}
-      toastClassName="!rounded-xl !shadow-card-hover !text-sm !font-medium"
+      autoClose={3200}
+      newestOnTop
+      limit={4}
+      transition={Slide}
+      toastClassName="app-toast"
+      progressClassName="app-toast-progress"
+      hideProgressBar={false}
+      closeOnClick
+      pauseOnHover
+      draggable
     />
   </div>
   );

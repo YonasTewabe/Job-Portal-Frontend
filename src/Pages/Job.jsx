@@ -1,10 +1,18 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useLoaderData, Link, useNavigate, useRevalidator } from "react-router-dom";
 import { loginRedirectState } from "../utils/authNavigation";
-import { FaArrowLeft, FaMapMarkerAlt, FaClock, FaDollarSign, FaBuilding, FaPhone, FaEnvelope } from "react-icons/fa";
-import Swal from "sweetalert2";
+import {
+  ArrowLeftIcon,
+  MapPinIcon,
+  ClockIcon,
+  DollarIcon,
+  BuildingIcon,
+  PhoneIcon,
+  MailIcon,
+} from "../Components/icons";
 import axios from "../axiosInterceptor";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
+import { confirm, confirmDelete, confirmAction, showValidationMessage } from "../utils/confirm";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, Badge, Btn, Page } from "../Components/ui";
@@ -15,8 +23,6 @@ import {
   isJobOpen,
   normalizeJob,
 } from "../utils/jobs";
-import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
-
 const Job = ({ deleteJob }) => {
   const navigate = useNavigate();
   const { revalidate } = useRevalidator();
@@ -124,14 +130,10 @@ const Job = ({ deleteJob }) => {
     const closing = jobOpen;
 
     if (closing) {
-      const result = await Swal.fire({
+      const result = await confirmAction({
         title: "Close this job?",
         text: "Applicants will no longer be able to apply, even before the deadline.",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: SWAL_CONFIRM,
-        cancelButtonColor: SWAL_CANCEL,
-        confirmButtonText: "Yes, close it",
+        confirmText: "Yes, close it",
       });
       if (!result.isConfirmed) return;
       await patchJobStatus({ isOpen: false });
@@ -139,20 +141,17 @@ const Job = ({ deleteJob }) => {
     }
 
     if (isDeadlinePassed(job.deadline)) {
-      const result = await Swal.fire({
+      const result = await confirm({
         title: "Set a new deadline",
         text: "The application deadline has passed. Choose a new date to reopen this job.",
         input: "date",
         inputAttributes: { min: getMinDeadlineDate() },
         inputValue: getMinDeadlineDate(),
         icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: SWAL_CONFIRM,
-        cancelButtonColor: SWAL_CANCEL,
         confirmButtonText: "Reopen job",
         preConfirm: (value) => {
           if (!isFutureDeadline(value)) {
-            Swal.showValidationMessage("Please select a future deadline");
+            showValidationMessage("Please select a future deadline");
             return false;
           }
           return value;
@@ -163,35 +162,25 @@ const Job = ({ deleteJob }) => {
       return;
     }
 
-    const result = await Swal.fire({
+    const result = await confirmAction({
       title: "Reopen this job?",
       text: "Applicants can apply again until the deadline.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: SWAL_CONFIRM,
-      cancelButtonColor: SWAL_CANCEL,
-      confirmButtonText: "Yes, reopen it",
+      confirmText: "Yes, reopen it",
     });
     if (!result.isConfirmed) return;
     await patchJobStatus({ isOpen: true });
   };
 
-  const onDelete = (jobId) => {
-    Swal.fire({
+  const onDelete = async (jobId) => {
+    const result = await confirmDelete({
       title: "Delete this job?",
       text: "This cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: SWAL_CONFIRM,
-      cancelButtonColor: SWAL_CANCEL,
-      confirmButtonText: "Yes, delete",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await deleteJob(jobId);
-        toast.success("Job deleted");
-        navigate("/jobs");
-      }
     });
+    if (result.isConfirmed) {
+      await deleteJob(jobId);
+      toast.success("Job deleted");
+      navigate("/jobs");
+    }
   };
 
   return (
@@ -201,7 +190,7 @@ const Job = ({ deleteJob }) => {
         to="/jobs"
         className="inline-flex items-center gap-2 text-sm link-brand mb-6 group"
       >
-        <FaArrowLeft size={11} className="group-hover:-translate-x-0.5 transition-transform" />
+        <ArrowLeftIcon size={11} className="group-hover:-translate-x-0.5 transition-transform" />
         Back to listings
       </Link>
 
@@ -221,17 +210,17 @@ const Job = ({ deleteJob }) => {
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
                 border border-gray-100 px-3 py-1 rounded-full">
-                <FaMapMarkerAlt className="text-orange-400" size={10} />{job.location}
+                <MapPinIcon className="text-orange-400" size={10} />{job.location}
               </span>
               {job.salary && (
                 <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
                   border border-gray-100 px-3 py-1 rounded-full">
-                  <FaDollarSign className="text-emerald-500" size={10} />{job.salary}
+                  <DollarIcon className="text-emerald-500" size={10} />{job.salary}
                 </span>
               )}
               <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
                 border border-gray-100 px-3 py-1 rounded-full">
-                <FaClock className="text-brand-400" size={10} />Deadline: {job.deadline}
+                <ClockIcon className="text-brand-400" size={10} />Deadline: {job.deadline}
               </span>
               <span className="inline-flex items-center text-xs font-semibold bg-brand-50 text-brand-700
                 border border-brand-100 px-3 py-1 rounded-full">
@@ -259,7 +248,7 @@ const Job = ({ deleteJob }) => {
           <Card>
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-9 h-9 rounded-xl bg-brand-50 flex items-center justify-center">
-                <FaBuilding className="text-brand-500" size={15} />
+                <BuildingIcon className="text-brand-500" size={15} />
               </div>
               <h2 className="text-sm font-semibold text-gray-700">Company</h2>
             </div>
@@ -269,11 +258,11 @@ const Job = ({ deleteJob }) => {
 
             <div className="space-y-2 text-xs text-gray-600">
               <div className="flex items-center gap-2">
-                <FaEnvelope className="text-gray-400 shrink-0" size={11} />
+                <MailIcon className="text-gray-400 shrink-0" size={11} />
                 <span>{job.contactEmail || "—"}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FaPhone className="text-gray-400 shrink-0" size={11} />
+                <PhoneIcon className="text-gray-400 shrink-0" size={11} />
                 <span>{job.companyPhone ? `+251 ${job.companyPhone}` : "—"}</span>
               </div>
             </div>

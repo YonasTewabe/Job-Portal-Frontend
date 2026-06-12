@@ -4,9 +4,9 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn, Badge } from "../Components/ui";
-import { FaPlus } from "react-icons/fa";
+import { PlusIcon, BuildingIcon } from "../Components/icons";
 import { countOpenJobs } from "../utils/jobs";
 
 const SuperAdminCompanies = () => {
@@ -61,7 +61,7 @@ const SuperAdminCompanies = () => {
           <p className="text-sm text-gray-500 mt-1">{companies.length} registered</p>
         </div>
         <Link to="/superadmin/companies/new" className={Btn.primary("gap-2 shadow-sm")}>
-          <FaPlus size={11} /> New Company
+          <PlusIcon size={11} /> New Company
         </Link>
       </div>
 
@@ -69,7 +69,7 @@ const SuperAdminCompanies = () => {
         <Table
           headers={headers}
           empty={companies.length === 0
-            ? <Empty message="No companies yet. Add one to get started." icon="🏢" />
+            ? <Empty message="No companies yet. Add one to get started." icon={BuildingIcon} />
             : null}
         >
           {companies.map((company, i) => (

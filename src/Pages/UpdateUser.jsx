@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { useAuth } from "../context/AuthContext";
 import NotFoundPage from "./NotFoundPage";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";

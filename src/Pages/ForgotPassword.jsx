@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
 
 const schema = Yup.object().shape({

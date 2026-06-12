@@ -1,11 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import {
-  FaHome, FaBriefcase, FaUserPlus, FaList, FaUsers,
-  FaBuilding, FaTachometerAlt, FaBars, FaTimes, FaComments,
-} from "react-icons/fa";
-import { CiLogout } from "react-icons/ci";
-import { MdOutlineAccountCircle } from "react-icons/md";
+  HomeIcon,
+  BriefcaseIcon,
+  UserPlusIcon,
+  ListIcon,
+  UsersIcon,
+  BuildingIcon,
+  DashboardIcon,
+  MenuIcon,
+  CloseIcon,
+  MessageIcon,
+  LogoutIcon,
+  UserCircleIcon,
+} from "./icons";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { getDefaultRoute } from "../utils/routes";
@@ -17,23 +25,23 @@ import { useChat } from "../context/ChatContext";
 
 const menus = {
   user: [
-    { icon: <FaHome />,      text: "Home",            link: "/home" },
-    { icon: <FaBriefcase />, text: "Browse Jobs",      link: "/jobs" },
-    { icon: <FaList />,      text: "My Applications",  link: "/status" },
+    { icon: <HomeIcon />,      text: "Home",            link: "/home" },
+    { icon: <BriefcaseIcon />, text: "Browse Jobs",      link: "/jobs" },
+    { icon: <ListIcon />,      text: "My Applications",  link: "/status" },
   ],
   company_admin: [
-    { icon: <FaTachometerAlt />, text: "Dashboard", link: "/company/dashboard" },
-    { icon: <FaUserPlus />,      text: "Post a Job", link: "/add-job" },
-    { icon: <FaBriefcase />,     text: "My Jobs",   link: "/jobs" },
-    { icon: <FaList />,          text: "Payments",   link: "/company/payments" },
+    { icon: <DashboardIcon />, text: "Dashboard", link: "/company/dashboard" },
+    { icon: <UserPlusIcon />,  text: "Post a Job", link: "/add-job" },
+    { icon: <BriefcaseIcon />, text: "My Jobs",   link: "/jobs" },
+    { icon: <ListIcon />,      text: "Payments",   link: "/company/payments" },
   ],
   superadmin: [
-    { icon: <FaTachometerAlt />, text: "Dashboard", link: "/superadmin/dashboard" },
-    { icon: <FaBuilding />,      text: "Companies",  link: "/superadmin/companies" },
-    { icon: <FaUsers />,         text: "Super Admins", link: "/superadmin/admins" },
-    { icon: <FaUsers />,         text: "Job Seekers", link: "/superadmin/applicants" },
-    { icon: <FaBriefcase />,     text: "All Jobs",   link: "/jobs" },
-    { icon: <FaList />,          text: "Payments",    link: "/superadmin/payments" },
+    { icon: <DashboardIcon />, text: "Dashboard", link: "/superadmin/dashboard" },
+    { icon: <BuildingIcon />,  text: "Companies",  link: "/superadmin/companies" },
+    { icon: <UsersIcon />,     text: "Super Admins", link: "/superadmin/admins" },
+    { icon: <UsersIcon />,     text: "Job Seekers", link: "/superadmin/applicants" },
+    { icon: <BriefcaseIcon />, text: "All Jobs",   link: "/jobs" },
+    { icon: <ListIcon />,      text: "Payments",    link: "/superadmin/payments" },
   ],
 };
 
@@ -48,7 +56,7 @@ const NavItem = ({ icon, text, link, onClick, disabled }) => {
         title="Posting is disabled while your company account is suspended"
         aria-disabled="true"
       >
-        <span className="text-base opacity-80">{icon}</span>
+        <span className="text-brand-500 opacity-90">{icon}</span>
         {text}
       </span>
     );
@@ -65,7 +73,7 @@ const NavItem = ({ icon, text, link, onClick, disabled }) => {
            : "text-gray-700 hover:bg-brand-50 hover:text-brand-800"}`
       }
     >
-      <span className="text-base opacity-80">{icon}</span>
+      <span className="text-brand-500 opacity-90">{icon}</span>
       {text}
     </NavLink>
   );
@@ -102,7 +110,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* ── Top bar ───────────────────────────────────────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-4 gap-3 nav-glass">
 
         <button
@@ -110,7 +117,7 @@ const Navbar = () => {
           aria-label="Open menu"
           className="shrink-0 p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all"
         >
-          <FaBars size={18} />
+          <MenuIcon size={18} />
         </button>
 
         <div className="flex flex-1 items-center min-w-0">
@@ -130,7 +137,7 @@ const Navbar = () => {
             className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all"
             aria-label="Messages"
           >
-            <FaComments size={18} />
+            <MessageIcon size={18} />
             {chatUnread > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-brand-500 text-white text-[10px] font-bold flex items-center justify-center">
                 {chatUnread > 9 ? "9+" : chatUnread}
@@ -142,7 +149,7 @@ const Navbar = () => {
             to={profilePath}
             className="flex items-center gap-1.5 text-sm font-medium link-nav px-3 py-1.5 rounded-xl"
           >
-            <MdOutlineAccountCircle size={20} className="text-gray-500" />
+            <UserCircleIcon size={20} className="text-gray-500" />
             <span className="hidden sm:inline">{user.name || "Profile"}</span>
           </Link>
           <button
@@ -150,20 +157,18 @@ const Navbar = () => {
             className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-red-600
               px-3 py-1.5 rounded-xl hover:bg-red-50 transition-all"
           >
-            <CiLogout size={20} />
+            <LogoutIcon size={20} />
             <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
       </header>
 
-      {/* ── Backdrop overlay ──────────────────────────────────────────── */}
       <div
         className={`fixed inset-0 z-50 bg-black/30 backdrop-blur-sm transition-opacity duration-300
           ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         onClick={() => setOpen(false)}
       />
 
-      {/* ── Sidebar ───────────────────────────────────────────────────── */}
       <aside
         ref={sidebarRef}
         className={`fixed top-0 left-0 h-full w-72 bg-white z-50 flex flex-col
@@ -171,7 +176,6 @@ const Navbar = () => {
           border-r border-gray-100 shadow-float
           ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Header */}
         <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100">
           <Link
             to={dashboardPath}
@@ -187,29 +191,12 @@ const Navbar = () => {
             aria-label="Close menu"
             className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all"
           >
-            <FaTimes size={16} />
+            <CloseIcon size={16} />
           </button>
         </div>
 
-        {/* User pill */}
-        <div className="px-4 pt-4 pb-2">
-          <Link
-            to={profilePath}
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100
-              hover:bg-gray-100 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
-              <MdOutlineAccountCircle size={20} className="text-brand-600" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{user.name || "Account"}</p>
-              <p className="text-xs text-gray-400 capitalize">{role?.replace("_", " ")}</p>
-            </div>
-          </Link>
-        </div>
 
-        {/* Nav items */}
+
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
           {menuItems.map(({ icon, text, link }) => (
             <NavItem
@@ -223,14 +210,29 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Footer */}
         <div className="p-3 border-t border-gray-100">
+                  <div className="px-4 pt-4 pb-2">
+          <Link
+            to={profilePath}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100
+              hover:bg-gray-100 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+              <UserCircleIcon size={20} className="text-brand-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">{user.name || "Account"}</p>
+              <p className="text-xs text-gray-400 capitalize">{user.email}</p>
+            </div>
+          </Link>
+        </div>
           <button
             onClick={() => { setOpen(false); handleLogout(); }}
             className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium
               text-red-600 hover:bg-red-50 w-full transition-all duration-150"
           >
-            <CiLogout size={18} /> Sign out
+            <LogoutIcon size={18} /> Sign out
           </button>
         </div>
       </aside>

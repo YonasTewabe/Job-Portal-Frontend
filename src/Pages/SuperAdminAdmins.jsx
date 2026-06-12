@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import NotFoundPage from "./NotFoundPage";
 import Spinner from "../Components/Spinner";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn } from "../Components/ui";
+import { UserCircleIcon } from "../Components/icons";
 
 const SuperAdminAdmins = () => {
   const { user: authUser } = useAuth();
@@ -46,7 +47,7 @@ const SuperAdminAdmins = () => {
             { key: "email", label: "Email" },
             { key: "you", label: "" },
           ]}
-          empty={admins.length === 0 && <Empty message="No super admins found." icon="👤" />}
+          empty={admins.length === 0 && <Empty message="No super admins found." icon={UserCircleIcon} />}
         >
           {admins.map((admin, i) => (
             <Tr key={admin.id} striped={i % 2 !== 0}>

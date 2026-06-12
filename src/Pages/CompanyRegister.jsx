@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { preserveFromPublic } from "../utils/authNavigation";
 import { AuthBackHome } from "../Components/ui";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { getDefaultRoute } from "../utils/routes";

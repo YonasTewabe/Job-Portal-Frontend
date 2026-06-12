@@ -1,5 +1,5 @@
 import CryptoJS from "crypto-js";
-import { toast } from "react-toastify";
+import { toast } from "./toast";
 import api from "../axiosInterceptor";
 
 /**

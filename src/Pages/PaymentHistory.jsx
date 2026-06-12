@@ -4,8 +4,9 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, inputCls, Btn } from "../Components/ui";
+import { CreditCardIcon } from "../Components/icons";
 
 const formatMoney = (amount, currency = "ETB") =>
   `${Number(amount).toLocaleString()} ${currency}`;
@@ -167,7 +168,7 @@ const PaymentHistory = () => {
           <Table
             headers={headers}
             empty={payments.length === 0
-              ? <Empty message="No payments found for the selected filters." icon="💳" />
+              ? <Empty message="No payments found for the selected filters." icon={CreditCardIcon} />
               : null}
           >
             {payments.map((payment, i) => (

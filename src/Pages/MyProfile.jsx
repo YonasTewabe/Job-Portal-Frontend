@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
-import { BiShow, BiHide } from "react-icons/bi";
-import { FaPlus, FaTrash } from "react-icons/fa";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
+import { EyeIcon, EyeOffIcon, PlusIcon, TrashIcon } from "../Components/icons";
+import { toast } from "../utils/toast";
+import { confirmDelete } from "../utils/confirm";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { patchSession } from "../utils/session";
@@ -18,7 +17,6 @@ import {
   normalizeEducations,
   normalizeExperiences,
 } from "../utils/profileSchema";
-import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
 import CvFileActions from "../Components/CvFileActions";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -53,7 +51,7 @@ const PwdField = ({ id, label, value, onChange, show, onToggle, error }) => (
       />
       <button type="button" onClick={onToggle} aria-label="Toggle password visibility"
         className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-        {show ? <BiHide size={18} /> : <BiShow size={18} />}
+        {show ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
       </button>
     </div>
   </Field>
@@ -218,14 +216,9 @@ const MyProfile = () => {
   const handleDeleteProfile = () => {
     if (!selectedProfileId || profiles.length <= 1) return;
 
-    Swal.fire({
+    confirmDelete({
       title: "Delete this profile?",
       text: "This cannot be undone. Profiles with applications cannot be deleted.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: SWAL_CONFIRM,
-      cancelButtonColor: SWAL_CANCEL,
-      confirmButtonText: "Yes, delete",
     }).then(async (result) => {
       if (!result.isConfirmed) return;
       try {
@@ -381,7 +374,7 @@ const MyProfile = () => {
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <p className="text-sm font-semibold text-gray-700">Application profiles</p>
                     <button type="button" onClick={handleCreateProfile} className={Btn.secondary("gap-2 text-xs py-2 px-3")}>
-                      <FaPlus size={10} /> New profile
+                      <PlusIcon size={10} /> New profile
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -404,7 +397,7 @@ const MyProfile = () => {
                   </div>
                   {profiles.length > 1 && (
                     <button type="button" onClick={handleDeleteProfile} className={Btn.danger("gap-2 text-xs py-2 px-3")}>
-                      <FaTrash size={10} /> Delete selected profile
+                      <TrashIcon size={10} /> Delete selected profile
                     </button>
                   )}
                   <p className="text-xs text-gray-500">

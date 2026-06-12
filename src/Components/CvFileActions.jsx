@@ -1,5 +1,5 @@
-import { FaDownload, FaFilePdf } from "react-icons/fa";
 import { Btn } from "./ui";
+import { DownloadIcon, FileTextIcon } from "./icons";
 import {
   downloadApplicantCv,
   formatCvDisplayName,
@@ -27,7 +27,7 @@ const CvFileActions = ({
           }}
           className="inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium"
         >
-          <FaFilePdf className="text-red-500" size={12} /> View
+          <FileTextIcon className="text-red-500" size={12} /> View
         </button>
         <button
           type="button"
@@ -38,7 +38,7 @@ const CvFileActions = ({
           className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 font-medium"
           title="Download CV"
         >
-          <FaDownload size={11} />
+          <DownloadIcon size={11} />
         </button>
       </div>
     );
@@ -51,14 +51,14 @@ const CvFileActions = ({
         onClick={() => openApplicantCv(filename)}
         className={Btn.secondary("gap-2 text-sm")}
       >
-        <FaFilePdf className="text-red-500" size={14} /> View CV
+        <FileTextIcon className="text-red-500" size={14} /> View CV
       </button>
       <button
         type="button"
         onClick={() => downloadApplicantCv(filename)}
         className={Btn.ghost("gap-2 text-sm")}
       >
-        <FaDownload size={13} /> Download
+        <DownloadIcon size={13} /> Download
       </button>
       {showFilename && (
         <span className="text-xs text-gray-500 truncate max-w-xs" title={label}>

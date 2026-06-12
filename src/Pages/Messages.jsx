@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { FaComments, FaPaperPlane, FaHeadset, FaPlus, FaTimes } from "react-icons/fa";
-import { toast } from "react-toastify";
+import {
+  MessageIcon,
+  SendIcon,
+  HeadsetIcon,
+  PlusIcon,
+  CloseIcon,
+} from "../Components/icons";
+import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { useChat } from "../context/ChatContext";
@@ -542,7 +548,7 @@ const Messages = () => {
             disabled={opening}
             className={Btn.primary("gap-2 text-sm")}
           >
-            <FaPlus size={12} /> New message
+            <PlusIcon size={12} /> New message
           </button>
         )}
       </div>
@@ -571,7 +577,7 @@ const Messages = () => {
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                 aria-label="Close"
               >
-                <FaTimes size={14} />
+                <CloseIcon size={14} />
               </button>
             </div>
             <div className="flex border-b border-gray-100">
@@ -674,7 +680,7 @@ const Messages = () => {
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                 aria-label="Close"
               >
-                <FaTimes size={14} />
+                <CloseIcon size={14} />
               </button>
             </div>
             <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
@@ -685,7 +691,7 @@ const Messages = () => {
                 className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-xl border border-gray-200
                   bg-white hover:bg-brand-50/50 transition-colors disabled:opacity-50"
               >
-                <FaHeadset className="text-brand-600 shrink-0" size={14} />
+                <HeadsetIcon className="text-brand-600 shrink-0" size={14} />
                 <div>
                   <p className="text-sm font-semibold text-gray-900">Platform support</p>
                   <p className="text-xs text-gray-500">Message the super admin team</p>
@@ -755,7 +761,7 @@ const Messages = () => {
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
                 aria-label="Close"
               >
-                <FaTimes size={14} />
+                <CloseIcon size={14} />
               </button>
             </div>
             <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
@@ -766,7 +772,7 @@ const Messages = () => {
                 className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-xl border border-gray-200
                   bg-white hover:bg-brand-50/50 transition-colors disabled:opacity-50"
               >
-                <FaHeadset className="text-brand-600 shrink-0" size={14} />
+                <HeadsetIcon className="text-brand-600 shrink-0" size={14} />
                 <div>
                   <p className="text-sm font-semibold text-gray-900">Platform support</p>
                   <p className="text-xs text-gray-500">Get help from the {APP_NAME} team</p>
@@ -819,7 +825,7 @@ const Messages = () => {
             ${isChatOpen ? "hidden md:flex" : "flex"}`}>
             <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between gap-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <FaComments size={12} /> Conversations
+                <MessageIcon size={12} /> Conversations
               </p>
               {(user.role === "user" || user.role === "company_admin" || user.role === "superadmin") && (
                 <button
@@ -882,7 +888,7 @@ const Messages = () => {
                     disabled={opening}
                     className={Btn.primary("gap-2 text-sm disabled:opacity-50")}
                   >
-                    <FaPlus size={12} /> New message
+                    <PlusIcon size={12} /> New message
                   </button>
                 </div>
               ) : user.role === "company_admin" || user.role === "superadmin" ? (
@@ -899,11 +905,11 @@ const Messages = () => {
                     disabled={opening}
                     className={Btn.primary("gap-2 text-sm disabled:opacity-50")}
                   >
-                    <FaPlus size={12} /> New message
+                    <PlusIcon size={12} /> New message
                   </button>
                 </div>
               ) : (
-                <Empty message="Select a conversation to start chatting." icon="💬" />
+                <Empty message="Select a conversation to start chatting." icon={MessageIcon} />
               )
             ) : (
               <>
@@ -992,7 +998,7 @@ const Messages = () => {
                       className={Btn.primary("shrink-0 px-4 disabled:opacity-50")}
                       aria-label="Send message"
                     >
-                      <FaPaperPlane size={14} />
+                      <SendIcon size={14} />
                     </button>
                   </form>
                 )}

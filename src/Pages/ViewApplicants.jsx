@@ -1,13 +1,20 @@
 import axios from "../axiosInterceptor";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import Donut from "./ViewReport";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Badge, Btn, inputCls, Empty, Table, Tr, Td, Field, SectionTitle, InfoRow } from "../Components/ui";
-import { FaSortUp, FaSortDown, FaSync, FaTimes, FaComments } from "react-icons/fa";
+import {
+  SortUpIcon,
+  SortDownIcon,
+  RefreshIcon,
+  CloseIcon,
+  MessageIcon,
+  UserCircleIcon,
+} from "../Components/icons";
 import { calculateAge } from "../utils/profileSchema";
 import CvFileActions from "../Components/CvFileActions";
 
@@ -269,7 +276,7 @@ const ApplicantDetailModal = ({
               aria-label="Close"
               className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors shrink-0"
             >
-              <FaTimes size={14} />
+              <CloseIcon size={14} />
             </button>
           </div>
 
@@ -341,7 +348,7 @@ const ApplicantDetailModal = ({
                 to={`/messages?applicationId=${applicant.id}`}
                 className={Btn.secondary("gap-2 text-sm inline-flex")}
               >
-                <FaComments size={14} /> Message applicant
+                <MessageIcon size={14} /> Message applicant
               </Link>
             </div>
 
@@ -539,8 +546,8 @@ const ViewApplicants = () => {
   const sortIcon = (key) => {
     if (sortCriterion !== key) return null;
     return sortAscending
-      ? <FaSortUp size={9} className="inline ml-1 opacity-70" />
-      : <FaSortDown size={9} className="inline ml-1 opacity-70" />;
+      ? <SortUpIcon size={9} className="inline ml-1 opacity-70" />
+      : <SortDownIcon size={9} className="inline ml-1 opacity-70" />;
   };
 
   const headers = [
@@ -563,7 +570,6 @@ const ViewApplicants = () => {
           <PageTitle>Applicants</PageTitle>
           <p className="text-sm text-gray-500 mt-1">
             {applicants.length} total applicant{applicants.length !== 1 ? "s" : ""}
-            {canManage && sorted.length > 0 && " · Click a row to view details"}
           </p>
         </div>
 
@@ -573,7 +579,7 @@ const ViewApplicants = () => {
             className="inline-flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-800
               px-3 py-1.5 rounded-xl hover:bg-brand-50 transition-all font-medium"
           >
-            <FaSync size={11} /> Refresh
+            <RefreshIcon size={11} /> Refresh
           </button>
         </div>
       </div>
@@ -582,7 +588,7 @@ const ViewApplicants = () => {
         <Table
           headers={headers}
           empty={sorted.length === 0
-            ? <Empty message="No applicants yet for this job." icon="👤" />
+            ? <Empty message="No applicants yet for this job." icon={UserCircleIcon} />
             : null}
         >
           {sorted.map((applicant, i) => (

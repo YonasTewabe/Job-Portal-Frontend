@@ -4,9 +4,14 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { toast } from "react-toastify";
+import { toast } from "../utils/toast";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Badge } from "../Components/ui";
-import { FaArrowLeft, FaUsers, FaComments } from "react-icons/fa";
+import {
+  ArrowLeftIcon,
+  UsersIcon,
+  MessageIcon,
+  BriefcaseIcon,
+} from "../Components/icons";
 import { Btn } from "../Components/ui";
 import { isJobOpen, sortJobsByPostedDate } from "../utils/jobs";
 
@@ -77,7 +82,7 @@ const SuperAdminCompanyDetail = () => {
         className="inline-flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700
           font-medium mb-6 group"
       >
-        <FaArrowLeft size={11} className="group-hover:-translate-x-0.5 transition-transform" />
+        <ArrowLeftIcon size={11} className="group-hover:-translate-x-0.5 transition-transform" />
         Back to companies
       </Link>
 
@@ -94,7 +99,7 @@ const SuperAdminCompanyDetail = () => {
             to={`/messages?companyId=${company.id}`}
             className={Btn.secondary("gap-2 text-sm")}
           >
-            <FaComments size={14} /> Message company
+            <MessageIcon size={14} /> Message company
           </Link>
           <Badge status={company.isActive ? "Active" : "Suspended"} />
         </div>
@@ -108,7 +113,7 @@ const SuperAdminCompanyDetail = () => {
         <Table
           headers={headers}
           empty={sortedJobs.length === 0
-            ? <Empty message="No jobs posted for this company yet." icon="📝" />
+            ? <Empty message="No jobs posted for this company yet." icon={BriefcaseIcon} />
             : null}
         >
           {sortedJobs.map((job, i) => (
@@ -128,7 +133,7 @@ const SuperAdminCompanyDetail = () => {
               </Td>
               <Td>
                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                  <FaUsers size={11} className="text-gray-400" />
+                  <UsersIcon size={11} className="text-gray-400" />
                   {applicantCounts[job.id] ?? 0}
                 </span>
               </Td>

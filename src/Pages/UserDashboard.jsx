@@ -4,7 +4,13 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
-import { FaBriefcase, FaCheckCircle, FaClock, FaComments } from "react-icons/fa";
+import {
+  BriefcaseIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  MessageIcon,
+  ClipboardIcon,
+} from "../Components/icons";
 
 const StatCard = ({ icon, label, value, color }) => (
   <Card className="flex items-center gap-4">
@@ -68,10 +74,10 @@ const UserDashboard = () => {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Link to="/messages" className={Btn.secondary("gap-2 px-4 py-2.5 text-sm")}>
-            <FaComments size={13} /> Messages
+            <MessageIcon size={13} /> Messages
           </Link>
           <Link to="/jobs" className="btn-primary px-4 py-2.5">
-            <FaBriefcase size={13} /> Browse Jobs
+            <BriefcaseIcon size={13} /> Browse Jobs
           </Link>
         </div>
       </div>
@@ -79,19 +85,19 @@ const UserDashboard = () => {
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
         <StatCard
-          icon={<FaBriefcase size={18} />}
+          icon={<BriefcaseIcon size={18} />}
           label="Total Applications"
           value={applications.length}
           color={{ bg: "bg-brand-50", text: "text-brand-600" }}
         />
         <StatCard
-          icon={<FaCheckCircle size={18} />}
+          icon={<CheckCircleIcon size={18} />}
           label="In Progress"
           value={inProgress}
           color={{ bg: "bg-emerald-50", text: "text-emerald-600" }}
         />
         <StatCard
-          icon={<FaClock size={18} />}
+          icon={<ClockIcon size={18} />}
           label="Pending Review"
           value={pending}
           color={{ bg: "bg-amber-50", text: "text-amber-500" }}
@@ -107,7 +113,7 @@ const UserDashboard = () => {
         <Table
           headers={headers}
           empty={applications.length === 0
-            ? <Empty message="You haven't applied to any jobs yet." icon="📋" />
+            ? <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
             : null}
         >
           {applications.map((app, i) => (
@@ -133,7 +139,7 @@ const UserDashboard = () => {
                   to={`/messages?applicationId=${app.id}`}
                   className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
                 >
-                  <FaComments size={12} /> Message
+                  <MessageIcon size={12} /> Message
                 </Link>
               </Td>
             </Tr>

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
-import { BiShow, BiHide } from "react-icons/bi";
-import { toast } from "react-toastify";
+import { EyeIcon, EyeOffIcon } from "../Components/icons";
+import { toast } from "../utils/toast";
 import NotFoundPage from "./NotFoundPage";
 import { useAuth } from "../context/AuthContext";
 import axios from "../axiosInterceptor";
@@ -110,7 +110,7 @@ const AddSuperAdmin = () => {
               onClick={() => setShowPassword((v) => !v)}
               className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <BiHide size={18} /> : <BiShow size={18} />}
+              {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
         </Field>
@@ -130,7 +130,7 @@ const AddSuperAdmin = () => {
               onClick={() => setShowConfirm((v) => !v)}
               className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
             >
-              {showConfirm ? <BiHide size={18} /> : <BiShow size={18} />}
+              {showConfirm ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
         </Field>
