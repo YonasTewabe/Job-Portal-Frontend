@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import {
-  HomeIcon,
   BriefcaseIcon,
   UserPlusIcon,
   ListIcon,
@@ -25,7 +24,7 @@ import { useChat } from "../context/ChatContext";
 
 const menus = {
   user: [
-    { icon: <HomeIcon />, text: "Home", link: "/home" },
+    { icon: <DashboardIcon />, text: "Dashboard", link: "/dashboard" },
     { icon: <BriefcaseIcon />, text: "Browse Jobs", link: "/jobs" },
     { icon: <ListIcon />, text: "My Applications", link: "/status" },
   ],

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
+import JobListings from "../Components/JobListings";
 import { Page, PageTitle, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
 import {
   BriefcaseIcon,
@@ -59,7 +60,7 @@ const UserDashboard = () => {
   ).length;
   const pending = applications.filter((a) => a.status === "Pending").length;
 
-  const headers = [
+  const appHeaders = [
     { label: "Job", key: "job" },
     { label: "Company", key: "company" },
     { label: "Applied", key: "applied" },
@@ -69,99 +70,115 @@ const UserDashboard = () => {
   ];
 
   return (
-    <Page>
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-        <div>
-          <span className="section-eyebrow mb-3">Dashboard</span>
-          <PageTitle className="mt-3">Welcome back, {authUser?.name || "there"}</PageTitle>
-          <p className="text-sm text-slate-500 mt-1.5">
-            Here's a summary of your job search activity.
-          </p>
+    <>
+      {/* ── Dashboard section ─────────────────────────────────────────────── */}
+      <Page className="max-w-5xl pb-0">
+        {/* Header */}
+        <div className="flex items-start justify-between flex-wrap gap-4 mb-8">
+          <div>
+            <span className="section-eyebrow mb-3">Dashboard</span>
+            <PageTitle className="mt-3">Welcome back, {authUser?.name || "there"}</PageTitle>
+            <p className="text-sm text-slate-500 mt-1.5">
+              Here&apos;s a summary of your job search activity.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap mt-1">
+            <Link to="/jobs" className="btn-primary px-4 py-2.5">
+              <BriefcaseIcon size={13} /> Browse Jobs
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link to="/messages" className={Btn.secondary("gap-2 px-4 py-2.5 text-sm")}>
-            <MessageIcon size={13} /> Messages
-          </Link>
-          <Link to="/jobs" className="btn-primary px-4 py-2.5">
-            <BriefcaseIcon size={13} /> Browse Jobs
+
+        {/* Stat cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          <StatCard
+            icon={<BriefcaseIcon size={18} />}
+            label="Total Applications"
+            value={applications.length}
+            color={{ bg: "bg-brand-50", text: "text-brand-600" }}
+          />
+          <StatCard
+            icon={<CheckCircleIcon size={18} />}
+            label="In Progress"
+            value={inProgress}
+            color={{ bg: "bg-emerald-50", text: "text-emerald-600" }}
+          />
+          <StatCard
+            icon={<ClockIcon size={18} />}
+            label="Pending Review"
+            value={pending}
+            color={{ bg: "bg-amber-50", text: "text-amber-500" }}
+          />
+        </div>
+
+        {/* Applications table */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-gray-700">Your Applications</h2>
+          <span className="text-xs text-gray-400">{applications.length} total</span>
+        </div>
+        <Card className="p-0 overflow-hidden">
+          <Table
+            headers={appHeaders}
+            empty={
+              applications.length === 0 ? (
+                <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
+              ) : null
+            }
+          >
+            {applications.map((app, i) => (
+              <Tr key={app.id ?? i} striped={i % 2 !== 0}>
+                <Td className="font-medium text-gray-900">
+                  {app.job?.title ?? app.jobtitle ?? "—"}
+                </Td>
+                <Td className="text-gray-600">
+                  {app.job?.company?.name ?? app.companyname ?? "—"}
+                </Td>
+                <Td className="text-gray-400 text-xs">
+                  {app.applicationDate
+                    ? new Date(app.applicationDate).toLocaleDateString()
+                    : (app.applicationdate ?? "—")}
+                </Td>
+                <Td>
+                  <Badge status={app.status} />
+                </Td>
+                <Td className="text-xs text-gray-400">
+                  {app.status === "Interview Scheduled" && app.interviewDate
+                    ? `${
+                        app.interviewHasTime
+                          ? new Date(app.interviewDate).toLocaleString([], {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })
+                          : new Date(app.interviewDate).toLocaleDateString([], {
+                              dateStyle: "short",
+                            })
+                      } — ${app.interviewLocation ?? ""}`
+                    : "—"}
+                </Td>
+                <Td>
+                  <Link
+                    to={`/messages?applicationId=${app.id}`}
+                    className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
+                  >
+                    <MessageIcon size={12} /> Message
+                  </Link>
+                </Td>
+              </Tr>
+            ))}
+          </Table>
+        </Card>
+      </Page>
+
+      {/* ── Recent job listings ───────────────────────────────────────────── */}
+      <div className="border-t border-slate-100 mt-10">
+        <JobListings isHome />
+        <div className="pb-4 text-center">
+          <Link to="/jobs" className="text-sm font-semibold link-brand">
+            View all open positions →
           </Link>
         </div>
       </div>
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <StatCard
-          icon={<BriefcaseIcon size={18} />}
-          label="Total Applications"
-          value={applications.length}
-          color={{ bg: "bg-brand-50", text: "text-brand-600" }}
-        />
-        <StatCard
-          icon={<CheckCircleIcon size={18} />}
-          label="In Progress"
-          value={inProgress}
-          color={{ bg: "bg-emerald-50", text: "text-emerald-600" }}
-        />
-        <StatCard
-          icon={<ClockIcon size={18} />}
-          label="Pending Review"
-          value={pending}
-          color={{ bg: "bg-amber-50", text: "text-amber-500" }}
-        />
-      </div>
-
-      {/* Applications table */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-gray-700">Your Applications</h2>
-        <span className="text-xs text-gray-400">{applications.length} total</span>
-      </div>
-      <Card className="p-0 overflow-hidden">
-        <Table
-          headers={headers}
-          empty={
-            applications.length === 0 ? (
-              <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
-            ) : null
-          }
-        >
-          {applications.map((app, i) => (
-            <Tr key={app.id ?? i} striped={i % 2 !== 0}>
-              <Td className="font-medium text-gray-900">{app.job?.title ?? app.jobtitle ?? "—"}</Td>
-              <Td className="text-gray-600">{app.job?.company?.name ?? app.companyname ?? "—"}</Td>
-              <Td className="text-gray-400 text-xs">
-                {app.applicationDate
-                  ? new Date(app.applicationDate).toLocaleDateString()
-                  : (app.applicationdate ?? "—")}
-              </Td>
-              <Td>
-                <Badge status={app.status} />
-              </Td>
-              <Td className="text-xs text-gray-400">
-                {app.status === "Interview Scheduled" && app.interviewDate
-                  ? `${
-                      app.interviewHasTime
-                        ? new Date(app.interviewDate).toLocaleString([], {
-                            dateStyle: "short",
-                            timeStyle: "short",
-                          })
-                        : new Date(app.interviewDate).toLocaleDateString([], { dateStyle: "short" })
-                    } — ${app.interviewLocation ?? ""}`
-                  : "—"}
-              </Td>
-              <Td>
-                <Link
-                  to={`/messages?applicationId=${app.id}`}
-                  className={Btn.ghost("gap-1.5 text-xs py-1.5 px-3")}
-                >
-                  <MessageIcon size={12} /> Message
-                </Link>
-              </Td>
-            </Tr>
-          ))}
-        </Table>
-      </Card>
-    </Page>
+    </>
   );
 };
 

@@ -258,15 +258,6 @@ const Messages = () => {
     [user?.role, loadCompanyMeta, selectConversation, setSearchParams]
   );
 
-  const loadUserMeta = useCallback(
-    (profile) => ({
-      userId: profile.user?.id ?? profile.userId,
-      title: profile.fullname ?? profile.user?.name ?? "Job seeker",
-      subtitle: profile.email ?? profile.user?.email ?? "User",
-    }),
-    []
-  );
-
   const openUserChatView = useCallback(
     async (targetUserId) => {
       if (!targetUserId) return;
@@ -283,17 +274,30 @@ const Messages = () => {
           selectConversation(conv.id, conv);
           setSearchParams({ conversation: conv.id });
         } else {
-          let profile = users.find((u) => (u.user?.id ?? u.userId) === targetUserId);
+          let profile = users.find((u) => u.userId === targetUserId);
           if (!profile) {
             try {
               const { data } = await axios.get("/api/applicants");
-              profile = Array.isArray(data) ? data.find((p) => p.user?.id === targetUserId) : null;
+              const found = Array.isArray(data)
+                ? data.find((p) => p.user?.id === targetUserId)
+                : null;
+              profile = found
+                ? {
+                    userId: targetUserId,
+                    name: found.fullname ?? found.user?.name ?? "",
+                    email: found.email ?? found.user?.email ?? "",
+                  }
+                : null;
             } catch {
               profile = null;
             }
           }
           const meta = profile
-            ? loadUserMeta(profile)
+            ? {
+                userId: profile.userId,
+                title: profile.name || "Job seeker",
+                subtitle: profile.email || "User",
+              }
             : { userId: targetUserId, title: "Job seeker", subtitle: "User" };
           setPendingUserId(targetUserId);
           setPendingUserMeta(meta);
@@ -307,14 +311,28 @@ const Messages = () => {
         setOpening(false);
       }
     },
-    [users, loadUserMeta, selectConversation, setSearchParams]
+    [users, selectConversation, setSearchParams]
   );
 
   const loadUsers = useCallback(async () => {
     setUsersLoading(true);
     try {
       const { data } = await axios.get("/api/applicants");
-      setUsers(Array.isArray(data) ? data : []);
+      const all = Array.isArray(data) ? data : [];
+
+      // Deduplicate: one entry per user, keeping the first profile encountered
+      const seen = new Map();
+      for (const profile of all) {
+        const uid = profile.user?.id;
+        if (uid && !seen.has(uid)) {
+          seen.set(uid, {
+            userId: uid,
+            name: profile.fullname ?? profile.user?.name ?? "",
+            email: profile.email ?? profile.user?.email ?? "",
+          });
+        }
+      }
+      setUsers([...seen.values()]);
     } catch {
       setUsers([]);
       toast.error("Could not load registered users");
@@ -475,6 +493,26 @@ const Messages = () => {
       behavior: grew && messages.length > 1 ? "smooth" : "auto",
     });
   }, [messages]);
+
+  const closeChat = useCallback(() => {
+    setPendingApplicationId(null);
+    setPendingAppMeta(null);
+    setPendingSupportCompanyId(null);
+    setPendingSupportMeta(null);
+    setPendingUserId(null);
+    setPendingUserMeta(null);
+    setPendingUserPlatformSupport(false);
+    selectConversation(null);
+  }, [selectConversation]);
+
+  // Close active chat on Escape
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "Escape" && isChatOpen) closeChat();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [isChatOpen, closeChat]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -682,23 +720,20 @@ const Messages = () => {
                     No registered users found.
                   </p>
                 ) : (
-                  users.map((profile) => {
-                    const id = profile.user?.id;
-                    if (!id) return null;
+                  users.map((u) => {
+                    if (!u.userId) return null;
                     return (
                       <button
-                        key={profile.id ?? id}
+                        key={u.userId}
                         type="button"
                         disabled={opening}
-                        onClick={() => openUserChatView(id)}
+                        onClick={() => openUserChatView(u.userId)}
                         className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
                       >
                         <p className="text-sm font-semibold text-gray-900 truncate">
-                          {profile.fullname ?? profile.user?.name ?? "User"}
+                          {u.name || "User"}
                         </p>
-                        <p className="text-xs text-gray-500 truncate mt-0.5">
-                          {profile.email ?? profile.user?.email ?? "—"}
-                        </p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">{u.email || "—"}</p>
                       </button>
                     );
                   })
@@ -901,18 +936,6 @@ const Messages = () => {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                 <MessageIcon size={12} /> Conversations
               </p>
-              {(user.role === "user" ||
-                user.role === "company_admin" ||
-                user.role === "superadmin") && (
-                <button
-                  type="button"
-                  onClick={handleOpenNewPicker}
-                  disabled={opening}
-                  className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-50"
-                >
-                  + New
-                </button>
-              )}
             </div>
             <div className="flex-1 overflow-y-auto">
               {conversations.length === 0 ? (
@@ -997,16 +1020,7 @@ const Messages = () => {
                   <button
                     type="button"
                     className="md:hidden text-sm text-brand-600"
-                    onClick={() => {
-                      setPendingApplicationId(null);
-                      setPendingAppMeta(null);
-                      setPendingSupportCompanyId(null);
-                      setPendingSupportMeta(null);
-                      setPendingUserId(null);
-                      setPendingUserMeta(null);
-                      setPendingUserPlatformSupport(false);
-                      selectConversation(null);
-                    }}
+                    onClick={closeChat}
                   >
                     ← Back
                   </button>

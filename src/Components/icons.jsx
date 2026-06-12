@@ -10,6 +10,7 @@ import {
   LuBell,
   LuBriefcase,
   LuBuilding2,
+  LuCalendar,
   LuChevronRight,
   LuCheckCircle,
   LuUserCircle,
@@ -110,6 +111,7 @@ export const ClipboardIcon = createIcon(LuClipboardList);
 export const SendIcon = createIcon(LuSend);
 export const HeadsetIcon = createIcon(LuHeadphones);
 export const CreditCardIcon = createIcon(LuCreditCard);
+export const CalendarIcon = createIcon(LuCalendar);
 
 /** Decorative icon for empty states */
 export const EmptyStateIcon = ({ icon: Icon, className = "" }) => (

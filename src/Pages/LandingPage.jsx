@@ -96,7 +96,7 @@ const LandingPage = () => {
           </div>
 
           <p className="text-sm text-slate-500 animate-fade-up stagger-4">
-            Free to join · No credit card required
+            Free to join · No payment required
           </p>
 
           {/* Quick stats */}

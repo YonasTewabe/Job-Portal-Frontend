@@ -124,11 +124,25 @@ const ContactUs = () => {
           <form ref={form} onSubmit={handleSubmit} className="space-y-1">
             {user ? (
               <div className="grid grid-cols-2 gap-3 mb-1">
-                <Field label="Full name">
-                  <p className="text-sm text-gray-800 font-medium py-2.5">{user.name}</p>
+                <Field label="Full name" htmlFor="logged-name">
+                  <input
+                    id="logged-name"
+                    type="text"
+                    value={user.name ?? ""}
+                    disabled
+                    readOnly
+                    className={inputCls()}
+                  />
                 </Field>
-                <Field label="Email">
-                  <p className="text-sm text-gray-800 font-medium py-2.5">{displayEmail || "—"}</p>
+                <Field label="Email" htmlFor="logged-email">
+                  <input
+                    id="logged-email"
+                    type="email"
+                    value={displayEmail}
+                    disabled
+                    readOnly
+                    className={inputCls()}
+                  />
                 </Field>
               </div>
             ) : (

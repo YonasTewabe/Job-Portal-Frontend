@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MapPinIcon, ClockIcon, BriefcaseIcon, BuildingIcon } from "./icons";
-import { isJobOpen } from "../utils/jobs";
+import { MapPinIcon, ClockIcon, BriefcaseIcon, BuildingIcon, CalendarIcon } from "./icons";
+import { isJobOpen, getJobPostedDate } from "../utils/jobs";
 
 const JobListing = ({ job }) => {
   const [expanded, setExpanded] = useState(false);
@@ -10,6 +10,11 @@ const JobListing = ({ job }) => {
     ? job.description
     : job.description?.substring(0, MAX) + (job.description?.length > MAX ? "…" : "");
   const open = isJobOpen(job);
+
+  const postedDate = getJobPostedDate(job);
+  const postedLabel = postedDate
+    ? new Date(postedDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+    : null;
 
   return (
     <article className="group surface-card-interactive flex flex-col overflow-hidden">
@@ -63,8 +68,17 @@ const JobListing = ({ job }) => {
             px-2 py-0.5 rounded-full"
           >
             <ClockIcon size={10} />
-            {job.deadline}
+            Deadline: {job.deadline}
           </span>
+          {postedLabel && (
+            <span
+              className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-50 border border-gray-100
+              px-2 py-0.5 rounded-full"
+            >
+              <CalendarIcon size={10} />
+              Posted {postedLabel}
+            </span>
+          )}
         </div>
 
         {job.description && (

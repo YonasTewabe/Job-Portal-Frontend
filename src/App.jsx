@@ -10,7 +10,6 @@ import axios from "./axiosInterceptor";
 
 // Pages
 import LandingPage from "./Pages/LandingPage";
-import HomePage from "./Pages/HomePage";
 import NotFoundPage from "./Pages/NotFoundPage";
 import Jobs from "./Pages/Jobs";
 import Job, { jobLoader } from "./Pages/Job";
@@ -184,13 +183,12 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* ── Shared protected routes ─────────────────────────── */}
+        {/* /home redirects to /dashboard for users */}
         <Route
           path="home"
           element={
-            <ProtectedRoute>
-              <HomePage />
+            <ProtectedRoute roles={["user"]}>
+              <UserDashboard />
             </ProtectedRoute>
           }
         />
