@@ -7,8 +7,9 @@ import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Badge, Btn, inputCls, Empty, Table, Tr, Td, Field, SectionTitle, InfoRow } from "../Components/ui";
-import { FaSortUp, FaSortDown, FaFilePdf, FaSync, FaTimes, FaComments } from "react-icons/fa";
+import { FaSortUp, FaSortDown, FaSync, FaTimes, FaComments } from "react-icons/fa";
 import { calculateAge } from "../utils/profileSchema";
+import CvFileActions from "../Components/CvFileActions";
 
 const mergeApplication = (current, data) => ({
   ...current,
@@ -320,13 +321,7 @@ const ApplicantDetailModal = ({
             <div>
               <SectionTitle>CV</SectionTitle>
               {cv ? (
-                <button
-                  type="button"
-                  onClick={() => window.open(`/api/applicants/cv/${cv}`, "_blank")}
-                  className={Btn.secondary("gap-2 text-sm")}
-                >
-                  <FaFilePdf className="text-red-500" size={14} /> View CV
-                </button>
+                <CvFileActions filename={cv} />
               ) : (
                 <p className="text-sm text-gray-400">No CV uploaded</p>
               )}
@@ -605,16 +600,7 @@ const ViewApplicants = () => {
               <Td><Badge status={applicant.status} /></Td>
               <Td>
                 {getApplicantCv(applicant) ? (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(`/api/applicants/cv/${getApplicantCv(applicant)}`, "_blank");
-                    }}
-                    className="inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium"
-                  >
-                    <FaFilePdf className="text-red-500" size={12} /> PDF
-                  </button>
+                  <CvFileActions filename={getApplicantCv(applicant)} compact />
                 ) : (
                   <span className="text-xs text-gray-400">—</span>
                 )}

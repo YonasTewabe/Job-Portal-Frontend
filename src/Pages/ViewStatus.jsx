@@ -17,8 +17,7 @@ const ViewStatus = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data: applicant } = await axios.get("/api/applicants/me");
-        const { data: apps } = await axios.get(`/api/applications?applicantId=${applicant.id}`);
+        const { data: apps } = await axios.get(`/api/applications?userId=${userId}`);
         setApplications(Array.isArray(apps) ? apps : []);
       } catch {
         setApplications([]);

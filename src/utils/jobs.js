@@ -25,10 +25,29 @@ export const sortJobsByPostedDate = (jobs, order = "desc") => {
 export const normalizeJobs = (jobs) =>
   sortJobsByPostedDate(Array.isArray(jobs) ? jobs.map(normalizeJob) : []);
 
+export const isJobDraft = (job) => job?.status === "draft";
+
+export const isDeadlinePassed = (deadline) => {
+  if (!deadline) return false;
+  const value =
+    typeof deadline === "string" && deadline.length >= 10
+      ? deadline.slice(0, 10)
+      : formatDeadlineForInput(deadline);
+  if (!value) return false;
+  return !isFutureDeadline(value);
+};
+
 export const isJobOpen = (job) => {
+  if (isJobDraft(job)) return false;
   if (job?.isOpen === false) return false;
   if (!job?.deadline) return true;
-  return new Date(job.deadline) >= new Date();
+  return !isDeadlinePassed(job.deadline);
+};
+
+export const getJobListingStatus = (job) => {
+  if (isJobDraft(job)) return "Draft";
+  if (isJobOpen(job)) return "Active";
+  return "Closed";
 };
 
 export const countOpenJobs = (jobs) => (jobs ?? []).filter(isJobOpen).length;

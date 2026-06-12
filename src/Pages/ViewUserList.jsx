@@ -5,7 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn } from "../Components/ui";
-import { FaSort, FaSortUp, FaSortDown, FaFilePdf, FaComments } from "react-icons/fa";
+import { FaSort, FaSortUp, FaSortDown, FaComments } from "react-icons/fa";
+import CvFileActions from "../Components/CvFileActions";
 
 const COLS = [
   { key: "fullname", label: "Name" },
@@ -86,13 +87,7 @@ const ViewUserList = () => {
               </Td>
               <Td>
                 {p.cv ? (
-                  <button
-                    type="button"
-                    onClick={() => window.open(`/api/applicants/cv/${p.cv}`, "_blank")}
-                    className="inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium"
-                  >
-                    <FaFilePdf className="text-red-500" size={12} /> PDF
-                  </button>
+                  <CvFileActions filename={p.cv} compact />
                 ) : (
                   <span className="text-xs text-gray-400">—</span>
                 )}

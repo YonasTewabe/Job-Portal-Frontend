@@ -91,7 +91,7 @@ const AddJob = () => {
               {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </Field>
-          <Field label="Salary" htmlFor="salary" hint="Optional — e.g. 15,000 - 20,000 ETB or Negotiable">
+          <Field label="Salary" htmlFor="salary">
             <input
               id="salary"
               type="text"
@@ -127,9 +127,9 @@ const AddJob = () => {
         </Field>
 
         <Field label="Requirements" htmlFor="requirement">
-          <input
-            id="requirement" type="text" placeholder="Experience or education needed" required
-            value={requirement} onChange={(e) => setRequirement(e.target.value)} className={inputCls()}
+          <textarea
+            id="requirement" rows={5} placeholder="Experience or education needed" required
+            value={requirement} onChange={(e) => setRequirement(e.target.value)} className={inputCls() + " resize-none"}
           />
         </Field>
 

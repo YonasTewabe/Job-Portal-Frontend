@@ -5,6 +5,7 @@ import { getDefaultRoute } from "../utils/routes";
 import { publicAuthState } from "../utils/authNavigation";
 import JobListings from "../Components/JobListings";
 import ViewAllJobs from "../Components/ViewAllJobs";
+import { APP_NAME, APP_TAGLINE } from "../constants/brand";
 
 const features = [
   {
@@ -58,7 +59,7 @@ const LandingPage = () => {
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-center">
           <span className="section-eyebrow mb-6 animate-fade-up">
-            Your career, organized
+            Ethiopia&apos;s career platform
           </span>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900
@@ -67,8 +68,8 @@ const LandingPage = () => {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up stagger-2">
-            Application Tracker helps job seekers manage applications and helps companies
-            find the right talent — sign in or create an account to get started.
+            {APP_NAME} helps Ethiopian job seekers manage applications and helps companies
+            find the right talent — {APP_TAGLINE.toLowerCase()}.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 animate-fade-up stagger-3">
@@ -175,7 +176,7 @@ const LandingPage = () => {
                   text-white font-bold px-8 py-3 rounded-2xl text-sm
                   border border-white/25 hover:bg-white/20 transition-all hover:-translate-y-0.5"
               >
-                Register company
+                Register your company
               </Link>
               <Link
                 to="/login"

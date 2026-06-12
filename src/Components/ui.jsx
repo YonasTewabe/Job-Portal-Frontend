@@ -68,6 +68,7 @@ const statusColors = {
   Active:                "bg-emerald-50 text-emerald-700 border border-emerald-200",
   Closed:                "bg-red-50 text-red-700 border border-red-200",
   Suspended:             "bg-red-50 text-red-700 border border-red-200",
+  Draft:                 "bg-violet-50 text-violet-700 border border-violet-200",
 };
 
 export const Badge = ({ status }) => (

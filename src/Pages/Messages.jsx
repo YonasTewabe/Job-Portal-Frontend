@@ -7,10 +7,11 @@ import { useAuth } from "../context/AuthContext";
 import { useChat } from "../context/ChatContext";
 import Spinner from "../Components/Spinner";
 import { Page, PageTitle, Card, Btn, inputCls, Empty, Badge } from "../Components/ui";
+import { APP_NAME } from "../constants/brand";
 
 const PLATFORM_SUPPORT_META = {
   title: "Platform support",
-  subtitle: "Application Tracker team",
+  subtitle: `${APP_NAME} team`,
 };
 
 const formatTime = (iso) => {
@@ -314,10 +315,10 @@ const Messages = () => {
   }, []);
 
   const loadUserApplications = useCallback(async () => {
+    if (!user?.userId) return;
     setAppsLoading(true);
     try {
-      const { data: applicant } = await axios.get("/api/applicants/me");
-      const { data: apps } = await axios.get(`/api/applications?applicantId=${applicant.id}`);
+      const { data: apps } = await axios.get(`/api/applications?userId=${user.userId}`);
       setApplications(Array.isArray(apps) ? apps : []);
     } catch {
       setApplications([]);
@@ -325,7 +326,7 @@ const Messages = () => {
     } finally {
       setAppsLoading(false);
     }
-  }, []);
+  }, [user?.userId]);
 
   const loadCompanyApplications = useCallback(async () => {
     setAppsLoading(true);
@@ -768,7 +769,7 @@ const Messages = () => {
                 <FaHeadset className="text-brand-600 shrink-0" size={14} />
                 <div>
                   <p className="text-sm font-semibold text-gray-900">Platform support</p>
-                  <p className="text-xs text-gray-500">Get help from the Application Tracker team</p>
+                  <p className="text-xs text-gray-500">Get help from the {APP_NAME} team</p>
                 </div>
               </button>
             </div>

@@ -27,11 +27,19 @@ const PaymentSuccess = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [posting, setPosting] = useState(false);
+  const [draftJobId, setDraftJobId] = useState(null);
+
+  const buildJobPayload = () => {
+    if (!pendingJob?.title) return null;
+    const { companyId: _companyId, ...job } = pendingJob;
+    return job;
+  };
 
   const recordPayment = async (txRef) => {
-    if (!txRef || !pendingJob?.title) return;
+    if (!txRef || !pendingJob?.title) return null;
+    const job = buildJobPayload();
     try {
-      await api.post("/api/payments/record", {
+      const { data } = await api.post("/api/payments/record", {
         txRef,
         amount: Number(amount),
         currency: currency || "ETB",
@@ -39,9 +47,11 @@ const PaymentSuccess = () => {
         payerName: payerInfo.paymentPersonName,
         payerEmail: payerInfo.paymentPersonEmail,
         payerPhone: payerInfo.paymentPersonPhoneNumber,
+        ...(job ? { job } : {}),
       });
+      return data;
     } catch {
-      // Idempotent on retry; job publish may still proceed
+      return null;
     }
   };
 
@@ -53,7 +63,8 @@ const PaymentSuccess = () => {
       setPaymentStatus("Payment Verification Successful");
       setPaymentSuccess(true);
       setPaymentVerified(true, ref);
-      await recordPayment(ref);
+      const payment = await recordPayment(ref);
+      if (payment?.jobId) setDraftJobId(payment.jobId);
       setIsLoading(false);
     };
 
@@ -89,29 +100,30 @@ const PaymentSuccess = () => {
 
   if (user && user.role !== "company_admin") return <NotFoundPage />;
 
-  const handleContinue = async () => {
-    if (!pendingJob?.title || !pendingJob?.companyId) {
-      toast.error("Job details missing. Please fill out the job form again.");
-      navigate("/add-job");
+  const handlePublish = async () => {
+    if (!draftJobId) {
+      toast.error("Draft job not found. Check your dashboard or contact support.");
+      navigate("/company/dashboard");
       return;
     }
 
-    const txRef = searchParams.get("tx_ref") || storedTxRef;
-
     setPosting(true);
     try {
-      const { data: job } = await api.post("/api/jobs", pendingJob);
-      if (txRef && job?.id) {
-        await api.patch(`/api/payments/${encodeURIComponent(txRef)}/job/${job.id}`);
-      }
-      toast.success("Job posted successfully");
+      await api.patch(`/api/jobs/${draftJobId}/publish`);
+      toast.success("Job published successfully");
       resetPaymentStore();
       navigate("/company/dashboard");
     } catch {
-      toast.error("Payment succeeded but job posting failed. Please contact support.");
+      toast.error("Payment succeeded but publishing failed. You can publish from your dashboard.");
     } finally {
       setPosting(false);
     }
+  };
+
+  const handleSaveForLater = () => {
+    toast.info("Job saved as draft. You can publish or edit it from your dashboard.");
+    resetPaymentStore();
+    navigate("/company/dashboard");
   };
 
   return (
@@ -142,7 +154,7 @@ const PaymentSuccess = () => {
 
             <p className="text-sm text-gray-500">
               {paymentSuccess
-                ? "Your payment was successful. Continue to publish your job listing."
+                ? "Your payment was successful. Publish now or save the job as a draft to finish later."
                 : "We couldn't verify your payment."}
             </p>
 
@@ -152,15 +164,30 @@ const PaymentSuccess = () => {
               </p>
             )}
 
+            {paymentSuccess && draftJobId && (
+              <p className="text-xs text-gray-500">
+                A draft has been saved to your account.
+              </p>
+            )}
+
             {paymentSuccess && (
-              <button
-                type="button"
-                onClick={handleContinue}
-                disabled={posting}
-                className={Btn.full("primary", "py-3")}
-              >
-                {posting ? "Publishing job…" : "Publish job"}
-              </button>
+              <div className="flex flex-col gap-2 w-full">
+                <button
+                  type="button"
+                  onClick={handlePublish}
+                  disabled={posting || !draftJobId}
+                  className={Btn.full("primary", "py-3")}
+                >
+                  {posting ? "Publishing job…" : "Publish job"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveForLater}
+                  className={Btn.full("secondary", "py-3")}
+                >
+                  Save as draft &amp; go to dashboard
+                </button>
+              </div>
             )}
 
             {paymentSuccess === false && (

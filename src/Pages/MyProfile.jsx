@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
 import { BiShow, BiHide } from "react-icons/bi";
+import { FaPlus, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
@@ -16,6 +18,8 @@ import {
   normalizeEducations,
   normalizeExperiences,
 } from "../utils/profileSchema";
+import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
+import CvFileActions from "../Components/CvFileActions";
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
@@ -94,7 +98,10 @@ const MyProfile = () => {
   const [saving, setSaving]     = useState(false);
   const [errors, setErrors]     = useState({});
 
-  // Job seeker
+  // Job seeker profiles
+  const [profiles, setProfiles]       = useState([]);
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
+  const [profileName, setProfileName] = useState("");
   const [fullname, setFullname]       = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [sex, setSex]                 = useState("");
@@ -102,6 +109,7 @@ const MyProfile = () => {
   const [experiences, setExperiences] = useState([{ title: "", company: "", startDate: "", endDate: "" }]);
   const [userPhone, setUserPhone]     = useState("");
   const [cv, setCv]                   = useState(null);
+  const [existingCv, setExistingCv]   = useState("");
   const [email, setEmail]             = useState("");
 
   // Company admin
@@ -120,6 +128,34 @@ const MyProfile = () => {
   const [showNew, setShowNew]                 = useState(false);
   const [showConfirm, setShowConfirm]         = useState(false);
 
+  const applyProfileToForm = useCallback((data) => {
+    setProfileName(data.profileName ?? "");
+    setFullname(data.fullname ?? "");
+    setDateOfBirth(normalizeDateOfBirth(data));
+    setSex(data.sex ?? "");
+    setEducations(normalizeEducations(data));
+    setExperiences(normalizeExperiences(data));
+    setUserPhone(data.userPhone ?? data.userphone ?? data.phone ?? "");
+    setEmail(data.email ?? "");
+    setExistingCv(data.cv ?? "");
+    setCv(null);
+  }, []);
+
+  const loadProfiles = useCallback(async (preferredId) => {
+    const { data } = await axios.get("/api/applicants/me/profiles");
+    const list = Array.isArray(data) ? data : [];
+    setProfiles(list);
+
+    const nextId = preferredId && list.some((p) => p.id === preferredId)
+      ? preferredId
+      : list[0]?.id ?? null;
+    setSelectedProfileId(nextId);
+
+    const active = list.find((p) => p.id === nextId);
+    if (active) applyProfileToForm(active);
+    return list;
+  }, [applyProfileToForm]);
+
   useEffect(() => {
     if (!authUser) return;
 
@@ -127,14 +163,7 @@ const MyProfile = () => {
       setLoading(true);
       try {
         if (role === "user") {
-          const { data } = await axios.get("/api/applicants/me");
-          setFullname(data.fullname ?? "");
-          setDateOfBirth(normalizeDateOfBirth(data));
-          setSex(data.sex ?? "");
-          setEducations(normalizeEducations(data));
-          setExperiences(normalizeExperiences(data));
-          setUserPhone(data.userPhone ?? data.userphone ?? data.phone ?? "");
-          setEmail(data.email ?? "");
+          await loadProfiles();
         } else if (role === "company_admin") {
           const [userRes, companyRes] = await Promise.all([
             axios.get(`/api/users/${userId}`),
@@ -162,7 +191,52 @@ const MyProfile = () => {
     };
 
     load();
-  }, [authUser, role, userId]);
+  }, [authUser, role, userId, loadProfiles]);
+
+  const handleSelectProfile = async (profileId) => {
+    if (profileId === selectedProfileId) return;
+    setSelectedProfileId(profileId);
+    setErrors({});
+    try {
+      const { data } = await axios.get(`/api/applicants/me/profiles/${profileId}`);
+      applyProfileToForm(data);
+    } catch {
+      toast.error("Failed to load profile");
+    }
+  };
+
+  const handleCreateProfile = async () => {
+    try {
+      const { data } = await axios.post("/api/applicants/me/profiles", {});
+      toast.success("New profile created");
+      await loadProfiles(data.id);
+    } catch {
+      toast.error("Failed to create profile");
+    }
+  };
+
+  const handleDeleteProfile = () => {
+    if (!selectedProfileId || profiles.length <= 1) return;
+
+    Swal.fire({
+      title: "Delete this profile?",
+      text: "This cannot be undone. Profiles with applications cannot be deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: SWAL_CONFIRM,
+      cancelButtonColor: SWAL_CANCEL,
+      confirmButtonText: "Yes, delete",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+      try {
+        await axios.delete(`/api/applicants/me/profiles/${selectedProfileId}`);
+        toast.success("Profile deleted");
+        await loadProfiles();
+      } catch (error) {
+        toast.error(error.response?.data?.message ?? "Failed to delete profile");
+      }
+    });
+  };
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
@@ -171,7 +245,7 @@ const MyProfile = () => {
     try {
       if (role === "user") {
         applicantProfileSchema.validateSync(
-          { fullname, email, dateOfBirth, sex, educations, experiences, userPhone },
+          { profileName, fullname, email, dateOfBirth, sex, educations, experiences, userPhone },
           { abortEarly: false }
         );
       } else if (role === "company_admin") {
@@ -191,7 +265,12 @@ const MyProfile = () => {
     setSaving(true);
     try {
       if (role === "user") {
+        if (!selectedProfileId) {
+          toast.error("No profile selected");
+          return;
+        }
         const payload = {
+          profileName: profileName.trim() || undefined,
           fullname,
           email,
           dateOfBirth,
@@ -206,15 +285,16 @@ const MyProfile = () => {
           })),
           userPhone,
         };
-        await axios.patch("/api/applicants/me", payload);
+        await axios.patch(`/api/applicants/me/profiles/${selectedProfileId}`, payload);
         if (cv) {
           const fd = new FormData();
           fd.append("file", cv);
-          await axios.post("/api/applicants/me/cv", fd, {
+          await axios.post(`/api/applicants/me/profiles/${selectedProfileId}/cv`, fd, {
             headers: { "Content-Type": "multipart/form-data" },
           });
         }
-        patchSession({ name: fullname });
+        if (profiles.length === 1) patchSession({ name: fullname });
+        await loadProfiles(selectedProfileId);
       } else if (role === "company_admin") {
         if (!companyId) {
           toast.error("Company not found");
@@ -297,6 +377,47 @@ const MyProfile = () => {
           <form onSubmit={handleProfileSubmit} noValidate>
             {role === "user" && (
               <>
+                <div className="mb-6 space-y-3">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-sm font-semibold text-gray-700">Application profiles</p>
+                    <button type="button" onClick={handleCreateProfile} className={Btn.secondary("gap-2 text-xs py-2 px-3")}>
+                      <FaPlus size={10} /> New profile
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {profiles.map((profile) => (
+                      <button
+                        key={profile.id}
+                        type="button"
+                        onClick={() => handleSelectProfile(profile.id)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all
+                          ${selectedProfileId === profile.id
+                            ? "bg-brand-50 text-brand-700 border-brand-200"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}
+                      >
+                        {profile.profileName || "Profile"}
+                        {profile.profileCompleted && (
+                          <span className="ml-1.5 text-emerald-600">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {profiles.length > 1 && (
+                    <button type="button" onClick={handleDeleteProfile} className={Btn.danger("gap-2 text-xs py-2 px-3")}>
+                      <FaTrash size={10} /> Delete selected profile
+                    </button>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    Create separate profiles for different roles or CVs. When applying, you can choose which profile to use.
+                  </p>
+                </div>
+
+                <Field label="Profile name" htmlFor="profileName" error={errors.profileName}>
+                  <input id="profileName" type="text" value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)} className={inputCls(errors.profileName)}
+                    placeholder="How you'll identify this profile" />
+                </Field>
+
                 <Field label="Full name" htmlFor="fullname" error={errors.fullname}>
                   <input id="fullname" type="text" value={fullname}
                     onChange={(e) => setFullname(e.target.value)} className={inputCls(errors.fullname)} />
@@ -339,12 +460,22 @@ const MyProfile = () => {
                   errors={errors}
                 />
                 <Field label="CV (PDF)" htmlFor="cv">
+                  {existingCv ? (
+                    <CvFileActions filename={existingCv} showFilename className="mb-3" />
+                  ) : (
+                    <p className="mb-3 text-xs text-gray-400">No CV uploaded yet</p>
+                  )}
                   <input id="cv" type="file" accept="application/pdf"
-                    onChange={(e) => setCv(e.target.files[0])}
+                    onChange={(e) => setCv(e.target.files[0] ?? null)}
                     className="block w-full text-sm text-gray-500
                       file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0
                       file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700
                       hover:file:bg-brand-100 transition-all" />
+                  {cv && (
+                    <p className="mt-1.5 text-xs text-brand-600 font-medium">
+                      New file selected: {cv.name}
+                    </p>
+                  )}
                 </Field>
               </>
             )}

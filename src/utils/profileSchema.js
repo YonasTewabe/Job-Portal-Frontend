@@ -34,6 +34,7 @@ export const formatDateForInput = (value) => {
 };
 
 export const applicantProfileSchema = Yup.object().shape({
+  profileName: Yup.string().trim().max(80, "Max 80 characters"),
   fullname: Yup.string().matches(/^[A-Za-z ]*$/, "Letters only").required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
   dateOfBirth: Yup.string()

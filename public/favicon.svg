@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dereja">
+  <defs>
+    <linearGradient id="dj-bg" x1="6" y1="4" x2="34" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10b981"/>
+      <stop offset="1" stop-color="#065f46"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="36" height="36" rx="11" fill="url(#dj-bg)"/>
+  <rect x="10" y="25" width="7" height="9" rx="2" fill="#ffffff" fill-opacity="0.45"/>
+  <rect x="18.5" y="18" width="7" height="16" rx="2" fill="#ffffff" fill-opacity="0.72"/>
+  <rect x="27" y="10" width="7" height="24" rx="2" fill="#ffffff"/>
+  <path d="M30.5 13.5L33.5 10.5M30.5 13.5L27.5 10.5" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

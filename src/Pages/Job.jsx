@@ -8,14 +8,21 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, Badge, Btn, Page } from "../Components/ui";
-import { isJobOpen, normalizeJob } from "../utils/jobs";
+import {
+  getMinDeadlineDate,
+  isDeadlinePassed,
+  isFutureDeadline,
+  isJobOpen,
+  normalizeJob,
+} from "../utils/jobs";
 import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
 
 const Job = ({ deleteJob }) => {
   const navigate = useNavigate();
   const { revalidate } = useRevalidator();
   const job = useLoaderData();
-  const [applicantProfile, setApplicantProfile] = useState(null);
+  const [profiles, setProfiles] = useState([]);
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [applicationId, setApplicationId] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -34,23 +41,29 @@ const Job = ({ deleteJob }) => {
 
     const load = async () => {
       try {
-        const { data: profile } = await axios.get("/api/applicants/me");
+        const [{ data: profileList }, { data: apps }] = await Promise.all([
+          axios.get("/api/applicants/me/profiles"),
+          axios.get(`/api/applications?userId=${userId}`),
+        ]);
         if (cancelled) return;
-        setApplicantProfile(profile);
 
-        if (profile?.id) {
-          const { data: apps } = await axios.get(`/api/applications?applicantId=${profile.id}`);
-          if (cancelled) return;
-          const list = Array.isArray(apps) ? apps : [];
-          const match = list.find(
-            (app) => (app.job?.id ?? app.jobId) === job.id
-          );
-          setAlreadyApplied(!!match);
-          setApplicationId(match?.id ?? null);
-        }
+        const list = Array.isArray(profileList) ? profileList : [];
+        setProfiles(list);
+
+        const completeProfiles = list.filter((p) => p.profileCompleted);
+        const defaultProfile = completeProfiles[0] ?? list[0] ?? null;
+        setSelectedProfileId(defaultProfile?.id ?? null);
+
+        const applications = Array.isArray(apps) ? apps : [];
+        const match = applications.find(
+          (app) => (app.job?.id ?? app.jobId) === job.id
+        );
+        setAlreadyApplied(!!match);
+        setApplicationId(match?.id ?? null);
       } catch {
         if (!cancelled) {
-          setApplicantProfile(null);
+          setProfiles([]);
+          setSelectedProfileId(null);
           setAlreadyApplied(false);
           setApplicationId(null);
         }
@@ -63,13 +76,17 @@ const Job = ({ deleteJob }) => {
     return () => { cancelled = true; };
   }, [role, userId, job.id]);
 
-  const profileComplete = applicantProfile?.profileCompleted === true;
+  const selectedProfile = profiles.find((p) => p.id === selectedProfileId) ?? null;
+  const completeProfiles = profiles.filter((p) => p.profileCompleted);
+  const hasCompleteProfile = completeProfiles.length > 0;
+  const profileComplete = selectedProfile?.profileCompleted === true;
+  const showProfilePicker = completeProfiles.length > 1;
 
   const jobOpen = isJobOpen(job);
 
   const handleApply = async () => {
     if (alreadyApplied) return;
-    if (!profileComplete || !applicantProfile?.id) {
+    if (!profileComplete || !selectedProfile?.id) {
       toast.error("Complete your profile before applying");
       return;
     }
@@ -77,7 +94,7 @@ const Job = ({ deleteJob }) => {
     try {
       await axios.post("/api/applications", {
         jobId: job.id,
-        applicantId: applicantProfile.id,
+        applicantId: selectedProfile.id,
         applicationDate: new Date().toISOString(),
       });
       toast.success("Application submitted");
@@ -90,31 +107,73 @@ const Job = ({ deleteJob }) => {
     }
   };
 
-  const onToggleOpen = () => {
+  const patchJobStatus = async (payload) => {
+    setTogglingOpen(true);
+    try {
+      await axios.patch(`/api/jobs/${job.id}`, payload);
+      toast.success(payload.isOpen ? "Job reopened" : "Job closed");
+      revalidate();
+    } catch (error) {
+      toast.error(error.response?.data?.message ?? "Failed to update job status");
+    } finally {
+      setTogglingOpen(false);
+    }
+  };
+
+  const onToggleOpen = async () => {
     const closing = jobOpen;
-    Swal.fire({
-      title: closing ? "Close this job?" : "Reopen this job?",
-      text: closing
-        ? "Applicants will no longer be able to apply, even before the deadline."
-        : "Applicants can apply again if the deadline has not passed.",
+
+    if (closing) {
+      const result = await Swal.fire({
+        title: "Close this job?",
+        text: "Applicants will no longer be able to apply, even before the deadline.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: SWAL_CONFIRM,
+        cancelButtonColor: SWAL_CANCEL,
+        confirmButtonText: "Yes, close it",
+      });
+      if (!result.isConfirmed) return;
+      await patchJobStatus({ isOpen: false });
+      return;
+    }
+
+    if (isDeadlinePassed(job.deadline)) {
+      const result = await Swal.fire({
+        title: "Set a new deadline",
+        text: "The application deadline has passed. Choose a new date to reopen this job.",
+        input: "date",
+        inputAttributes: { min: getMinDeadlineDate() },
+        inputValue: getMinDeadlineDate(),
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: SWAL_CONFIRM,
+        cancelButtonColor: SWAL_CANCEL,
+        confirmButtonText: "Reopen job",
+        preConfirm: (value) => {
+          if (!isFutureDeadline(value)) {
+            Swal.showValidationMessage("Please select a future deadline");
+            return false;
+          }
+          return value;
+        },
+      });
+      if (!result.isConfirmed) return;
+      await patchJobStatus({ isOpen: true, deadline: result.value });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Reopen this job?",
+      text: "Applicants can apply again until the deadline.",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: SWAL_CONFIRM,
       cancelButtonColor: SWAL_CANCEL,
-      confirmButtonText: closing ? "Yes, close it" : "Yes, reopen it",
-    }).then(async (result) => {
-      if (!result.isConfirmed) return;
-      setTogglingOpen(true);
-      try {
-        await axios.patch(`/api/jobs/${job.id}`, { isOpen: !closing });
-        toast.success(closing ? "Job closed" : "Job reopened");
-        revalidate();
-      } catch {
-        toast.error("Failed to update job status");
-      } finally {
-        setTogglingOpen(false);
-      }
+      confirmButtonText: "Yes, reopen it",
     });
+    if (!result.isConfirmed) return;
+    await patchJobStatus({ isOpen: true });
   };
 
   const onDelete = (jobId) => {
@@ -279,14 +338,42 @@ const Job = ({ deleteJob }) => {
                       </Link>
                     )}
                   </div>
-                ) : profileComplete ? (
-                  <button
-                    onClick={handleApply}
-                    disabled={submitting}
-                    className={Btn.full("primary", "py-3")}
-                  >
-                    {submitting ? "Submitting…" : "Apply Now"}
-                  </button>
+                ) : hasCompleteProfile ? (
+                  <div className="space-y-3">
+                    {showProfilePicker && (
+                      <div>
+                        <label htmlFor="apply-profile" className="block text-xs font-semibold text-gray-600 mb-1.5">
+                          Apply with profile
+                        </label>
+                        <select
+                          id="apply-profile"
+                          value={selectedProfileId ?? ""}
+                          onChange={(e) => setSelectedProfileId(e.target.value)}
+                          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800
+                            focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400"
+                        >
+                          {completeProfiles.map((profile) => (
+                            <option key={profile.id} value={profile.id}>
+                              {profile.profileName || profile.fullname || "Profile"}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    {profileComplete ? (
+                      <button
+                        onClick={handleApply}
+                        disabled={submitting}
+                        className={Btn.full("primary", "py-3")}
+                      >
+                        {submitting ? "Submitting…" : "Apply Now"}
+                      </button>
+                    ) : (
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        The selected profile is incomplete. Choose another profile or complete it first.
+                      </p>
+                    )}
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     <p className="text-sm text-gray-600 leading-relaxed">

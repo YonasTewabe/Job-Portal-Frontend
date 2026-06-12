@@ -5,8 +5,9 @@ import { useLoaderData, Link, useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import { Page, Card, SectionTitle, InfoRow, Btn } from "../Components/ui";
-import { FaEdit, FaKey, FaTrash, FaFilePdf } from "react-icons/fa";
+import { FaEdit, FaKey, FaTrash } from "react-icons/fa";
 import { SWAL_CANCEL, SWAL_CONFIRM } from "../constants/theme";
+import CvFileActions from "../Components/CvFileActions";
 
 const Account = ({ deleteUser }) => {
   const user = useLoaderData();
@@ -80,12 +81,7 @@ const Account = ({ deleteUser }) => {
               )}
               <div className="pt-4">
                 {user.cv ? (
-                  <button
-                    onClick={() => window.open(`/api/applicants/cv/${user.cv}`, "_blank")}
-                    className={Btn.secondary("gap-2 text-sm")}
-                  >
-                    <FaFilePdf className="text-red-500" size={14} /> Download CV
-                  </button>
+                  <CvFileActions filename={user.cv} />
                 ) : (
                   <p className="text-sm text-gray-400">No CV uploaded</p>
                 )}

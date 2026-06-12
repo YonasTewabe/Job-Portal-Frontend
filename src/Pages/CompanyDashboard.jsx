@@ -5,10 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { toast } from "react-toastify";
-import { Page, Card, Badge, Table, Tr, Td, Empty } from "../Components/ui";
+import { Page, Card, Badge, Table, Tr, Td, Empty, Btn } from "../Components/ui";
 import { FaBriefcase, FaEnvelope, FaPlus } from "react-icons/fa";
 import PostJobLink from "../Components/PostJobLink";
-import { sortJobsByPostedDate } from "../utils/jobs";
+import { getJobListingStatus, isJobDraft, sortJobsByPostedDate } from "../utils/jobs";
 
 const StatCard = ({ icon, label, value, color = { bg: "bg-brand-50", text: "text-brand-600" } }) => (
   <Card className="flex items-center gap-4">
@@ -27,11 +27,19 @@ const CompanyDashboard = () => {
   const [company, setCompany] = useState(null);
   const [jobs, setJobs]       = useState([]);
   const [loading, setLoading] = useState(true);
+  const [publishingId, setPublishingId] = useState(null);
+
+  const loadCompany = () => {
+    return axios.get("/api/companies/mine")
+      .then(({ data }) => {
+        setCompany(data);
+        setJobs(sortJobsByPostedDate(data.jobs ?? []));
+      });
+  };
 
   useEffect(() => {
     if (authUser?.role !== "company_admin") return;
-    axios.get("/api/companies/mine")
-      .then(({ data }) => { setCompany(data); setJobs(sortJobsByPostedDate(data.jobs ?? [])); })
+    loadCompany()
       .catch(() => toast.error("Failed to load company data"))
       .finally(() => setLoading(false));
   }, [authUser]);
@@ -40,9 +48,25 @@ const CompanyDashboard = () => {
   if (loading) return <div className="py-24"><Spinner loading /></div>;
 
   const sortedJobs = sortJobsByPostedDate(jobs);
+  const publishedCount = sortedJobs.filter((job) => !isJobDraft(job)).length;
+  const draftCount = sortedJobs.filter(isJobDraft).length;
+
+  const handlePublish = async (jobId) => {
+    setPublishingId(jobId);
+    try {
+      await axios.patch(`/api/jobs/${jobId}/publish`);
+      toast.success("Job published");
+      await loadCompany();
+    } catch (error) {
+      toast.error(error.response?.data?.message ?? "Failed to publish job");
+    } finally {
+      setPublishingId(null);
+    }
+  };
 
   const headers = [
     { label: "Title",    key: "title" },
+    { label: "Status",   key: "status" },
     { label: "Type",     key: "type" },
     { label: "Location", key: "location" },
     { label: "Deadline", key: "deadline" },
@@ -51,7 +75,6 @@ const CompanyDashboard = () => {
 
   return (
     <Page className="max-w-5xl">
-      {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{company?.name}</h1>
@@ -59,30 +82,24 @@ const CompanyDashboard = () => {
             <p className="text-sm text-gray-500 mt-1.5 max-w-lg leading-relaxed">{company.description}</p>
           )}
         </div>
-        <PostJobLink
-          className="btn-primary px-4 py-2.5"
-        >
+        <PostJobLink className="btn-primary px-4 py-2.5">
           <FaPlus size={11} /> Post a Job
         </PostJobLink>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
         <StatCard
           icon={<FaBriefcase size={18} />}
-          label="Jobs Posted"
-          value={sortedJobs.length}
+          label="Published Jobs"
+          value={publishedCount}
           color={{ bg: "bg-brand-50", text: "text-brand-600" }}
         />
-        <Card className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-2xl bg-sky-50 flex items-center justify-center shrink-0">
-            <FaEnvelope className="text-sky-500" size={16} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs text-gray-400 font-medium mb-0.5">Contact Email</p>
-            <p className="text-sm font-semibold text-gray-900 truncate">{company?.contactEmail ?? "—"}</p>
-          </div>
-        </Card>
+        <StatCard
+          icon={<FaBriefcase size={18} />}
+          label="Draft Jobs"
+          value={draftCount}
+          color={{ bg: "bg-violet-50", text: "text-violet-600" }}
+        />
         <Card className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0">
             <span className="text-lg">🏢</span>
@@ -103,7 +120,6 @@ const CompanyDashboard = () => {
         </Link>
       </div>
 
-      {/* Jobs table */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-gray-700">Job Listings</h2>
         <span className="text-xs text-gray-400">{sortedJobs.length} total</span>
@@ -113,32 +129,48 @@ const CompanyDashboard = () => {
           headers={headers}
           empty={sortedJobs.length === 0 ? <Empty message="No jobs posted yet." icon="📝" /> : null}
         >
-          {sortedJobs.map((job, i) => (
-            <Tr key={job.id} striped={i % 2 !== 0}>
-              <Td className="font-medium text-gray-900">{job.title}</Td>
-              <Td>
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
-                  {job.type}
-                </span>
-              </Td>
-              <Td className="text-gray-500 text-xs">{job.location}</Td>
-              <Td className="text-gray-400 text-xs">
-                {job.deadline ? new Date(job.deadline).toLocaleDateString() : "—"}
-              </Td>
-              <Td>
-                <div className="flex items-center gap-3">
-                  <Link to={`/job/${job.id}`}
-                    className="text-xs link-brand">
-                    View
-                  </Link>
-                  <Link to={`/edit-job/${job.id}`}
-                    className="text-xs text-amber-600 hover:text-amber-700 font-semibold hover:underline">
-                    Edit
-                  </Link>
-                </div>
-              </Td>
-            </Tr>
-          ))}
+          {sortedJobs.map((job, i) => {
+            const draft = isJobDraft(job);
+            return (
+              <Tr key={job.id} striped={i % 2 !== 0}>
+                <Td className="font-medium text-gray-900">{job.title}</Td>
+                <Td>
+                  <Badge status={getJobListingStatus(job)} />
+                </Td>
+                <Td>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
+                    {job.type}
+                  </span>
+                </Td>
+                <Td className="text-gray-500 text-xs">{job.location}</Td>
+                <Td className="text-gray-400 text-xs">
+                  {job.deadline ? new Date(job.deadline).toLocaleDateString() : "—"}
+                </Td>
+                <Td>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {!draft && (
+                      <Link to={`/job/${job.id}`} className="text-xs link-brand">
+                        View
+                      </Link>
+                    )}
+                    <Link to={`/edit-job/${job.id}`} className="text-xs text-amber-600 hover:text-amber-700 font-semibold hover:underline">
+                      Edit
+                    </Link>
+                    {draft && (
+                      <button
+                        type="button"
+                        onClick={() => handlePublish(job.id)}
+                        disabled={publishingId === job.id}
+                        className={Btn.primary("text-xs py-1.5 px-3")}
+                      >
+                        {publishingId === job.id ? "Publishing…" : "Publish"}
+                      </button>
+                    )}
+                  </div>
+                </Td>
+              </Tr>
+            );
+          })}
         </Table>
       </Card>
     </Page>

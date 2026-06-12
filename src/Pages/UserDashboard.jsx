@@ -25,9 +25,12 @@ const UserDashboard = () => {
 
   useEffect(() => {
     const load = async () => {
+      if (!authUser?.userId) {
+        setLoading(false);
+        return;
+      }
       try {
-        const { data: applicant } = await axios.get("/api/applicants/me");
-        const { data: apps }      = await axios.get(`/api/applications?applicantId=${applicant.id}`);
+        const { data: apps } = await axios.get(`/api/applications?userId=${authUser.userId}`);
         setApps(Array.isArray(apps) ? apps : []);
       } catch {
         setApps([]);
@@ -36,7 +39,7 @@ const UserDashboard = () => {
       }
     };
     load();
-  }, []);
+  }, [authUser?.userId]);
 
   if (loading) return <div className="py-24"><Spinner loading /></div>;
 

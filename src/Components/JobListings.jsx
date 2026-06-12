@@ -5,7 +5,7 @@ import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PostJobLink from "./PostJobLink";
-import { normalizeJobs, isJobOpen, getJobPostedDate } from "../utils/jobs";
+import { normalizeJobs, isJobOpen, isJobDraft, getJobPostedDate } from "../utils/jobs";
 import { FaSearch, FaPlus } from "react-icons/fa";
 
 const JobListings = ({ isHome = false }) => {
@@ -32,7 +32,8 @@ const JobListings = ({ isHome = false }) => {
   if (error)   return <p className="text-center py-24 text-red-500 text-sm">Failed to load jobs.</p>;
 
   const hideClosedJobs = !authUser || role === "user";
-  const visibleJobs = hideClosedJobs ? jobs.filter(isJobOpen) : jobs;
+  const visibleJobs = (hideClosedJobs ? jobs.filter(isJobOpen) : jobs)
+    .filter((job) => role === "company_admin" || !isJobDraft(job));
 
   const filtered = visibleJobs.filter((job) =>
     [job.title, job.requirement, job.companyName, job.description]

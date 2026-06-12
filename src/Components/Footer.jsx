@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Logo from "./Logo";
+import { APP_NAME, APP_TAGLINE } from "../constants/brand";
 
 const Footer = () => (
   <footer className="bg-white border-t border-slate-200/80 mt-auto">
@@ -8,11 +9,10 @@ const Footer = () => (
         {/* Brand */}
         <div>
           <div className="flex items-center gap-2.5 mb-3">
-            <Logo size={24} variant="color" />
-            <span className="text-sm font-bold text-slate-800 tracking-tight">Application Tracker</span>
+            <Logo size={24} variant="color" showText />
           </div>
           <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
-            The modern way to track job applications and connect talent with opportunity.
+            {APP_TAGLINE}. Track applications and connect talent with opportunity.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ const Footer = () => (
 
       <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-xs text-slate-400">
-          © {new Date().getFullYear()} Application Tracker. All rights reserved.
+          © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </p>
         <p className="text-xs text-slate-400">
           Built for job seekers and recruiters

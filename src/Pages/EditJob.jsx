@@ -5,7 +5,7 @@ import axios from "../axiosInterceptor";
 import NotFoundPage from "./NotFoundPage";
 import { useAuth } from "../context/AuthContext";
 import { FormCard, Field, inputCls, Btn } from "../Components/ui";
-import { formatDeadlineForInput, getMinDeadlineDate, isFutureDeadline } from "../utils/jobs";
+import { formatDeadlineForInput, getMinDeadlineDate, isFutureDeadline, isJobDraft } from "../utils/jobs";
 
 const EditJob = ({ updateJobSubmit }) => {
   const job = useLoaderData();
@@ -17,8 +17,10 @@ const EditJob = ({ updateJobSubmit }) => {
   const [salary,      setSalary]      = useState(job.salary      || "");
   const [deadline,    setDeadline]    = useState(formatDeadlineForInput(job.deadline));
   const [loading,     setLoading]     = useState(false);
+  const [publishing,  setPublishing]  = useState(false);
 
   const { user: authUser } = useAuth();
+  const isDraft = isJobDraft(job);
   const navigate = useNavigate();
   const { id }   = useParams();
 
@@ -51,10 +53,26 @@ const EditJob = ({ updateJobSubmit }) => {
     finally { setLoading(false); }
   };
 
+  const handlePublish = async () => {
+    setPublishing(true);
+    try {
+      await axios.patch(`/api/jobs/${id}/publish`);
+      toast.success("Job published successfully");
+      navigate("/company/dashboard");
+    } catch (error) {
+      toast.error(error.response?.data?.message ?? "Failed to publish job");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   const jobTypes = ["Full-Time", "Part-Time", "Remote", "Internship"];
 
   return (
-    <FormCard title="Edit Job" subtitle="Update the details for this listing.">
+    <FormCard
+      title={isDraft ? "Edit Draft Job" : "Edit Job"}
+      subtitle={isDraft ? "Update this draft, then publish when you are ready." : "Update the details for this listing."}
+    >
       <form onSubmit={handleSubmit} noValidate>
         <Field label="Job title" htmlFor="title">
           <input
@@ -69,7 +87,7 @@ const EditJob = ({ updateJobSubmit }) => {
               {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </Field>
-          <Field label="Salary" htmlFor="salary" hint="Optional — leave empty if not specified">
+          <Field label="Salary" htmlFor="salary">
             <input
               id="salary"
               type="text"
@@ -105,15 +123,27 @@ const EditJob = ({ updateJobSubmit }) => {
         </Field>
 
         <Field label="Requirements" htmlFor="requirement">
-          <input
-            id="requirement" type="text" required
-            value={requirement} onChange={(e) => setRequirement(e.target.value)} className={inputCls()}
+          <textarea
+            id="requirement" rows={5} placeholder="Experience or education needed" required
+            value={requirement} onChange={(e) => setRequirement(e.target.value)} className={inputCls() + " resize-none"}
           />
         </Field>
 
-        <button type="submit" disabled={loading} className={Btn.full("primary", "mt-2 py-3")}>
-          {loading ? "Saving…" : "Save Changes"}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          <button type="submit" disabled={loading} className={Btn.full("primary", "py-3 sm:flex-1")}>
+            {loading ? "Saving…" : "Save Changes"}
+          </button>
+          {isDraft && (
+            <button
+              type="button"
+              onClick={handlePublish}
+              disabled={publishing || loading}
+              className={Btn.full("secondary", "py-3 sm:flex-1")}
+            >
+              {publishing ? "Publishing…" : "Publish job"}
+            </button>
+          )}
+        </div>
       </form>
     </FormCard>
   );
