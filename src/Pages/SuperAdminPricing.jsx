@@ -27,7 +27,12 @@ const SuperAdminPricing = () => {
   }, [user]);
 
   if (user?.role !== "superadmin") return <NotFoundPage />;
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +81,8 @@ const SuperAdminPricing = () => {
           </Field>
 
           <p className="text-xs text-gray-500 mb-6">
-            This amount is charged in Ethiopian Birr (ETB) through Chapa when a company admin publishes a job listing.
+            This amount is charged in Ethiopian Birr (ETB) through Chapa when a company admin
+            publishes a job listing.
           </p>
 
           <button type="submit" disabled={saving} className={Btn.full("primary", "py-3")}>

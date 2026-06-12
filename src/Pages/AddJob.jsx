@@ -13,17 +13,17 @@ import { getMinDeadlineDate, isFutureDeadline } from "../utils/jobs";
 
 const AddJob = () => {
   const { user: authUser } = useAuth();
-  const myRole    = authUser?.role;
-  const navigate  = useNavigate();
+  const myRole = authUser?.role;
+  const navigate = useNavigate();
   const { setPendingJob } = usePayment();
 
-  const [title,       setTitle]       = useState("");
-  const [type,        setType]        = useState("Full-Time");
-  const [location,    setLocation]    = useState("");
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("Full-Time");
+  const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [requirement, setRequirement] = useState("");
-  const [salary,      setSalary]      = useState("");
-  const [deadline,    setDeadline]    = useState("");
+  const [salary, setSalary] = useState("");
+  const [deadline, setDeadline] = useState("");
   const [postingFee, setPostingFee] = useState(null);
 
   const { company, isSuspended, loading: companyLoading } = useCompany();
@@ -37,7 +37,12 @@ const AddJob = () => {
   }, []);
 
   if (myRole !== "company_admin") return <NotFoundPage />;
-  if (companyLoading) return <div className="py-24"><Spinner loading /></div>;
+  if (companyLoading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
   if (isSuspended) return <SuspendedAccount />;
 
   const minDeadline = getMinDeadlineDate();
@@ -80,15 +85,29 @@ const AddJob = () => {
       <form onSubmit={handleSubmit} noValidate>
         <Field label="Job title" htmlFor="title">
           <input
-            id="title" type="text" placeholder="e.g. Front-end Developer" required
-            value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls()}
+            id="title"
+            type="text"
+            placeholder="e.g. Front-end Developer"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={inputCls()}
           />
         </Field>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Job type" htmlFor="type">
-            <select id="type" value={type} onChange={(e) => setType(e.target.value)} className={inputCls()}>
-              {jobTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+            <select
+              id="type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className={inputCls()}
+            >
+              {jobTypes.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Salary" htmlFor="salary">
@@ -106,30 +125,48 @@ const AddJob = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Location" htmlFor="location">
             <input
-              id="location" type="text" placeholder="City or Remote" required
-              value={location} onChange={(e) => setLocation(e.target.value)} className={inputCls()}
+              id="location"
+              type="text"
+              placeholder="City or Remote"
+              required
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className={inputCls()}
             />
           </Field>
           <Field label="Application deadline" htmlFor="deadline">
             <input
-              id="deadline" type="date" required min={minDeadline}
-              value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputCls()}
+              id="deadline"
+              type="date"
+              required
+              min={minDeadline}
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              className={inputCls()}
             />
           </Field>
         </div>
 
         <Field label="Job description" htmlFor="description">
           <textarea
-            id="description" rows={5} placeholder="Duties, expectations, culture…"
-            value={description} onChange={(e) => setDescription(e.target.value)}
+            id="description"
+            rows={5}
+            placeholder="Duties, expectations, culture…"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className={inputCls() + " resize-none"}
           />
         </Field>
 
         <Field label="Requirements" htmlFor="requirement">
           <textarea
-            id="requirement" rows={5} placeholder="Experience or education needed" required
-            value={requirement} onChange={(e) => setRequirement(e.target.value)} className={inputCls() + " resize-none"}
+            id="requirement"
+            rows={5}
+            placeholder="Experience or education needed"
+            required
+            value={requirement}
+            onChange={(e) => setRequirement(e.target.value)}
+            className={inputCls() + " resize-none"}
           />
         </Field>
 

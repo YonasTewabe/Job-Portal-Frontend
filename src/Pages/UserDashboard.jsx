@@ -25,9 +25,9 @@ const StatCard = ({ icon, label, value, color }) => (
 );
 
 const UserDashboard = () => {
-  const { user: authUser }         = useAuth();
-  const [applications, setApps]    = useState([]);
-  const [loading, setLoading]      = useState(true);
+  const { user: authUser } = useAuth();
+  const [applications, setApps] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -47,7 +47,12 @@ const UserDashboard = () => {
     load();
   }, [authUser?.userId]);
 
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
 
   const inProgress = applications.filter(
     (a) => a.status === "Under Consideration" || a.status === "Interview Scheduled"
@@ -55,12 +60,12 @@ const UserDashboard = () => {
   const pending = applications.filter((a) => a.status === "Pending").length;
 
   const headers = [
-    { label: "Job",       key: "job" },
-    { label: "Company",   key: "company" },
-    { label: "Applied",   key: "applied" },
-    { label: "Status",    key: "status" },
+    { label: "Job", key: "job" },
+    { label: "Company", key: "company" },
+    { label: "Applied", key: "applied" },
+    { label: "Status", key: "status" },
     { label: "Interview", key: "interview" },
-    { label: "Chat",      key: "chat" },
+    { label: "Chat", key: "chat" },
   ];
 
   return (
@@ -70,7 +75,9 @@ const UserDashboard = () => {
         <div>
           <span className="section-eyebrow mb-3">Dashboard</span>
           <PageTitle className="mt-3">Welcome back, {authUser?.name || "there"}</PageTitle>
-          <p className="text-sm text-slate-500 mt-1.5">Here's a summary of your job search activity.</p>
+          <p className="text-sm text-slate-500 mt-1.5">
+            Here's a summary of your job search activity.
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Link to="/messages" className={Btn.secondary("gap-2 px-4 py-2.5 text-sm")}>
@@ -112,9 +119,11 @@ const UserDashboard = () => {
       <Card className="p-0 overflow-hidden">
         <Table
           headers={headers}
-          empty={applications.length === 0
-            ? <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
-            : null}
+          empty={
+            applications.length === 0 ? (
+              <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
+            ) : null
+          }
         >
           {applications.map((app, i) => (
             <Tr key={app.id ?? i} striped={i % 2 !== 0}>
@@ -123,14 +132,20 @@ const UserDashboard = () => {
               <Td className="text-gray-400 text-xs">
                 {app.applicationDate
                   ? new Date(app.applicationDate).toLocaleDateString()
-                  : app.applicationdate ?? "—"}
+                  : (app.applicationdate ?? "—")}
               </Td>
-              <Td><Badge status={app.status} /></Td>
+              <Td>
+                <Badge status={app.status} />
+              </Td>
               <Td className="text-xs text-gray-400">
                 {app.status === "Interview Scheduled" && app.interviewDate
-                  ? `${app.interviewHasTime
-                      ? new Date(app.interviewDate).toLocaleString([], { dateStyle: "short", timeStyle: "short" })
-                      : new Date(app.interviewDate).toLocaleDateString([], { dateStyle: "short" })
+                  ? `${
+                      app.interviewHasTime
+                        ? new Date(app.interviewDate).toLocaleString([], {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                          })
+                        : new Date(app.interviewDate).toLocaleDateString([], { dateStyle: "short" })
                     } — ${app.interviewLocation ?? ""}`
                   : "—"}
               </Td>

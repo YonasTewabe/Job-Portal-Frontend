@@ -39,9 +39,9 @@ const StatCard = ({ icon, label, value, color }) => (
 const SuperAdminDashboard = () => {
   const { user: authUser } = useAuth();
   const [companies, setCompanies] = useState([]);
-  const [jobs, setJobs]           = useState([]);
-  const [users, setUsers]         = useState([]);
-  const [loading, setLoading]     = useState(true);
+  const [jobs, setJobs] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (authUser?.role !== "superadmin") return;
@@ -60,10 +60,15 @@ const SuperAdminDashboard = () => {
   }, [authUser]);
 
   if (authUser?.role !== "superadmin") return <NotFoundPage />;
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
 
   const activeCompanies = companies.filter((c) => c.isActive).length;
-  const openJobsCount   = countOpenJobs(jobs);
+  const openJobsCount = countOpenJobs(jobs);
   const recentCompanies = [...companies]
     .sort((a, b) => companyRecency(b) - companyRecency(a))
     .slice(0, RECENT_LIMIT);
@@ -115,7 +120,10 @@ const SuperAdminDashboard = () => {
               <p className="text-sm font-semibold text-gray-900">Manage Companies</p>
               <p className="text-xs text-gray-500 mt-0.5">View, suspend, or add companies</p>
             </div>
-            <ChevronRightIcon className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+            <ChevronRightIcon
+              className="text-gray-300 group-hover:text-brand-500 transition-colors"
+              size={14}
+            />
           </Card>
         </Link>
 
@@ -125,7 +133,10 @@ const SuperAdminDashboard = () => {
               <p className="text-sm font-semibold text-gray-900">Browse All Jobs</p>
               <p className="text-xs text-gray-500 mt-0.5">View every listing on the platform</p>
             </div>
-            <ChevronRightIcon className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+            <ChevronRightIcon
+              className="text-gray-300 group-hover:text-brand-500 transition-colors"
+              size={14}
+            />
           </Card>
         </Link>
         <Link to="/superadmin/payments" className="group">
@@ -134,7 +145,10 @@ const SuperAdminDashboard = () => {
               <p className="text-sm font-semibold text-gray-900">Payment History</p>
               <p className="text-xs text-gray-500 mt-0.5">View job posting payments</p>
             </div>
-            <ChevronRightIcon className="text-gray-300 group-hover:text-brand-500 transition-colors" size={14} />
+            <ChevronRightIcon
+              className="text-gray-300 group-hover:text-brand-500 transition-colors"
+              size={14}
+            />
           </Card>
         </Link>
       </div>

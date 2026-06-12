@@ -159,15 +159,11 @@ const PaymentSuccess = () => {
             </p>
 
             {paymentSuccess && pendingJob?.title && (
-              <p className="text-sm text-gray-700 font-medium">
-                Job: {pendingJob.title}
-              </p>
+              <p className="text-sm text-gray-700 font-medium">Job: {pendingJob.title}</p>
             )}
 
             {paymentSuccess && draftJobId && (
-              <p className="text-xs text-gray-500">
-                A draft has been saved to your account.
-              </p>
+              <p className="text-xs text-gray-500">A draft has been saved to your account.</p>
             )}
 
             {paymentSuccess && (

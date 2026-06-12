@@ -9,20 +9,20 @@ import { preserveAuthRedirect, resolvePostAuthPath } from "../utils/authNavigati
 import { AuthCard, Field, inputCls, Btn } from "../Components/ui";
 
 const schema = Yup.object().shape({
-  email:    Yup.string().email("Invalid email address").required("Email is required"),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
   password: Yup.string().required("Password is required").min(8, "Minimum 8 characters"),
 });
 
 const Login = () => {
-  const [email, setEmail]               = useState("");
-  const [password, setPassword]         = useState("");
-  const [errors, setErrors]             = useState({});
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading]           = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { user, login } = useAuth();
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   if (user) {
     return <Navigate to={resolvePostAuthPath(location, user.role)} replace />;
@@ -35,7 +35,9 @@ const Login = () => {
       return true;
     } catch (err) {
       const fe = {};
-      err.inner.forEach((e) => { fe[e.path] = e.message; });
+      err.inner.forEach((e) => {
+        fe[e.path] = e.message;
+      });
       setErrors(fe);
       return false;
     }
@@ -61,8 +63,12 @@ const Login = () => {
       <form onSubmit={handleSubmit} noValidate className="space-y-1">
         <Field label="Email" htmlFor="email" error={errors.email}>
           <input
-            id="email" type="email" autoComplete="email" placeholder="you@example.com"
-            value={email} onChange={(e) => setEmail(e.target.value)}
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className={inputCls(errors.email)}
           />
         </Field>
@@ -70,13 +76,17 @@ const Login = () => {
         <Field label="Password" htmlFor="password" error={errors.password}>
           <div className="relative">
             <input
-              id="password" type={showPassword ? "text" : "password"}
-              autoComplete="current-password" placeholder="••••••••"
-              value={password} onChange={(e) => setPassword(e.target.value)}
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className={inputCls(errors.password) + " pr-10"}
             />
             <button
-              type="button" aria-label="Toggle password"
+              type="button"
+              aria-label="Toggle password"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
             >
@@ -105,7 +115,11 @@ const Login = () => {
         </p>
         <p className="text-sm text-gray-500">
           Hiring?{" "}
-          <Link to="/register/company" state={preserveAuthRedirect(location)} className="link-brand">
+          <Link
+            to="/register/company"
+            state={preserveAuthRedirect(location)}
+            className="link-brand"
+          >
             Register your company
           </Link>
         </p>

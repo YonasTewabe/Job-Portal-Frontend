@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import axios from "../axiosInterceptor";
 import { useAuth } from "./AuthContext";
 
@@ -28,7 +36,9 @@ export const NotificationProvider = ({ children }) => {
       ]);
       if (!mountedRef.current) return;
       setNotifications(Array.isArray(listRes.data) ? listRes.data : []);
-      setUnreadCount(typeof countRes.data === "number" ? countRes.data : countRes.data?.count ?? 0);
+      setUnreadCount(
+        typeof countRes.data === "number" ? countRes.data : (countRes.data?.count ?? 0)
+      );
     } catch {
       if (mountedRef.current) {
         setNotifications([]);
@@ -42,7 +52,9 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     mountedRef.current = true;
     fetchNotifications();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchNotifications]);
 
   useEffect(() => {
@@ -60,9 +72,7 @@ export const NotificationProvider = ({ children }) => {
 
   const markAsRead = useCallback(async (id) => {
     await axios.patch(`/api/notifications/${id}/read`);
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
     setUnreadCount((c) => Math.max(0, c - 1));
   }, []);
 
@@ -84,11 +94,7 @@ export const NotificationProvider = ({ children }) => {
     [notifications, unreadCount, loading, fetchNotifications, markAsRead, markAllAsRead]
   );
 
-  return (
-    <NotificationContext.Provider value={value}>
-      {children}
-    </NotificationContext.Provider>
-  );
+  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 };
 
 export const useNotifications = () => {

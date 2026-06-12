@@ -10,7 +10,12 @@ import { BriefcaseIcon, PlusIcon, BuildingIcon } from "../Components/icons";
 import PostJobLink from "../Components/PostJobLink";
 import { getJobListingStatus, isJobDraft, sortJobsByPostedDate } from "../utils/jobs";
 
-const StatCard = ({ icon, label, value, color = { bg: "bg-brand-50", text: "text-brand-600" } }) => (
+const StatCard = ({
+  icon,
+  label,
+  value,
+  color = { bg: "bg-brand-50", text: "text-brand-600" },
+}) => (
   <Card className="flex items-center gap-4">
     <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${color.bg}`}>
       <span className={color.text}>{icon}</span>
@@ -25,16 +30,15 @@ const StatCard = ({ icon, label, value, color = { bg: "bg-brand-50", text: "text
 const CompanyDashboard = () => {
   const { user: authUser } = useAuth();
   const [company, setCompany] = useState(null);
-  const [jobs, setJobs]       = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [publishingId, setPublishingId] = useState(null);
 
   const loadCompany = () => {
-    return axios.get("/api/companies/mine")
-      .then(({ data }) => {
-        setCompany(data);
-        setJobs(sortJobsByPostedDate(data.jobs ?? []));
-      });
+    return axios.get("/api/companies/mine").then(({ data }) => {
+      setCompany(data);
+      setJobs(sortJobsByPostedDate(data.jobs ?? []));
+    });
   };
 
   useEffect(() => {
@@ -45,7 +49,12 @@ const CompanyDashboard = () => {
   }, [authUser]);
 
   if (authUser?.role !== "company_admin") return <NotFoundPage />;
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
 
   const sortedJobs = sortJobsByPostedDate(jobs);
   const publishedCount = sortedJobs.filter((job) => !isJobDraft(job)).length;
@@ -65,12 +74,12 @@ const CompanyDashboard = () => {
   };
 
   const headers = [
-    { label: "Title",    key: "title" },
-    { label: "Status",   key: "status" },
-    { label: "Type",     key: "type" },
+    { label: "Title", key: "title" },
+    { label: "Status", key: "status" },
+    { label: "Type", key: "type" },
     { label: "Location", key: "location" },
     { label: "Deadline", key: "deadline" },
-    { label: "",         key: "actions" },
+    { label: "", key: "actions" },
   ];
 
   return (
@@ -79,7 +88,9 @@ const CompanyDashboard = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{company?.name}</h1>
           {company?.description && (
-            <p className="text-sm text-gray-500 mt-1.5 max-w-lg leading-relaxed">{company.description}</p>
+            <p className="text-sm text-gray-500 mt-1.5 max-w-lg leading-relaxed">
+              {company.description}
+            </p>
           )}
         </div>
         <PostJobLink className="btn-primary px-4 py-2.5">
@@ -127,7 +138,11 @@ const CompanyDashboard = () => {
       <Card className="p-0 overflow-hidden">
         <Table
           headers={headers}
-          empty={sortedJobs.length === 0 ? <Empty message="No jobs posted yet." icon={BriefcaseIcon} /> : null}
+          empty={
+            sortedJobs.length === 0 ? (
+              <Empty message="No jobs posted yet." icon={BriefcaseIcon} />
+            ) : null
+          }
         >
           {sortedJobs.map((job, i) => {
             const draft = isJobDraft(job);
@@ -153,7 +168,10 @@ const CompanyDashboard = () => {
                         View
                       </Link>
                     )}
-                    <Link to={`/edit-job/${job.id}`} className="text-xs text-amber-600 hover:text-amber-700 font-semibold hover:underline">
+                    <Link
+                      to={`/edit-job/${job.id}`}
+                      className="text-xs text-amber-600 hover:text-amber-700 font-semibold hover:underline"
+                    >
                       Edit
                     </Link>
                     {draft && (

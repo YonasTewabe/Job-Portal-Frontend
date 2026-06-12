@@ -8,7 +8,7 @@ const LABELS = ["Under Consideration", "Interview Scheduled", "Pending", "Reject
 const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
 
 const Donut = ({ jobId: jobIdProp }) => {
-  const [series,  setSeries]  = useState(null);
+  const [series, setSeries] = useState(null);
   const [loading, setLoading] = useState(true);
   const jobId = jobIdProp ?? Cookies.get("jobId");
 
@@ -27,7 +27,8 @@ const Donut = ({ jobId: jobIdProp }) => {
       return;
     }
     setLoading(true);
-    axios.get(`/api/applications?jobId=${jobId}`)
+    axios
+      .get(`/api/applications?jobId=${jobId}`)
       .then((r) => {
         const data = Array.isArray(r.data) ? r.data : [];
         setSeries([
@@ -37,11 +38,16 @@ const Donut = ({ jobId: jobIdProp }) => {
           data.filter((a) => a.status === "Rejected").length,
         ]);
       })
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [jobId]);
 
-  if (loading) return <div className="py-8"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-8">
+        <Spinner loading />
+      </div>
+    );
   if (!series || series.every((n) => n === 0))
     return <p className="text-sm text-gray-400 text-center py-4">No application data yet.</p>;
 

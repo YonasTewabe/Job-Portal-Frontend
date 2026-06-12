@@ -37,7 +37,11 @@ const Notifications = () => {
           </p>
         </div>
         {unreadCount > 0 && (
-          <button type="button" onClick={markAllAsRead} className={Btn.secondary("text-sm shrink-0")}>
+          <button
+            type="button"
+            onClick={markAllAsRead}
+            className={Btn.secondary("text-sm shrink-0")}
+          >
             Mark all read
           </button>
         )}
@@ -45,7 +49,9 @@ const Notifications = () => {
 
       <Card className="p-0 overflow-hidden">
         {loading && notifications.length === 0 ? (
-          <div className="py-16"><Spinner loading /></div>
+          <div className="py-16">
+            <Spinner loading />
+          </div>
         ) : notifications.length === 0 ? (
           <Empty message="No notifications yet." icon={BellIcon} />
         ) : (

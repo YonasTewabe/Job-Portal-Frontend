@@ -8,7 +8,7 @@ import { initializeChapaPayment } from "../utils/chapa";
 import NotFoundPage from "./NotFoundPage";
 import Spinner from "../Components/Spinner";
 import axios from "../axiosInterceptor";
-import { Btn, Card, Field, FormCard, inputCls } from "../Components/ui";
+import { Btn, Field, FormCard, inputCls } from "../Components/ui";
 
 const PaymentCheckout = () => {
   const navigate = useNavigate();
@@ -55,7 +55,11 @@ const PaymentCheckout = () => {
 
   if (user?.role !== "company_admin") return <NotFoundPage />;
   if (companyLoading || fetchingProfile) {
-    return <div className="py-24"><Spinner loading /></div>;
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
   }
   if (!pendingJob?.title) {
     return <Navigate to="/add-job" replace />;
@@ -94,10 +98,7 @@ const PaymentCheckout = () => {
   };
 
   return (
-    <FormCard
-      title="Complete payment"
-      subtitle="Pay the job posting fee to publish your listing."
-    >
+    <FormCard title="Complete payment" subtitle="Pay the job posting fee to publish your listing.">
       {errorMessage && (
         <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {errorMessage}

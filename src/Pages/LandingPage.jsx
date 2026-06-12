@@ -53,10 +53,7 @@ const LandingPage = () => {
     <>
       {/* Hero */}
       <section className="hero-surface pt-14 relative">
-        <div
-          className="hero-orb w-72 h-72 bg-brand-300/30 -top-20 -right-20"
-          aria-hidden
-        />
+        <div className="hero-orb w-72 h-72 bg-brand-300/30 -top-20 -right-20" aria-hidden />
         <div
           className="hero-orb w-56 h-56 bg-brand-400/20 top-32 -left-16"
           style={{ animationDelay: "2s" }}
@@ -68,14 +65,17 @@ const LandingPage = () => {
             Ethiopia&apos;s career platform
           </span>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900
-            leading-[1.1] tracking-tight mb-6 animate-fade-up stagger-1">
-            Track applications.<br className="hidden sm:block" /> Land your next role.
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900
+            leading-[1.1] tracking-tight mb-6 animate-fade-up stagger-1"
+          >
+            Track applications.
+            <br className="hidden sm:block" /> Land your next role.
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up stagger-2">
-            {APP_NAME} helps Ethiopian job seekers manage applications and helps companies
-            find the right talent — {APP_TAGLINE.toLowerCase()}.
+            {APP_NAME} helps Ethiopian job seekers manage applications and helps companies find the
+            right talent — {APP_TAGLINE.toLowerCase()}.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 animate-fade-up stagger-3">
@@ -102,10 +102,7 @@ const LandingPage = () => {
           {/* Quick stats */}
           <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto animate-fade-up stagger-4">
             {stats.map(({ value, label }) => (
-              <div
-                key={label}
-                className="surface-card px-5 py-4 text-center"
-              >
+              <div key={label} className="surface-card px-5 py-4 text-center">
                 <p className="text-lg font-bold text-brand-700 tracking-tight">{value}</p>
                 <p className="text-xs text-slate-500 mt-0.5 font-medium">{label}</p>
               </div>
@@ -140,9 +137,11 @@ const LandingPage = () => {
                 className="surface-card-interactive p-6 flex gap-4 group"
                 style={{ animationDelay: `${i * 0.05}s` }}
               >
-                <div className="shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100
+                <div
+                  className="shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100
                   border border-brand-200/80 flex items-center justify-center text-brand-600
-                  shadow-inner-soft group-hover:scale-105 transition-transform duration-300">
+                  shadow-inner-soft group-hover:scale-105 transition-transform duration-300"
+                >
                   {icon}
                 </div>
                 <div>

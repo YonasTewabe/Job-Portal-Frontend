@@ -4,7 +4,18 @@ import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { Page, PageTitle, Card, Table, Tr, Td, Empty, Btn, SectionTitle, InfoRow } from "../Components/ui";
+import {
+  Page,
+  PageTitle,
+  Card,
+  Table,
+  Tr,
+  Td,
+  Empty,
+  Btn,
+  SectionTitle,
+  InfoRow,
+} from "../Components/ui";
 import {
   SortIcon as SortNeutralIcon,
   SortUpIcon,
@@ -16,11 +27,11 @@ import {
 import CvFileActions from "../Components/CvFileActions";
 
 const COLS = [
-  { key: "fullname",     label: "Name" },
-  { key: "email",        label: "Email" },
-  { key: "phone",        label: "Phone" },
+  { key: "fullname", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
   { key: "profileCount", label: "Profiles", sortable: false },
-  { key: "message",      label: "Message",  sortable: false },
+  { key: "message", label: "Message", sortable: false },
 ];
 
 const formatDate = (raw) => {
@@ -42,9 +53,9 @@ const ProfileDetail = ({ profile, userId }) => (
       <InfoRow label="Email" value={profile.email || "—"} />
       <InfoRow
         label="Phone"
-        value={profile.phone || profile.userPhone
-          ? `+251 ${profile.phone || profile.userPhone}`
-          : "—"}
+        value={
+          profile.phone || profile.userPhone ? `+251 ${profile.phone || profile.userPhone}` : "—"
+        }
       />
     </div>
 
@@ -57,35 +68,41 @@ const ProfileDetail = ({ profile, userId }) => (
 
     <div>
       <SectionTitle>Education</SectionTitle>
-      {profile.educations?.length > 0
-        ? profile.educations.map((edu, i) => (
-            <InfoRow
-              key={i}
-              label={profile.educations.length > 1 ? `Education ${i + 1}` : "Education"}
-              value={`${edu.degree} — ${edu.university}${formatDateRange(edu.startDate, edu.endDate)}`}
-            />
-          ))
-        : <InfoRow label="Education" value="—" />}
+      {profile.educations?.length > 0 ? (
+        profile.educations.map((edu, i) => (
+          <InfoRow
+            key={i}
+            label={profile.educations.length > 1 ? `Education ${i + 1}` : "Education"}
+            value={`${edu.degree} — ${edu.university}${formatDateRange(edu.startDate, edu.endDate)}`}
+          />
+        ))
+      ) : (
+        <InfoRow label="Education" value="—" />
+      )}
     </div>
 
     <div>
       <SectionTitle>Work experience</SectionTitle>
-      {profile.experiences?.length > 0
-        ? profile.experiences.map((exp, i) => (
-            <InfoRow
-              key={i}
-              label={profile.experiences.length > 1 ? `Role ${i + 1}` : "Role"}
-              value={`${exp.title} at ${exp.company}${formatDateRange(exp.startDate, exp.endDate)}`}
-            />
-          ))
-        : <InfoRow label="Experience" value="—" />}
+      {profile.experiences?.length > 0 ? (
+        profile.experiences.map((exp, i) => (
+          <InfoRow
+            key={i}
+            label={profile.experiences.length > 1 ? `Role ${i + 1}` : "Role"}
+            value={`${exp.title} at ${exp.company}${formatDateRange(exp.startDate, exp.endDate)}`}
+          />
+        ))
+      ) : (
+        <InfoRow label="Experience" value="—" />
+      )}
     </div>
 
     <div>
       <SectionTitle>CV</SectionTitle>
-      {profile.cv
-        ? <CvFileActions filename={profile.cv} />
-        : <p className="text-sm text-gray-400">No CV uploaded</p>}
+      {profile.cv ? (
+        <CvFileActions filename={profile.cv} />
+      ) : (
+        <p className="text-sm text-gray-400">No CV uploaded</p>
+      )}
     </div>
 
     <div className="pt-2 border-t border-gray-100">
@@ -122,7 +139,6 @@ const JobSeekerDetailModal = ({ user, profiles, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <Card className="shadow-float overflow-hidden flex flex-col max-h-[90vh] p-0">
-
           {/* Header */}
           <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
             <div className="min-w-0">
@@ -148,13 +164,18 @@ const JobSeekerDetailModal = ({ user, profiles, onClose }) => {
                   type="button"
                   onClick={() => setActiveIdx(i)}
                   className={`px-3 py-2 text-xs font-semibold rounded-t-lg whitespace-nowrap transition-colors
-                    ${activeIdx === i
-                      ? "bg-white border border-b-white border-gray-200 text-brand-600 -mb-px relative z-10"
-                      : "text-gray-400 hover:text-gray-600"}`}
+                    ${
+                      activeIdx === i
+                        ? "bg-white border border-b-white border-gray-200 text-brand-600 -mb-px relative z-10"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                 >
                   {p.profileName || `Profile ${i + 1}`}
                   {p.profileCompleted && (
-                    <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" title="Complete" />
+                    <span
+                      className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"
+                      title="Complete"
+                    />
                   )}
                 </button>
               ))}
@@ -165,7 +186,6 @@ const JobSeekerDetailModal = ({ user, profiles, onClose }) => {
           <div className="overflow-y-auto px-6 py-5 flex-1">
             <ProfileDetail profile={active} userId={user.id} />
           </div>
-
         </Card>
       </div>
     </div>
@@ -174,16 +194,17 @@ const JobSeekerDetailModal = ({ user, profiles, onClose }) => {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 const ViewUserList = () => {
-  const [users,    setUsers]    = useState([]); // one entry per unique user
-  const [loading,  setLoading]  = useState(true);
-  const [sortKey,  setSortKey]  = useState(null);
+  const [users, setUsers] = useState([]); // one entry per unique user
+  const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [selected, setSelected] = useState(null); // { user, profiles[] }
   const { user: authUser } = useAuth();
   const myRole = authUser?.role;
 
   useEffect(() => {
-    axios.get("/api/applicants")
+    axios
+      .get("/api/applicants")
       .then((r) => {
         const all = Array.isArray(r.data) ? r.data : [];
 
@@ -193,10 +214,10 @@ const ViewUserList = () => {
           const uid = profile.user?.id ?? profile.id;
           if (!byUser.has(uid)) {
             byUser.set(uid, {
-              id:    uid,
-              name:  profile.fullname ?? profile.user?.name ?? "",
-              email: profile.email    ?? profile.user?.email ?? "",
-              phone: profile.phone    ?? profile.userPhone   ?? "",
+              id: uid,
+              name: profile.fullname ?? profile.user?.name ?? "",
+              email: profile.email ?? profile.user?.email ?? "",
+              phone: profile.phone ?? profile.userPhone ?? "",
               profiles: [profile],
             });
           } else {
@@ -206,7 +227,7 @@ const ViewUserList = () => {
 
         setUsers([...byUser.values()]);
       })
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
@@ -214,7 +235,10 @@ const ViewUserList = () => {
 
   const handleSort = (key) => {
     if (key === sortKey) setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortOrder("asc"); }
+    else {
+      setSortKey(key);
+      setSortOrder("asc");
+    }
   };
 
   const sortValue = (u, key) => {
@@ -231,19 +255,32 @@ const ViewUserList = () => {
 
   const SortIndicator = ({ col }) => {
     if (col !== sortKey) return <SortNeutralIcon className="ml-1 inline opacity-25" size={9} />;
-    return sortOrder === "asc"
-      ? <SortUpIcon className="ml-1 inline text-brand-500" size={9} />
-      : <SortDownIcon className="ml-1 inline text-brand-500" size={9} />;
+    return sortOrder === "asc" ? (
+      <SortUpIcon className="ml-1 inline text-brand-500" size={9} />
+    ) : (
+      <SortDownIcon className="ml-1 inline text-brand-500" size={9} />
+    );
   };
 
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
   if (myRole !== "superadmin") return <NotFoundPage />;
 
   const headers = COLS.map((c) => ({
-    key:     c.key,
-    label:   c.sortable === false
-      ? c.label
-      : <span className="inline-flex items-center">{c.label}<SortIndicator col={c.key} /></span>,
+    key: c.key,
+    label:
+      c.sortable === false ? (
+        c.label
+      ) : (
+        <span className="inline-flex items-center">
+          {c.label}
+          <SortIndicator col={c.key} />
+        </span>
+      ),
     onClick: c.sortable === false ? undefined : () => handleSort(c.key),
   }));
 
@@ -259,7 +296,9 @@ const ViewUserList = () => {
       <Card className="p-0 overflow-hidden">
         <Table
           headers={headers}
-          empty={sorted.length === 0 ? <Empty message="No registered users." icon={UsersIcon} /> : null}
+          empty={
+            sorted.length === 0 ? <Empty message="No registered users." icon={UsersIcon} /> : null
+          }
         >
           {sorted.map((u, i) => (
             <Tr key={u.id ?? i} striped={i % 2 !== 0} onClick={() => openDetail(u)}>

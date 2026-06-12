@@ -6,22 +6,17 @@ import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
 import { toast } from "../utils/toast";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, Badge } from "../Components/ui";
-import {
-  ArrowLeftIcon,
-  UsersIcon,
-  MessageIcon,
-  BriefcaseIcon,
-} from "../Components/icons";
+import { ArrowLeftIcon, UsersIcon, MessageIcon, BriefcaseIcon } from "../Components/icons";
 import { Btn } from "../Components/ui";
 import { isJobOpen, sortJobsByPostedDate } from "../utils/jobs";
 
 const SuperAdminCompanyDetail = () => {
   const { id } = useParams();
   const { user: authUser } = useAuth();
-  const [company, setCompany]       = useState(null);
-  const [jobs, setJobs]             = useState([]);
+  const [company, setCompany] = useState(null);
+  const [jobs, setJobs] = useState([]);
   const [applicantCounts, setCounts] = useState({});
-  const [loading, setLoading]       = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (authUser?.role !== "superadmin" || !id) return;
@@ -60,19 +55,24 @@ const SuperAdminCompanyDetail = () => {
   }, [authUser, id]);
 
   if (authUser?.role !== "superadmin") return <NotFoundPage />;
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
   if (!company) return <NotFoundPage />;
 
   const sortedJobs = sortJobsByPostedDate(jobs);
 
   const headers = [
-    { label: "Job",        key: "title" },
-    { label: "Type",       key: "type" },
-    { label: "Location",   key: "location" },
-    { label: "Deadline",   key: "deadline" },
-    { label: "Status",     key: "status" },
+    { label: "Job", key: "title" },
+    { label: "Type", key: "type" },
+    { label: "Location", key: "location" },
+    { label: "Deadline", key: "deadline" },
+    { label: "Status", key: "status" },
     { label: "Applicants", key: "applicants" },
-    { label: "Actions",    key: "actions" },
+    { label: "Actions", key: "actions" },
   ];
 
   return (
@@ -95,10 +95,7 @@ const SuperAdminCompanyDetail = () => {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            to={`/messages?companyId=${company.id}`}
-            className={Btn.secondary("gap-2 text-sm")}
-          >
+          <Link to={`/messages?companyId=${company.id}`} className={Btn.secondary("gap-2 text-sm")}>
             <MessageIcon size={14} /> Message company
           </Link>
           <Badge status={company.isActive ? "Active" : "Suspended"} />
@@ -112,9 +109,11 @@ const SuperAdminCompanyDetail = () => {
         </div>
         <Table
           headers={headers}
-          empty={sortedJobs.length === 0
-            ? <Empty message="No jobs posted for this company yet." icon={BriefcaseIcon} />
-            : null}
+          empty={
+            sortedJobs.length === 0 ? (
+              <Empty message="No jobs posted for this company yet." icon={BriefcaseIcon} />
+            ) : null
+          }
         >
           {sortedJobs.map((job, i) => (
             <Tr key={job.id} striped={i % 2 !== 0}>
@@ -139,10 +138,7 @@ const SuperAdminCompanyDetail = () => {
               </Td>
               <Td>
                 <div className="flex items-center gap-3">
-                  <Link
-                    to={`/job/${job.id}`}
-                    className="text-xs link-brand"
-                  >
+                  <Link to={`/job/${job.id}`} className="text-xs link-brand">
                     View
                   </Link>
                   <Link

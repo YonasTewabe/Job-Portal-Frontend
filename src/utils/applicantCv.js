@@ -8,10 +8,9 @@ export function formatCvDisplayName(filename) {
 }
 
 async function fetchApplicantCvBlob(filename) {
-  const { data } = await axios.get(
-    `/api/applicants/cv/${encodeURIComponent(filename)}`,
-    { responseType: "blob" },
-  );
+  const { data } = await axios.get(`/api/applicants/cv/${encodeURIComponent(filename)}`, {
+    responseType: "blob",
+  });
   return new Blob([data], { type: "application/pdf" });
 }
 
@@ -29,8 +28,7 @@ export async function openApplicantCv(filename) {
   try {
     const blob = await fetchApplicantCvBlob(filename);
     const url = URL.createObjectURL(blob);
-    const tab = window.open(url, "_blank", "noopener,noreferrer");
-
+    window.open(url, "_blank", "noopener,noreferrer");
     setTimeout(() => URL.revokeObjectURL(url), 120_000);
   } catch (error) {
     toast.error(cvErrorMessage(error));

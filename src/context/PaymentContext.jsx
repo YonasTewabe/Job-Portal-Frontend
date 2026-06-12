@@ -69,10 +69,7 @@ export const PaymentProvider = ({ children }) => {
     [updateState]
   );
 
-  const setTxRef = useCallback(
-    (txRef) => updateState({ txRef }),
-    [updateState]
-  );
+  const setTxRef = useCallback((txRef) => updateState({ txRef }), [updateState]);
 
   const setPaymentVerified = useCallback(
     (paymentVerified, txRef = null) => updateState({ paymentVerified, txRef }),

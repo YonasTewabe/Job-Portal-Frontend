@@ -25,23 +25,23 @@ import { useChat } from "../context/ChatContext";
 
 const menus = {
   user: [
-    { icon: <HomeIcon />,      text: "Home",            link: "/home" },
-    { icon: <BriefcaseIcon />, text: "Browse Jobs",      link: "/jobs" },
-    { icon: <ListIcon />,      text: "My Applications",  link: "/status" },
+    { icon: <HomeIcon />, text: "Home", link: "/home" },
+    { icon: <BriefcaseIcon />, text: "Browse Jobs", link: "/jobs" },
+    { icon: <ListIcon />, text: "My Applications", link: "/status" },
   ],
   company_admin: [
     { icon: <DashboardIcon />, text: "Dashboard", link: "/company/dashboard" },
-    { icon: <UserPlusIcon />,  text: "Post a Job", link: "/add-job" },
-    { icon: <BriefcaseIcon />, text: "My Jobs",   link: "/jobs" },
-    { icon: <ListIcon />,      text: "Payments",   link: "/company/payments" },
+    { icon: <UserPlusIcon />, text: "Post a Job", link: "/add-job" },
+    { icon: <BriefcaseIcon />, text: "My Jobs", link: "/jobs" },
+    { icon: <ListIcon />, text: "Payments", link: "/company/payments" },
   ],
   superadmin: [
     { icon: <DashboardIcon />, text: "Dashboard", link: "/superadmin/dashboard" },
-    { icon: <BuildingIcon />,  text: "Companies",  link: "/superadmin/companies" },
-    { icon: <UsersIcon />,     text: "Super Admins", link: "/superadmin/admins" },
-    { icon: <UsersIcon />,     text: "Job Seekers", link: "/superadmin/applicants" },
-    { icon: <BriefcaseIcon />, text: "All Jobs",   link: "/jobs" },
-    { icon: <ListIcon />,      text: "Payments",    link: "/superadmin/payments" },
+    { icon: <BuildingIcon />, text: "Companies", link: "/superadmin/companies" },
+    { icon: <UsersIcon />, text: "Super Admins", link: "/superadmin/admins" },
+    { icon: <UsersIcon />, text: "Job Seekers", link: "/superadmin/applicants" },
+    { icon: <BriefcaseIcon />, text: "All Jobs", link: "/jobs" },
+    { icon: <ListIcon />, text: "Payments", link: "/superadmin/payments" },
   ],
 };
 
@@ -68,9 +68,11 @@ const NavItem = ({ icon, text, link, onClick, disabled }) => {
       onClick={onClick}
       className={({ isActive }) =>
         `${baseCls}
-         ${isActive
-           ? "nav-item-active shadow-sm"
-           : "text-gray-700 hover:bg-brand-50 hover:text-brand-800"}`
+         ${
+           isActive
+             ? "nav-item-active shadow-sm"
+             : "text-gray-700 hover:bg-brand-50 hover:text-brand-800"
+         }`
       }
     >
       <span className="text-brand-500 opacity-90">{icon}</span>
@@ -90,9 +92,14 @@ const Navbar = () => {
   const { unreadCount: chatUnread } = useChat();
 
   const handleLogout = async () => {
-    try { await axios.post("/api/auth/logout", { withCredentials: true }); }
-    catch { /* ignore */ }
-    finally { logout(); navigate("/", { replace: true }); }
+    try {
+      await axios.post("/api/auth/logout", { withCredentials: true });
+    } catch {
+      /* ignore */
+    } finally {
+      logout();
+      navigate("/", { replace: true });
+    }
   };
 
   useEffect(() => {
@@ -111,7 +118,6 @@ const Navbar = () => {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-4 gap-3 nav-glass">
-
         <button
           onClick={() => setOpen(true)}
           aria-label="Open menu"
@@ -195,8 +201,6 @@ const Navbar = () => {
           </button>
         </div>
 
-
-
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
           {menuItems.map(({ icon, text, link }) => (
             <NavItem
@@ -211,24 +215,29 @@ const Navbar = () => {
         </nav>
 
         <div className="p-3 border-t border-gray-100">
-                  <div className="px-4 pt-4 pb-2">
-          <Link
-            to={profilePath}
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100
+          <div className="px-4 pt-4 pb-2">
+            <Link
+              to={profilePath}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100
               hover:bg-gray-100 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
-              <UserCircleIcon size={20} className="text-brand-600" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{user.name || "Account"}</p>
-              <p className="text-xs text-gray-400 capitalize">{user.email}</p>
-            </div>
-          </Link>
-        </div>
+            >
+              <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                <UserCircleIcon size={20} className="text-brand-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 truncate">
+                  {user.name || "Account"}
+                </p>
+                <p className="text-xs text-gray-400 capitalize">{user.email}</p>
+              </div>
+            </Link>
+          </div>
           <button
-            onClick={() => { setOpen(false); handleLogout(); }}
+            onClick={() => {
+              setOpen(false);
+              handleLogout();
+            }}
             className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium
               text-red-600 hover:bg-red-50 w-full transition-all duration-150"
           >

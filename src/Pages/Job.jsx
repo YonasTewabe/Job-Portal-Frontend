@@ -36,7 +36,7 @@ const Job = ({ deleteJob }) => {
   const [togglingOpen, setTogglingOpen] = useState(false);
 
   const { user: authUser } = useAuth();
-  const role   = authUser?.role;
+  const role = authUser?.role;
   const userId = authUser?.userId;
 
   useEffect(() => {
@@ -61,9 +61,7 @@ const Job = ({ deleteJob }) => {
         setSelectedProfileId(defaultProfile?.id ?? null);
 
         const applications = Array.isArray(apps) ? apps : [];
-        const match = applications.find(
-          (app) => (app.job?.id ?? app.jobId) === job.id
-        );
+        const match = applications.find((app) => (app.job?.id ?? app.jobId) === job.id);
         setAlreadyApplied(!!match);
         setApplicationId(match?.id ?? null);
       } catch {
@@ -79,7 +77,9 @@ const Job = ({ deleteJob }) => {
     };
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [role, userId, job.id]);
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId) ?? null;
@@ -186,10 +186,7 @@ const Job = ({ deleteJob }) => {
   return (
     <Page>
       {/* Back link */}
-      <Link
-        to="/jobs"
-        className="inline-flex items-center gap-2 text-sm link-brand mb-6 group"
-      >
+      <Link to="/jobs" className="inline-flex items-center gap-2 text-sm link-brand mb-6 group">
         <ArrowLeftIcon size={11} className="group-hover:-translate-x-0.5 transition-transform" />
         Back to listings
       </Link>
@@ -208,22 +205,33 @@ const Job = ({ deleteJob }) => {
 
             {/* Meta chips */}
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
-                border border-gray-100 px-3 py-1 rounded-full">
-                <MapPinIcon className="text-orange-400" size={10} />{job.location}
+              <span
+                className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                border border-gray-100 px-3 py-1 rounded-full"
+              >
+                <MapPinIcon className="text-orange-400" size={10} />
+                {job.location}
               </span>
               {job.salary && (
-                <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
-                  border border-gray-100 px-3 py-1 rounded-full">
-                  <DollarIcon className="text-emerald-500" size={10} />{job.salary}
+                <span
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                  border border-gray-100 px-3 py-1 rounded-full"
+                >
+                  <DollarIcon className="text-emerald-500" size={10} />
+                  {job.salary}
                 </span>
               )}
-              <span className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
-                border border-gray-100 px-3 py-1 rounded-full">
-                <ClockIcon className="text-brand-400" size={10} />Deadline: {job.deadline}
+              <span
+                className="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50
+                border border-gray-100 px-3 py-1 rounded-full"
+              >
+                <ClockIcon className="text-brand-400" size={10} />
+                Deadline: {job.deadline}
               </span>
-              <span className="inline-flex items-center text-xs font-semibold bg-brand-50 text-brand-700
-                border border-brand-100 px-3 py-1 rounded-full">
+              <span
+                className="inline-flex items-center text-xs font-semibold bg-brand-50 text-brand-700
+                border border-brand-100 px-3 py-1 rounded-full"
+              >
                 {job.type}
               </span>
             </div>
@@ -231,14 +239,22 @@ const Job = ({ deleteJob }) => {
 
           {/* Description */}
           <Card>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Description</h2>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{job.description}</p>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">
+              Description
+            </h2>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              {job.description}
+            </p>
           </Card>
 
           {/* Requirements */}
           <Card>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Requirements</h2>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{job.requirement}</p>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">
+              Requirements
+            </h2>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              {job.requirement}
+            </p>
           </Card>
         </div>
 
@@ -303,7 +319,10 @@ const Job = ({ deleteJob }) => {
             <Card>
               {jobOpen ? (
                 profileLoading ? (
-                  <button disabled className={Btn.full("primary", "opacity-50 cursor-not-allowed py-3")}>
+                  <button
+                    disabled
+                    className={Btn.full("primary", "opacity-50 cursor-not-allowed py-3")}
+                  >
                     Loading…
                   </button>
                 ) : alreadyApplied ? (
@@ -331,7 +350,10 @@ const Job = ({ deleteJob }) => {
                   <div className="space-y-3">
                     {showProfilePicker && (
                       <div>
-                        <label htmlFor="apply-profile" className="block text-xs font-semibold text-gray-600 mb-1.5">
+                        <label
+                          htmlFor="apply-profile"
+                          className="block text-xs font-semibold text-gray-600 mb-1.5"
+                        >
                           Apply with profile
                         </label>
                         <select
@@ -359,7 +381,8 @@ const Job = ({ deleteJob }) => {
                       </button>
                     ) : (
                       <p className="text-sm text-gray-600 leading-relaxed">
-                        The selected profile is incomplete. Choose another profile or complete it first.
+                        The selected profile is incomplete. Choose another profile or complete it
+                        first.
                       </p>
                     )}
                   </div>
@@ -374,7 +397,10 @@ const Job = ({ deleteJob }) => {
                   </div>
                 )
               ) : (
-                <button disabled className={Btn.full("danger", "opacity-50 cursor-not-allowed py-3")}>
+                <button
+                  disabled
+                  className={Btn.full("danger", "opacity-50 cursor-not-allowed py-3")}
+                >
                   {job.isOpen === false ? "Applications Closed" : "Deadline Passed"}
                 </button>
               )}
@@ -383,7 +409,9 @@ const Job = ({ deleteJob }) => {
 
           {role === "company_admin" && (
             <Card className="space-y-3">
-              <Link to={`/edit-job/${job.id}`} className={Btn.full("primary")}>Edit Job</Link>
+              <Link to={`/edit-job/${job.id}`} className={Btn.full("primary")}>
+                Edit Job
+              </Link>
               <Link to={`/applicants/${job.id}`} className={Btn.full("success")}>
                 View Applicants
               </Link>
@@ -395,7 +423,9 @@ const Job = ({ deleteJob }) => {
               >
                 {togglingOpen ? "Updating…" : jobOpen ? "Close Job" : "Reopen Job"}
               </button>
-              <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
+              <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>
+                Delete Job
+              </button>
             </Card>
           )}
 
@@ -412,7 +442,9 @@ const Job = ({ deleteJob }) => {
               >
                 {togglingOpen ? "Updating…" : jobOpen ? "Close Job" : "Reopen Job"}
               </button>
-              <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>Delete Job</button>
+              <button onClick={() => onDelete(job.id)} className={Btn.full("danger")}>
+                Delete Job
+              </button>
             </Card>
           )}
         </div>

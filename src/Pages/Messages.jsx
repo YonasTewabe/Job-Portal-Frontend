@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  MessageIcon,
-  SendIcon,
-  HeadsetIcon,
-  PlusIcon,
-  CloseIcon,
-} from "../Components/icons";
+import { MessageIcon, SendIcon, HeadsetIcon, PlusIcon, CloseIcon } from "../Components/icons";
 import { toast } from "../utils/toast";
 import axios from "../axiosInterceptor";
 import { useAuth } from "../context/AuthContext";
@@ -27,7 +21,12 @@ const formatTime = (iso) => {
   const sameDay = d.toDateString() === now.toDateString();
   return sameDay
     ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    : d.toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    : d.toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 };
 
 const ConversationItem = ({ conv, active, onClick }) => (
@@ -100,76 +99,89 @@ const Messages = () => {
   const initRef = useRef(false);
 
   const selected =
-    conversations.find((c) => c.id === selectedId)
-    ?? (activeConvMeta?.id === selectedId ? activeConvMeta : null)
-    ?? (pendingApplicationId && pendingAppMeta ? pendingAppMeta : null)
-    ?? (pendingSupportCompanyId && pendingSupportMeta ? pendingSupportMeta : null)
-    ?? (pendingUserId && pendingUserMeta ? pendingUserMeta : null)
-    ?? (pendingUserPlatformSupport ? PLATFORM_SUPPORT_META : null);
+    conversations.find((c) => c.id === selectedId) ??
+    (activeConvMeta?.id === selectedId ? activeConvMeta : null) ??
+    (pendingApplicationId && pendingAppMeta ? pendingAppMeta : null) ??
+    (pendingSupportCompanyId && pendingSupportMeta ? pendingSupportMeta : null) ??
+    (pendingUserId && pendingUserMeta ? pendingUserMeta : null) ??
+    (pendingUserPlatformSupport ? PLATFORM_SUPPORT_META : null);
 
   const isChatOpen = Boolean(
-    selectedId || pendingApplicationId || pendingSupportCompanyId || pendingUserId || pendingUserPlatformSupport
+    selectedId ||
+    pendingApplicationId ||
+    pendingSupportCompanyId ||
+    pendingUserId ||
+    pendingUserPlatformSupport
   );
 
-  const loadApplicationMeta = useCallback(async (applicationId) => {
-    const { data: app } = await axios.get(`/api/applications/${applicationId}`);
-    const isApplicant = user?.role === "user";
-    const companyName = app.job?.company?.name ?? "Company";
-    const applicantName = app.applicant?.user?.name ?? "Applicant";
-    return {
-      applicationId,
-      title: app.job?.title ?? "Job application",
-      subtitle: isApplicant
-        ? `${companyName} · Job application`
-        : `${applicantName} · Job application`,
-    };
-  }, [user?.role]);
+  const loadApplicationMeta = useCallback(
+    async (applicationId) => {
+      const { data: app } = await axios.get(`/api/applications/${applicationId}`);
+      const isApplicant = user?.role === "user";
+      const companyName = app.job?.company?.name ?? "Company";
+      const applicantName = app.applicant?.user?.name ?? "Applicant";
+      return {
+        applicationId,
+        title: app.job?.title ?? "Job application",
+        subtitle: isApplicant
+          ? `${companyName} · Job application`
+          : `${applicantName} · Job application`,
+      };
+    },
+    [user?.role]
+  );
 
-  const selectConversation = useCallback((id, meta = null) => {
-    setPendingApplicationId(null);
-    setPendingAppMeta(null);
-    setPendingSupportCompanyId(null);
-    setPendingSupportMeta(null);
-    setPendingUserId(null);
-    setPendingUserMeta(null);
-    setPendingUserPlatformSupport(false);
-    if (meta) setActiveConvMeta(meta);
-    else if (id) {
-      const found = conversations.find((c) => c.id === id);
-      if (found) setActiveConvMeta(found);
-    } else {
-      setActiveConvMeta(null);
-    }
-    setSearchParams(id ? { conversation: id } : {});
-  }, [setSearchParams, conversations]);
-
-  const openJobChatView = useCallback(async (applicationId) => {
-    setOpening(true);
-    try {
-      const { data: conv } = await axios.get(
-        `/api/chat/conversations/by-application/${applicationId}`
-      );
-      setShowNewPicker(false);
-      if (conv?.id) {
-        setPendingApplicationId(null);
-        setPendingAppMeta(null);
-        setActiveConvMeta(conv);
-        selectConversation(conv.id, conv);
-        setSearchParams({ conversation: conv.id });
+  const selectConversation = useCallback(
+    (id, meta = null) => {
+      setPendingApplicationId(null);
+      setPendingAppMeta(null);
+      setPendingSupportCompanyId(null);
+      setPendingSupportMeta(null);
+      setPendingUserId(null);
+      setPendingUserMeta(null);
+      setPendingUserPlatformSupport(false);
+      if (meta) setActiveConvMeta(meta);
+      else if (id) {
+        const found = conversations.find((c) => c.id === id);
+        if (found) setActiveConvMeta(found);
       } else {
-        const meta = await loadApplicationMeta(applicationId);
-        setPendingApplicationId(applicationId);
-        setPendingAppMeta(meta);
         setActiveConvMeta(null);
-        setMessages([]);
-        setSearchParams({ applicationId });
       }
-    } catch (err) {
-      toast.error(err.response?.data?.message ?? "Could not open conversation");
-    } finally {
-      setOpening(false);
-    }
-  }, [loadApplicationMeta, selectConversation, setSearchParams]);
+      setSearchParams(id ? { conversation: id } : {});
+    },
+    [setSearchParams, conversations]
+  );
+
+  const openJobChatView = useCallback(
+    async (applicationId) => {
+      setOpening(true);
+      try {
+        const { data: conv } = await axios.get(
+          `/api/chat/conversations/by-application/${applicationId}`
+        );
+        setShowNewPicker(false);
+        if (conv?.id) {
+          setPendingApplicationId(null);
+          setPendingAppMeta(null);
+          setActiveConvMeta(conv);
+          selectConversation(conv.id, conv);
+          setSearchParams({ conversation: conv.id });
+        } else {
+          const meta = await loadApplicationMeta(applicationId);
+          setPendingApplicationId(applicationId);
+          setPendingAppMeta(meta);
+          setActiveConvMeta(null);
+          setMessages([]);
+          setSearchParams({ applicationId });
+        }
+      } catch (err) {
+        toast.error(err.response?.data?.message ?? "Could not open conversation");
+      } finally {
+        setOpening(false);
+      }
+    },
+    [loadApplicationMeta, selectConversation, setSearchParams]
+  );
 
   const openUserPlatformSupportView = useCallback(async () => {
     setOpening(true);
@@ -194,105 +206,109 @@ const Messages = () => {
     }
   }, [selectConversation, setSearchParams]);
 
-  const loadCompanyMeta = useCallback(async (companyId) => {
-    const { data: company } = await axios.get(`/api/companies/${companyId}`);
-    const isSuperadmin = user?.role === "superadmin";
-    return {
-      companyId,
-      title: isSuperadmin ? (company.name ?? "Company") : "Platform support",
-      subtitle: isSuperadmin
-        ? (company.admin?.name ?? "Company admin")
-        : "Support",
-    };
-  }, [user?.role]);
+  const loadCompanyMeta = useCallback(
+    async (companyId) => {
+      const { data: company } = await axios.get(`/api/companies/${companyId}`);
+      const isSuperadmin = user?.role === "superadmin";
+      return {
+        companyId,
+        title: isSuperadmin ? (company.name ?? "Company") : "Platform support",
+        subtitle: isSuperadmin ? (company.admin?.name ?? "Company admin") : "Support",
+      };
+    },
+    [user?.role]
+  );
 
-  const openSupportChatView = useCallback(async (companyId = null) => {
-    setOpening(true);
-    setShowNewPicker(false);
-    try {
-      const { data: conv } = await axios.get("/api/chat/conversations/company-support", {
-        params: companyId ? { companyId } : {},
-      });
-      if (conv?.id) {
-        setPendingSupportCompanyId(null);
-        setPendingSupportMeta(null);
-        setActiveConvMeta(conv);
-        selectConversation(conv.id, conv);
-        setSearchParams({ conversation: conv.id });
-        return;
-      }
-
-      let resolvedCompanyId = companyId;
-      if (!resolvedCompanyId && user?.role === "company_admin") {
-        const { data: company } = await axios.get("/api/companies/mine");
-        resolvedCompanyId = company.id;
-      }
-      if (!resolvedCompanyId) return;
-
-      const meta = await loadCompanyMeta(resolvedCompanyId);
-      setPendingSupportCompanyId(resolvedCompanyId);
-      setPendingSupportMeta(meta);
-      setActiveConvMeta(null);
-      setMessages([]);
-      setSearchParams(
-        user?.role === "superadmin"
-          ? { companyId: resolvedCompanyId }
-          : {}
-      );
-    } catch (err) {
-      toast.error(err.response?.data?.message ?? "Could not open support chat");
-    } finally {
-      setOpening(false);
-    }
-  }, [user?.role, loadCompanyMeta, selectConversation, setSearchParams]);
-
-  const loadUserMeta = useCallback((profile) => ({
-    userId: profile.user?.id ?? profile.userId,
-    title: profile.fullname ?? profile.user?.name ?? "Job seeker",
-    subtitle: profile.email ?? profile.user?.email ?? "User",
-  }), []);
-
-  const openUserChatView = useCallback(async (targetUserId) => {
-    if (!targetUserId) return;
-    setOpening(true);
-    try {
-      const { data: conv } = await axios.get("/api/chat/conversations/user-support", {
-        params: { userId: targetUserId },
-      });
+  const openSupportChatView = useCallback(
+    async (companyId = null) => {
+      setOpening(true);
       setShowNewPicker(false);
-      if (conv?.id) {
-        setPendingUserId(null);
-        setPendingUserMeta(null);
-        setActiveConvMeta(conv);
-        selectConversation(conv.id, conv);
-        setSearchParams({ conversation: conv.id });
-      } else {
-        let profile = users.find((u) => (u.user?.id ?? u.userId) === targetUserId);
-        if (!profile) {
-          try {
-            const { data } = await axios.get("/api/applicants");
-            profile = Array.isArray(data)
-              ? data.find((p) => p.user?.id === targetUserId)
-              : null;
-          } catch {
-            profile = null;
-          }
+      try {
+        const { data: conv } = await axios.get("/api/chat/conversations/company-support", {
+          params: companyId ? { companyId } : {},
+        });
+        if (conv?.id) {
+          setPendingSupportCompanyId(null);
+          setPendingSupportMeta(null);
+          setActiveConvMeta(conv);
+          selectConversation(conv.id, conv);
+          setSearchParams({ conversation: conv.id });
+          return;
         }
-        const meta = profile
-          ? loadUserMeta(profile)
-          : { userId: targetUserId, title: "Job seeker", subtitle: "User" };
-        setPendingUserId(targetUserId);
-        setPendingUserMeta(meta);
+
+        let resolvedCompanyId = companyId;
+        if (!resolvedCompanyId && user?.role === "company_admin") {
+          const { data: company } = await axios.get("/api/companies/mine");
+          resolvedCompanyId = company.id;
+        }
+        if (!resolvedCompanyId) return;
+
+        const meta = await loadCompanyMeta(resolvedCompanyId);
+        setPendingSupportCompanyId(resolvedCompanyId);
+        setPendingSupportMeta(meta);
         setActiveConvMeta(null);
         setMessages([]);
-        setSearchParams({ userId: targetUserId });
+        setSearchParams(user?.role === "superadmin" ? { companyId: resolvedCompanyId } : {});
+      } catch (err) {
+        toast.error(err.response?.data?.message ?? "Could not open support chat");
+      } finally {
+        setOpening(false);
       }
-    } catch (err) {
-      toast.error(err.response?.data?.message ?? "Could not open conversation");
-    } finally {
-      setOpening(false);
-    }
-  }, [users, loadUserMeta, selectConversation, setSearchParams]);
+    },
+    [user?.role, loadCompanyMeta, selectConversation, setSearchParams]
+  );
+
+  const loadUserMeta = useCallback(
+    (profile) => ({
+      userId: profile.user?.id ?? profile.userId,
+      title: profile.fullname ?? profile.user?.name ?? "Job seeker",
+      subtitle: profile.email ?? profile.user?.email ?? "User",
+    }),
+    []
+  );
+
+  const openUserChatView = useCallback(
+    async (targetUserId) => {
+      if (!targetUserId) return;
+      setOpening(true);
+      try {
+        const { data: conv } = await axios.get("/api/chat/conversations/user-support", {
+          params: { userId: targetUserId },
+        });
+        setShowNewPicker(false);
+        if (conv?.id) {
+          setPendingUserId(null);
+          setPendingUserMeta(null);
+          setActiveConvMeta(conv);
+          selectConversation(conv.id, conv);
+          setSearchParams({ conversation: conv.id });
+        } else {
+          let profile = users.find((u) => (u.user?.id ?? u.userId) === targetUserId);
+          if (!profile) {
+            try {
+              const { data } = await axios.get("/api/applicants");
+              profile = Array.isArray(data) ? data.find((p) => p.user?.id === targetUserId) : null;
+            } catch {
+              profile = null;
+            }
+          }
+          const meta = profile
+            ? loadUserMeta(profile)
+            : { userId: targetUserId, title: "Job seeker", subtitle: "User" };
+          setPendingUserId(targetUserId);
+          setPendingUserMeta(meta);
+          setActiveConvMeta(null);
+          setMessages([]);
+          setSearchParams({ userId: targetUserId });
+        }
+      } catch (err) {
+        toast.error(err.response?.data?.message ?? "Could not open conversation");
+      } finally {
+        setOpening(false);
+      }
+    },
+    [users, loadUserMeta, selectConversation, setSearchParams]
+  );
 
   const loadUsers = useCallback(async () => {
     setUsersLoading(true);
@@ -361,33 +377,37 @@ const Messages = () => {
     }
   };
 
-  const loadMessages = useCallback(async (conversationId) => {
-    if (!conversationId) {
-      setMessages([]);
-      return;
-    }
-    setMessagesLoading(true);
-    try {
-      const { data } = await axios.get(`/api/chat/conversations/${conversationId}/messages`);
-      setMessages(Array.isArray(data) ? data : []);
-      await axios.patch(`/api/chat/conversations/${conversationId}/read`);
-      refresh();
-    } catch {
-      setMessages([]);
-    } finally {
-      setMessagesLoading(false);
-    }
-  }, [refresh]);
+  const loadMessages = useCallback(
+    async (conversationId) => {
+      if (!conversationId) {
+        setMessages([]);
+        return;
+      }
+      setMessagesLoading(true);
+      try {
+        const { data } = await axios.get(`/api/chat/conversations/${conversationId}/messages`);
+        setMessages(Array.isArray(data) ? data : []);
+        await axios.patch(`/api/chat/conversations/${conversationId}/read`);
+        refresh();
+      } catch {
+        setMessages([]);
+      } finally {
+        setMessagesLoading(false);
+      }
+    },
+    [refresh]
+  );
 
   useEffect(() => {
     if (initRef.current) return;
     const supportParam = searchParams.get("support");
     if (
-      !applicationIdParam
-      && !(companyIdParam && user?.role === "superadmin")
-      && !(userIdParam && user?.role === "superadmin")
-      && !(supportParam === "platform" && user?.role === "user")
-    ) return;
+      !applicationIdParam &&
+      !(companyIdParam && user?.role === "superadmin") &&
+      !(userIdParam && user?.role === "superadmin") &&
+      !(supportParam === "platform" && user?.role === "user")
+    )
+      return;
 
     initRef.current = true;
     const init = async () => {
@@ -411,7 +431,17 @@ const Messages = () => {
       }
     };
     init();
-  }, [applicationIdParam, companyIdParam, userIdParam, searchParams, user?.role, openSupportChatView, openJobChatView, openUserChatView, openUserPlatformSupportView]);
+  }, [
+    applicationIdParam,
+    companyIdParam,
+    userIdParam,
+    searchParams,
+    user?.role,
+    openSupportChatView,
+    openJobChatView,
+    openUserChatView,
+    openUserPlatformSupportView,
+  ]);
 
   useEffect(() => {
     loadMessages(selectedId);
@@ -450,7 +480,14 @@ const Messages = () => {
     e.preventDefault();
     const text = draft.trim();
     if (!text || sending) return;
-    if (!selectedId && !pendingApplicationId && !pendingSupportCompanyId && !pendingUserId && !pendingUserPlatformSupport) return;
+    if (
+      !selectedId &&
+      !pendingApplicationId &&
+      !pendingSupportCompanyId &&
+      !pendingUserId &&
+      !pendingUserPlatformSupport
+    )
+      return;
 
     setSending(true);
     try {
@@ -523,7 +560,9 @@ const Messages = () => {
   if (loading && conversations.length === 0 && !opening) {
     return (
       <Page>
-        <div className="py-24"><Spinner loading /></div>
+        <div className="py-24">
+          <Spinner loading />
+        </div>
       </Page>
     );
   }
@@ -565,93 +604,107 @@ const Messages = () => {
             role="dialog"
             aria-label="New message"
           >
-          <Card className="shadow-float p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">New message</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Message a company or a job seeker</p>
+            <Card className="shadow-float p-0 overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">New message</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Message a company or a job seeker</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowNewPicker(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                  aria-label="Close"
+                >
+                  <CloseIcon size={14} />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowNewPicker(false)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                aria-label="Close"
-              >
-                <CloseIcon size={14} />
-              </button>
-            </div>
-            <div className="flex border-b border-gray-100">
-              <button
-                type="button"
-                onClick={() => setNewPickerTab("companies")}
-                className={`flex-1 py-2.5 text-xs font-semibold transition-colors
-                  ${newPickerTab === "companies"
-                    ? "text-brand-700 border-b-2 border-brand-600 bg-brand-50/50"
-                    : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Companies
-              </button>
-              <button
-                type="button"
-                onClick={() => setNewPickerTab("users")}
-                className={`flex-1 py-2.5 text-xs font-semibold transition-colors
-                  ${newPickerTab === "users"
-                    ? "text-brand-700 border-b-2 border-brand-600 bg-brand-50/50"
-                    : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Job seekers
-              </button>
-            </div>
-            <div className="max-h-80 overflow-y-auto">
-              {newPickerTab === "companies" ? (
-                companiesLoading ? (
-                  <div className="py-12"><Spinner loading /></div>
-                ) : companies.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-10 px-5">No companies found.</p>
+              <div className="flex border-b border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setNewPickerTab("companies")}
+                  className={`flex-1 py-2.5 text-xs font-semibold transition-colors
+                  ${
+                    newPickerTab === "companies"
+                      ? "text-brand-700 border-b-2 border-brand-600 bg-brand-50/50"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Companies
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewPickerTab("users")}
+                  className={`flex-1 py-2.5 text-xs font-semibold transition-colors
+                  ${
+                    newPickerTab === "users"
+                      ? "text-brand-700 border-b-2 border-brand-600 bg-brand-50/50"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Job seekers
+                </button>
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {newPickerTab === "companies" ? (
+                  companiesLoading ? (
+                    <div className="py-12">
+                      <Spinner loading />
+                    </div>
+                  ) : companies.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-10 px-5">
+                      No companies found.
+                    </p>
+                  ) : (
+                    companies.map((company) => (
+                      <button
+                        key={company.id}
+                        type="button"
+                        disabled={opening}
+                        onClick={() => openSupportChatView(company.id)}
+                        className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
+                      >
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {company.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                          {company.admin?.name ?? company.adminName ?? "Company admin"}
+                        </p>
+                      </button>
+                    ))
+                  )
+                ) : usersLoading ? (
+                  <div className="py-12">
+                    <Spinner loading />
+                  </div>
+                ) : users.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-10 px-5">
+                    No registered users found.
+                  </p>
                 ) : (
-                  companies.map((company) => (
-                    <button
-                      key={company.id}
-                      type="button"
-                      disabled={opening}
-                      onClick={() => openSupportChatView(company.id)}
-                      className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
-                    >
-                      <p className="text-sm font-semibold text-gray-900 truncate">{company.name}</p>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">
-                        {company.admin?.name ?? company.adminName ?? "Company admin"}
-                      </p>
-                    </button>
-                  ))
-                )
-              ) : usersLoading ? (
-                <div className="py-12"><Spinner loading /></div>
-              ) : users.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-10 px-5">No registered users found.</p>
-              ) : (
-                users.map((profile) => {
-                  const id = profile.user?.id;
-                  if (!id) return null;
-                  return (
-                    <button
-                      key={profile.id ?? id}
-                      type="button"
-                      disabled={opening}
-                      onClick={() => openUserChatView(id)}
-                      className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
-                    >
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {profile.fullname ?? profile.user?.name ?? "User"}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">
-                        {profile.email ?? profile.user?.email ?? "—"}
-                      </p>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </Card>
+                  users.map((profile) => {
+                    const id = profile.user?.id;
+                    if (!id) return null;
+                    return (
+                      <button
+                        key={profile.id ?? id}
+                        type="button"
+                        disabled={opening}
+                        onClick={() => openUserChatView(id)}
+                        className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
+                      >
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {profile.fullname ?? profile.user?.name ?? "User"}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                          {profile.email ?? profile.user?.email ?? "—"}
+                        </p>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </Card>
           </div>
         </div>
       )}
@@ -668,71 +721,82 @@ const Messages = () => {
             role="dialog"
             aria-label="New message"
           >
-          <Card className="shadow-float p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">New message</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Per job application or platform support</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowNewPicker(false)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                aria-label="Close"
-              >
-                <CloseIcon size={14} />
-              </button>
-            </div>
-            <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
-              <button
-                type="button"
-                disabled={opening}
-                onClick={() => { setShowNewPicker(false); openSupportChatView(); }}
-                className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-xl border border-gray-200
-                  bg-white hover:bg-brand-50/50 transition-colors disabled:opacity-50"
-              >
-                <HeadsetIcon className="text-brand-600 shrink-0" size={14} />
+            <Card className="shadow-float p-0 overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Platform support</p>
-                  <p className="text-xs text-gray-500">Message the super admin team</p>
+                  <h2 className="text-base font-semibold text-gray-900">New message</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Per job application or platform support
+                  </p>
                 </div>
-              </button>
-            </div>
-            <div className="px-5 py-2 border-b border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Applicants by job
-              </p>
-            </div>
-            <div className="max-h-72 overflow-y-auto">
-              {appsLoading ? (
-                <div className="py-12"><Spinner loading /></div>
-              ) : applications.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-10 px-5">
-                  No applications yet. When someone applies to your jobs, you can message them here per job.
+                <button
+                  type="button"
+                  onClick={() => setShowNewPicker(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                  aria-label="Close"
+                >
+                  <CloseIcon size={14} />
+                </button>
+              </div>
+              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
+                <button
+                  type="button"
+                  disabled={opening}
+                  onClick={() => {
+                    setShowNewPicker(false);
+                    openSupportChatView();
+                  }}
+                  className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-xl border border-gray-200
+                  bg-white hover:bg-brand-50/50 transition-colors disabled:opacity-50"
+                >
+                  <HeadsetIcon className="text-brand-600 shrink-0" size={14} />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Platform support</p>
+                    <p className="text-xs text-gray-500">Message the super admin team</p>
+                  </div>
+                </button>
+              </div>
+              <div className="px-5 py-2 border-b border-gray-100">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Applicants by job
                 </p>
-              ) : (
-                applications.map((app) => (
-                  <button
-                    key={app.id}
-                    type="button"
-                    disabled={opening}
-                    onClick={() => { setShowNewPicker(false); openJobChatView(app.id); }}
-                    className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
-                  >
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                      {app.job?.title ?? app.jobtitle ?? "Job"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate mt-0.5">
-                      {app.applicant?.user?.name ?? app.applicantname ?? "Applicant"}
-                    </p>
-                    <div className="mt-1.5">
-                      <Badge status={app.status} />
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </Card>
+              </div>
+              <div className="max-h-72 overflow-y-auto">
+                {appsLoading ? (
+                  <div className="py-12">
+                    <Spinner loading />
+                  </div>
+                ) : applications.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-10 px-5">
+                    No applications yet. When someone applies to your jobs, you can message them
+                    here per job.
+                  </p>
+                ) : (
+                  applications.map((app) => (
+                    <button
+                      key={app.id}
+                      type="button"
+                      disabled={opening}
+                      onClick={() => {
+                        setShowNewPicker(false);
+                        openJobChatView(app.id);
+                      }}
+                      className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
+                    >
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {app.job?.title ?? app.jobtitle ?? "Job"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {app.applicant?.user?.name ?? app.applicantname ?? "Applicant"}
+                      </p>
+                      <div className="mt-1.5">
+                        <Badge status={app.status} />
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </Card>
           </div>
         </div>
       )}
@@ -749,71 +813,79 @@ const Messages = () => {
             role="dialog"
             aria-label="New message"
           >
-          <Card className="shadow-float p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">New message</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Per job application or platform support</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowNewPicker(false)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                aria-label="Close"
-              >
-                <CloseIcon size={14} />
-              </button>
-            </div>
-            <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
-              <button
-                type="button"
-                disabled={opening}
-                onClick={() => openUserPlatformSupportView()}
-                className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-xl border border-gray-200
-                  bg-white hover:bg-brand-50/50 transition-colors disabled:opacity-50"
-              >
-                <HeadsetIcon className="text-brand-600 shrink-0" size={14} />
+            <Card className="shadow-float p-0 overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Platform support</p>
-                  <p className="text-xs text-gray-500">Get help from the {APP_NAME} team</p>
+                  <h2 className="text-base font-semibold text-gray-900">New message</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Per job application or platform support
+                  </p>
                 </div>
-              </button>
-            </div>
-            <div className="px-5 py-2 border-b border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Employers by job
-              </p>
-            </div>
-            <div className="max-h-72 overflow-y-auto">
-              {appsLoading ? (
-                <div className="py-12"><Spinner loading /></div>
-              ) : applications.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-10 px-5">
-                  You have no applications yet. Apply to a job first, then you can message the employer here per job.
+                <button
+                  type="button"
+                  onClick={() => setShowNewPicker(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                  aria-label="Close"
+                >
+                  <CloseIcon size={14} />
+                </button>
+              </div>
+              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
+                <button
+                  type="button"
+                  disabled={opening}
+                  onClick={() => openUserPlatformSupportView()}
+                  className="w-full flex items-center gap-2 text-left px-3 py-2.5 rounded-xl border border-gray-200
+                  bg-white hover:bg-brand-50/50 transition-colors disabled:opacity-50"
+                >
+                  <HeadsetIcon className="text-brand-600 shrink-0" size={14} />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Platform support</p>
+                    <p className="text-xs text-gray-500">Get help from the {APP_NAME} team</p>
+                  </div>
+                </button>
+              </div>
+              <div className="px-5 py-2 border-b border-gray-100">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Employers by job
                 </p>
-              ) : (
-                applications.map((app) => (
-                  <button
-                    key={app.id}
-                    type="button"
-                    disabled={opening}
-                    onClick={() => { setShowNewPicker(false); openJobChatView(app.id); }}
-                    className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
-                  >
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                      {app.job?.title ?? "Job"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate mt-0.5">
-                      {app.job?.company?.name ?? "Company"}
-                    </p>
-                    <div className="mt-1.5">
-                      <Badge status={app.status} />
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </Card>
+              </div>
+              <div className="max-h-72 overflow-y-auto">
+                {appsLoading ? (
+                  <div className="py-12">
+                    <Spinner loading />
+                  </div>
+                ) : applications.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-10 px-5">
+                    You have no applications yet. Apply to a job first, then you can message the
+                    employer here per job.
+                  </p>
+                ) : (
+                  applications.map((app) => (
+                    <button
+                      key={app.id}
+                      type="button"
+                      disabled={opening}
+                      onClick={() => {
+                        setShowNewPicker(false);
+                        openJobChatView(app.id);
+                      }}
+                      className="w-full text-left px-5 py-3.5 border-b border-gray-50 hover:bg-brand-50/50 transition-colors disabled:opacity-50"
+                    >
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {app.job?.title ?? "Job"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {app.job?.company?.name ?? "Company"}
+                      </p>
+                      <div className="mt-1.5">
+                        <Badge status={app.status} />
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </Card>
           </div>
         </div>
       )}
@@ -821,13 +893,17 @@ const Messages = () => {
       <Card className="p-0 overflow-hidden">
         <div className="flex flex-col md:flex-row min-h-[520px] max-h-[calc(100vh-12rem)]">
           {/* Conversation list */}
-          <div className={`md:w-80 border-r border-gray-100 flex flex-col shrink-0
-            ${isChatOpen ? "hidden md:flex" : "flex"}`}>
+          <div
+            className={`md:w-80 border-r border-gray-100 flex flex-col shrink-0
+            ${isChatOpen ? "hidden md:flex" : "flex"}`}
+          >
             <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between gap-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                 <MessageIcon size={12} /> Conversations
               </p>
-              {(user.role === "user" || user.role === "company_admin" || user.role === "superadmin") && (
+              {(user.role === "user" ||
+                user.role === "company_admin" ||
+                user.role === "superadmin") && (
                 <button
                   type="button"
                   onClick={handleOpenNewPicker}
@@ -842,7 +918,9 @@ const Messages = () => {
               {conversations.length === 0 ? (
                 <div className="p-6 text-center">
                   <p className="text-sm text-gray-400">No conversations yet.</p>
-                  {(user.role === "user" || user.role === "company_admin" || user.role === "superadmin") && (
+                  {(user.role === "user" ||
+                    user.role === "company_admin" ||
+                    user.role === "superadmin") && (
                     <button
                       type="button"
                       onClick={handleOpenNewPicker}
@@ -861,20 +939,22 @@ const Messages = () => {
                     return bTime - aTime;
                   })
                   .map((conv) => (
-                  <ConversationItem
-                    key={conv.id}
-                    conv={conv}
-                    active={conv.id === selectedId}
-                    onClick={() => selectConversation(conv.id)}
-                  />
-                ))
+                    <ConversationItem
+                      key={conv.id}
+                      conv={conv}
+                      active={conv.id === selectedId}
+                      onClick={() => selectConversation(conv.id)}
+                    />
+                  ))
               )}
             </div>
           </div>
 
           {/* Chat panel */}
-          <div className={`flex-1 flex flex-col min-w-0
-            ${!isChatOpen ? "hidden md:flex" : "flex"}`}>
+          <div
+            className={`flex-1 flex flex-col min-w-0
+            ${!isChatOpen ? "hidden md:flex" : "flex"}`}
+          >
             {!selected ? (
               user.role === "user" ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
@@ -941,7 +1021,9 @@ const Messages = () => {
                   className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-slate-50/50"
                 >
                   {messagesLoading && messages.length === 0 ? (
-                    <div className="py-12"><Spinner loading /></div>
+                    <div className="py-12">
+                      <Spinner loading />
+                    </div>
                   ) : messages.length === 0 ? (
                     <p className="text-center text-sm text-gray-400 py-12">
                       No messages yet. Say hello!
@@ -954,9 +1036,11 @@ const Messages = () => {
                       >
                         <div
                           className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm
-                            ${msg.isMine
-                              ? "bg-brand-600 text-white rounded-br-md"
-                              : "bg-white border border-gray-100 text-gray-800 rounded-bl-md shadow-sm"}`}
+                            ${
+                              msg.isMine
+                                ? "bg-brand-600 text-white rounded-br-md"
+                                : "bg-white border border-gray-100 text-gray-800 rounded-bl-md shadow-sm"
+                            }`}
                         >
                           {!msg.isMine && (
                             <p className="text-[10px] font-semibold text-gray-400 mb-0.5">
@@ -964,7 +1048,9 @@ const Messages = () => {
                             </p>
                           )}
                           <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                          <p className={`text-[10px] mt-1 ${msg.isMine ? "text-brand-200" : "text-gray-400"}`}>
+                          <p
+                            className={`text-[10px] mt-1 ${msg.isMine ? "text-brand-200" : "text-gray-400"}`}
+                          >
                             {formatTime(msg.createdAt)}
                           </p>
                         </div>

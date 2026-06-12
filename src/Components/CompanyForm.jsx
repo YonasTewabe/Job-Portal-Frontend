@@ -6,12 +6,12 @@ import { Card, Field, inputCls, Btn } from "./ui";
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
 export const companyFormSchema = Yup.object().shape({
-  name:          Yup.string().required("Company name is required"),
-  description:   Yup.string().required("Description is required"),
-  contactEmail:  Yup.string().email("Invalid email").required("Contact email is required"),
-  phone:         Yup.string().required("Phone is required"),
-  adminName:     Yup.string().required("Admin name is required"),
-  adminEmail:    Yup.string().email("Invalid email").required("Admin email is required"),
+  name: Yup.string().required("Company name is required"),
+  description: Yup.string().required("Description is required"),
+  contactEmail: Yup.string().email("Invalid email").required("Contact email is required"),
+  phone: Yup.string().required("Phone is required"),
+  adminName: Yup.string().required("Admin name is required"),
+  adminEmail: Yup.string().email("Invalid email").required("Admin email is required"),
   adminPassword: Yup.string()
     .required("Password is required")
     .matches(passwordRegex, "Must include upper, lower, number & special char")
@@ -35,7 +35,7 @@ const CompanyForm = ({
   cancelLabel,
   onCancel,
 }) => {
-  const [form, setForm]     = useState(EMPTY_COMPANY_FORM);
+  const [form, setForm] = useState(EMPTY_COMPANY_FORM);
   const [errors, setErrors] = useState({});
   const [showPass, setShowPass] = useState(false);
 
@@ -48,7 +48,9 @@ const CompanyForm = ({
       setErrors({});
     } catch (err) {
       const fe = {};
-      err.inner.forEach((item) => { fe[item.path] = item.message; });
+      err.inner.forEach((item) => {
+        fe[item.path] = item.message;
+      });
       setErrors(fe);
       return;
     }
@@ -65,25 +67,47 @@ const CompanyForm = ({
           </h2>
 
           <Field label="Company name" htmlFor="name" error={errors.name}>
-            <input id="name" type="text" placeholder="Acme Corp"
-              value={form.name} onChange={set("name")} className={inputCls(errors.name)} />
+            <input
+              id="name"
+              type="text"
+              placeholder="Acme Corp"
+              value={form.name}
+              onChange={set("name")}
+              className={inputCls(errors.name)}
+            />
           </Field>
 
           <Field label="Description" htmlFor="description" error={errors.description}>
-            <textarea id="description" rows={4} placeholder="What does your company do?"
-              value={form.description} onChange={set("description")}
-              className={inputCls(errors.description) + " resize-none"} />
+            <textarea
+              id="description"
+              rows={4}
+              placeholder="What does your company do?"
+              value={form.description}
+              onChange={set("description")}
+              className={inputCls(errors.description) + " resize-none"}
+            />
           </Field>
 
           <Field label="Contact email" htmlFor="contactEmail" error={errors.contactEmail}>
-            <input id="contactEmail" type="email" placeholder="hr@company.com"
-              value={form.contactEmail} onChange={set("contactEmail")}
-              className={inputCls(errors.contactEmail)} />
+            <input
+              id="contactEmail"
+              type="email"
+              placeholder="hr@company.com"
+              value={form.contactEmail}
+              onChange={set("contactEmail")}
+              className={inputCls(errors.contactEmail)}
+            />
           </Field>
 
           <Field label="Phone" htmlFor="phone" error={errors.phone}>
-            <input id="phone" type="tel" placeholder="+1-555-000-0000"
-              value={form.phone} onChange={set("phone")} className={inputCls(errors.phone)} />
+            <input
+              id="phone"
+              type="tel"
+              placeholder="+1-555-000-0000"
+              value={form.phone}
+              onChange={set("phone")}
+              className={inputCls(errors.phone)}
+            />
           </Field>
         </Card>
 
@@ -97,25 +121,49 @@ const CompanyForm = ({
           </p>
 
           <Field label="Admin full name" htmlFor="adminName" error={errors.adminName}>
-            <input id="adminName" type="text" placeholder="Jane Smith"
-              value={form.adminName} onChange={set("adminName")} className={inputCls(errors.adminName)} />
+            <input
+              id="adminName"
+              type="text"
+              placeholder="Jane Smith"
+              value={form.adminName}
+              onChange={set("adminName")}
+              className={inputCls(errors.adminName)}
+            />
           </Field>
 
           <Field label="Admin email" htmlFor="adminEmail" error={errors.adminEmail}>
-            <input id="adminEmail" type="email" placeholder="jane@company.com"
-              value={form.adminEmail} onChange={set("adminEmail")} className={inputCls(errors.adminEmail)} />
+            <input
+              id="adminEmail"
+              type="email"
+              placeholder="jane@company.com"
+              value={form.adminEmail}
+              onChange={set("adminEmail")}
+              className={inputCls(errors.adminEmail)}
+            />
           </Field>
 
-          <Field label="Admin password" htmlFor="adminPassword" error={errors.adminPassword}
-            hint="Min 8 chars with upper, lower, number & symbol">
+          <Field
+            label="Admin password"
+            htmlFor="adminPassword"
+            error={errors.adminPassword}
+            hint="Min 8 chars with upper, lower, number & symbol"
+          >
             <div className="relative">
-              <input id="adminPassword" type={showPass ? "text" : "password"}
-                placeholder="••••••••" autoComplete="new-password"
-                value={form.adminPassword} onChange={set("adminPassword")}
-                className={inputCls(errors.adminPassword) + " pr-10"} />
-              <button type="button" onClick={() => setShowPass((v) => !v)}
+              <input
+                id="adminPassword"
+                type={showPass ? "text" : "password"}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                value={form.adminPassword}
+                onChange={set("adminPassword")}
+                className={inputCls(errors.adminPassword) + " pr-10"}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass((v) => !v)}
                 aria-label="Toggle password"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+              >
                 {showPass ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
               </button>
             </div>

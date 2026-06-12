@@ -24,16 +24,19 @@ const SuperAdminAdmins = () => {
   }, [authUser]);
 
   if (authUser?.role !== "superadmin") return <NotFoundPage />;
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
 
   return (
     <Page className="max-w-4xl">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <PageTitle>Super Admins</PageTitle>
-          <p className="text-sm text-gray-500 mt-1">
-            Platform administrators with full access.
-          </p>
+          <p className="text-sm text-gray-500 mt-1">Platform administrators with full access.</p>
         </div>
         <Link to="/superadmin/admins/new" className={Btn.primary("gap-2 shadow-sm")}>
           + Add Super Admin
@@ -47,7 +50,9 @@ const SuperAdminAdmins = () => {
             { key: "email", label: "Email" },
             { key: "you", label: "" },
           ]}
-          empty={admins.length === 0 && <Empty message="No super admins found." icon={UserCircleIcon} />}
+          empty={
+            admins.length === 0 && <Empty message="No super admins found." icon={UserCircleIcon} />
+          }
         >
           {admins.map((admin, i) => (
             <Tr key={admin.id} striped={i % 2 !== 0}>

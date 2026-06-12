@@ -14,26 +14,26 @@ const Layout = () => {
   const showPublicNav = !user && !AUTH_PATHS.includes(pathname);
 
   return (
-  <div className="app-shell">
-    {user ? <Navbar /> : showPublicNav && <PublicNavbar />}
-    <div className="flex-1">
-      <Outlet />
+    <div className="app-shell">
+      {user ? <Navbar /> : showPublicNav && <PublicNavbar />}
+      <div className="flex-1">
+        <Outlet />
+      </div>
+      <Footer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3200}
+        newestOnTop
+        limit={4}
+        transition={Slide}
+        toastClassName="app-toast"
+        progressClassName="app-toast-progress"
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
     </div>
-    <Footer />
-    <ToastContainer
-      position="top-right"
-      autoClose={3200}
-      newestOnTop
-      limit={4}
-      transition={Slide}
-      toastClassName="app-toast"
-      progressClassName="app-toast-progress"
-      hideProgressBar={false}
-      closeOnClick
-      pauseOnHover
-      draggable
-    />
-  </div>
   );
 };
 

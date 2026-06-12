@@ -1,17 +1,8 @@
 import { Btn } from "./ui";
 import { DownloadIcon, FileTextIcon } from "./icons";
-import {
-  downloadApplicantCv,
-  formatCvDisplayName,
-  openApplicantCv,
-} from "../utils/applicantCv";
+import { downloadApplicantCv, formatCvDisplayName, openApplicantCv } from "../utils/applicantCv";
 
-const CvFileActions = ({
-  filename,
-  compact = false,
-  showFilename = false,
-  className = "",
-}) => {
+const CvFileActions = ({ filename, compact = false, showFilename = false, className = "" }) => {
   if (!filename) return null;
 
   const label = formatCvDisplayName(filename);

@@ -36,10 +36,7 @@ export const initializeChapaPayment = async ({
     return { success: false, tx_ref: null };
   }
 
-  const encryptedPayload = CryptoJS.AES.encrypt(
-    JSON.stringify(payload),
-    encryptionKey
-  ).toString();
+  const encryptedPayload = CryptoJS.AES.encrypt(JSON.stringify(payload), encryptionKey).toString();
 
   try {
     const { data } = await api.post("/api/chapa/initiate", {

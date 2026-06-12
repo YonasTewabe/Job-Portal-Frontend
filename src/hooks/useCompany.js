@@ -19,12 +19,21 @@ export const useCompany = () => {
     let cancelled = false;
     setLoading(true);
 
-    axios.get("/api/companies/mine")
-      .then(({ data }) => { if (!cancelled) setCompany(data); })
-      .catch(() => { if (!cancelled) setCompany(null); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+    axios
+      .get("/api/companies/mine")
+      .then(({ data }) => {
+        if (!cancelled) setCompany(data);
+      })
+      .catch(() => {
+        if (!cancelled) setCompany(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   const isSuspended = company != null && company.isActive === false;

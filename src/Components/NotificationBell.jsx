@@ -74,7 +74,9 @@ const NotificationBell = () => {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-medium text-gray-900 line-clamp-1">{n.title}</p>
-                    {!n.read && <span className="w-2 h-2 rounded-full bg-brand-500 shrink-0 mt-1.5" />}
+                    {!n.read && (
+                      <span className="w-2 h-2 rounded-full bg-brand-500 shrink-0 mt-1.5" />
+                    )}
                   </div>
                   {n.message && (
                     <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.message}</p>

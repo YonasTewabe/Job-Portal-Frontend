@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import axios from "../axiosInterceptor";
 import { useAuth } from "./AuthContext";
 
@@ -39,7 +47,9 @@ export const ChatProvider = ({ children }) => {
   useEffect(() => {
     mountedRef.current = true;
     fetchConversations();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchConversations]);
 
   useEffect(() => {
@@ -55,11 +65,14 @@ export const ChatProvider = ({ children }) => {
     };
   }, [user?.userId, fetchConversations]);
 
-  const openConversation = useCallback(async (payload) => {
-    const { data } = await axios.post("/api/chat/conversations", payload);
-    await fetchConversations();
-    return data;
-  }, [fetchConversations]);
+  const openConversation = useCallback(
+    async (payload) => {
+      const { data } = await axios.post("/api/chat/conversations", payload);
+      await fetchConversations();
+      return data;
+    },
+    [fetchConversations]
+  );
 
   const upsertConversation = useCallback((conv) => {
     if (!conv?.id) return;
@@ -85,14 +98,10 @@ export const ChatProvider = ({ children }) => {
       openConversation,
       upsertConversation,
     }),
-    [conversations, unreadCount, loading, fetchConversations, openConversation, upsertConversation],
+    [conversations, unreadCount, loading, fetchConversations, openConversation, upsertConversation]
   );
 
-  return (
-    <ChatContext.Provider value={value}>
-      {children}
-    </ChatContext.Provider>
-  );
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
 
 export const useChat = () => {

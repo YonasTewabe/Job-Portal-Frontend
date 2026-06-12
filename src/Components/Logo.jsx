@@ -47,7 +47,14 @@ const Logo = ({ size = 32, variant = "color", showText = false }) => {
       >
         {useGradientBg && (
           <defs>
-            <linearGradient id={`${uid}-bg`} x1="6" y1="4" x2="34" y2="36" gradientUnits="userSpaceOnUse">
+            <linearGradient
+              id={`${uid}-bg`}
+              x1="6"
+              y1="4"
+              x2="34"
+              y2="36"
+              gradientUnits="userSpaceOnUse"
+            >
               <stop stopColor={ETHIO[500]} />
               <stop offset="1" stopColor={ETHIO[800]} />
             </linearGradient>
@@ -60,7 +67,9 @@ const Logo = ({ size = 32, variant = "color", showText = false }) => {
           width="36"
           height="36"
           rx="11"
-          fill={useGradientBg ? `url(#${uid}-bg)` : isWhite ? "rgba(255,255,255,0.14)" : "transparent"}
+          fill={
+            useGradientBg ? `url(#${uid}-bg)` : isWhite ? "rgba(255,255,255,0.14)" : "transparent"
+          }
           stroke={useGradientBg ? "none" : isWhite ? "rgba(255,255,255,0.4)" : mark}
           strokeWidth="1.5"
         />

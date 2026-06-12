@@ -2,42 +2,49 @@ import { useEffect, useState } from "react";
 import axios from "../axiosInterceptor";
 import JobListing from "./JobListing";
 import Spinner from "./Spinner";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PostJobLink from "./PostJobLink";
 import { normalizeJobs, isJobOpen, isJobDraft, getJobPostedDate } from "../utils/jobs";
 import { SearchIcon, PlusIcon } from "./icons";
 
 const JobListings = ({ isHome = false }) => {
-  const [jobs,         setJobs]         = useState([]);
-  const [loading,      setLoading]      = useState(true);
-  const [error,        setError]        = useState(null);
-  const [searchTerm,   setSearchTerm]   = useState("");
-  const [sortOrder,    setSortOrder]    = useState("desc");
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [sortCriteria, setSortCriteria] = useState("postedDate");
 
   const { user: authUser } = useAuth();
-  const role      = authUser?.role;
+  const role = authUser?.role;
   const companyId = authUser?.companyId;
 
   useEffect(() => {
     const url = companyId ? `/api/jobs?companyId=${companyId}` : "/api/jobs";
-    axios.get(url)
+    axios
+      .get(url)
       .then((r) => setJobs(normalizeJobs(r.data)))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [companyId]);
 
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
-  if (error)   return <p className="text-center py-24 text-red-500 text-sm">Failed to load jobs.</p>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
+  if (error) return <p className="text-center py-24 text-red-500 text-sm">Failed to load jobs.</p>;
 
   const hideClosedJobs = !authUser || role === "user";
-  const visibleJobs = (hideClosedJobs ? jobs.filter(isJobOpen) : jobs)
-    .filter((job) => role === "company_admin" || !isJobDraft(job));
+  const visibleJobs = (hideClosedJobs ? jobs.filter(isJobOpen) : jobs).filter(
+    (job) => role === "company_admin" || !isJobDraft(job)
+  );
 
   const filtered = visibleJobs.filter((job) =>
-    [job.title, job.requirement, job.companyName, job.description]
-      .some((f) => f?.toLowerCase().includes(searchTerm.toLowerCase()))
+    [job.title, job.requirement, job.companyName, job.description].some((f) =>
+      f?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   const sorted = [...filtered].sort((a, b) => {
@@ -45,11 +52,16 @@ const JobListings = ({ isHome = false }) => {
     switch (sortCriteria) {
       case "postedDate":
         return dir * (new Date(getJobPostedDate(a) ?? 0) - new Date(getJobPostedDate(b) ?? 0));
-      case "deadline":    return dir * (new Date(a.deadline) - new Date(b.deadline));
-      case "type":        return dir * a.type.localeCompare(b.type);
-      case "title":       return dir * a.title.localeCompare(b.title);
-      case "companyName": return dir * a.companyName.localeCompare(b.companyName);
-      default:            return 0;
+      case "deadline":
+        return dir * (new Date(a.deadline) - new Date(b.deadline));
+      case "type":
+        return dir * a.type.localeCompare(b.type);
+      case "title":
+        return dir * a.title.localeCompare(b.title);
+      case "companyName":
+        return dir * a.companyName.localeCompare(b.companyName);
+      default:
+        return 0;
     }
   });
 
@@ -62,7 +74,9 @@ const JobListings = ({ isHome = false }) => {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             {isHome && <span className="section-eyebrow mb-3">Open positions</span>}
-            <h2 className={`font-bold text-slate-900 tracking-tight ${isHome ? "text-2xl sm:text-3xl mt-3" : "text-xl"}`}>
+            <h2
+              className={`font-bold text-slate-900 tracking-tight ${isHome ? "text-2xl sm:text-3xl mt-3" : "text-xl"}`}
+            >
               {isHome ? "Recent Listings" : "Browse Jobs"}
             </h2>
             {!isHome && (
@@ -90,7 +104,10 @@ const JobListings = ({ isHome = false }) => {
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
             {/* Search */}
             <div className="relative flex-1">
-              <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={13} />
+              <SearchIcon
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                size={13}
+              />
               <input
                 type="text"
                 placeholder="Search by title, company, or skills…"
@@ -135,7 +152,9 @@ const JobListings = ({ isHome = false }) => {
         {/* Grid */}
         {display.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {display.map((job) => <JobListing key={job.id} job={job} />)}
+            {display.map((job) => (
+              <JobListing key={job.id} job={job} />
+            ))}
           </div>
         ) : (
           <div className="py-24 text-center">

@@ -1,6 +1,6 @@
 /** Brand palette — keep in sync with :root variables in index.css */
 export const BRAND = {
-  50:  "#eff6ff",
+  50: "#eff6ff",
   100: "#dbeafe",
   200: "#bfdbfe",
   300: "#93c5fd",

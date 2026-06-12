@@ -32,8 +32,6 @@ const Hero = () => {
   return (
     <section className="relative overflow-hidden hero-surface pt-14">
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-20 text-center">
-
-
         <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight mb-5">
           {c.heading}
         </h1>
@@ -45,14 +43,26 @@ const Hero = () => {
         {isPostJobCta ? (
           <PostJobLink className={ctaClassName}>
             {c.cta.label}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </PostJobLink>
         ) : (
           <Link to={c.cta.to} className={ctaClassName}>
             {c.cta.label}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>

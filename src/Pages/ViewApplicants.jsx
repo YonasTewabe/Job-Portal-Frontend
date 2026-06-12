@@ -6,7 +6,21 @@ import Donut from "./ViewReport";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../Components/Spinner";
 import NotFoundPage from "./NotFoundPage";
-import { Page, PageTitle, Card, Badge, Btn, inputCls, Empty, Table, Tr, Td, Field, SectionTitle, InfoRow } from "../Components/ui";
+import {
+  Page,
+  PageTitle,
+  Card,
+  Badge,
+  Btn,
+  inputCls,
+  Empty,
+  Table,
+  Tr,
+  Td,
+  Field,
+  SectionTitle,
+  InfoRow,
+} from "../Components/ui";
 import {
   SortUpIcon,
   SortDownIcon,
@@ -74,7 +88,10 @@ const ApplicantActions = ({
         <button
           type="button"
           disabled={busy}
-          onClick={(e) => { e.stopPropagation(); accept(applicant); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            accept(applicant);
+          }}
           className={Btn.success("text-sm py-2 px-4 disabled:opacity-50")}
         >
           {busy ? "Updating…" : "Accept"}
@@ -82,7 +99,10 @@ const ApplicantActions = ({
         <button
           type="button"
           disabled={busy}
-          onClick={(e) => { e.stopPropagation(); reject(applicant); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            reject(applicant);
+          }}
           className={Btn.danger("text-sm py-2 px-4 disabled:opacity-50")}
         >
           Reject
@@ -129,7 +149,10 @@ const ApplicantActions = ({
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); schedule(applicant); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              schedule(applicant);
+            }}
             disabled={busy || !fields.interviewDate || !fields.interviewLocation}
             className={Btn.primary("flex-1 text-sm py-2 disabled:opacity-40")}
           >
@@ -138,7 +161,10 @@ const ApplicantActions = ({
           <button
             type="button"
             disabled={busy}
-            onClick={(e) => { e.stopPropagation(); reject(applicant); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              reject(applicant);
+            }}
             className={Btn.danger("text-sm py-2 px-4 disabled:opacity-50")}
           >
             Reject
@@ -185,7 +211,11 @@ const ApplicantActions = ({
             />
           </Field>
           <div className="flex gap-2">
-            <button type="button" onClick={onRescheduleCancel} className={Btn.secondary("flex-1 text-sm py-2")}>
+            <button
+              type="button"
+              onClick={onRescheduleCancel}
+              className={Btn.secondary("flex-1 text-sm py-2")}
+            >
               Cancel
             </button>
             <button
@@ -203,10 +233,18 @@ const ApplicantActions = ({
 
     return (
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => onReschedule(applicant)} className={Btn.primary("text-sm py-2 px-4")}>
+        <button
+          type="button"
+          onClick={() => onReschedule(applicant)}
+          className={Btn.primary("text-sm py-2 px-4")}
+        >
           Reschedule
         </button>
-        <button type="button" onClick={() => reject(applicant)} className={Btn.danger("text-sm py-2 px-4")}>
+        <button
+          type="button"
+          onClick={() => reject(applicant)}
+          className={Btn.danger("text-sm py-2 px-4")}
+        >
           Reject
         </button>
       </div>
@@ -337,7 +375,10 @@ const ApplicantDetailModal = ({
             {applicant.status === "Interview Scheduled" && !rescheduleMode && (
               <div>
                 <SectionTitle>Interview</SectionTitle>
-                <InfoRow label="When" value={formatInterviewWhen(applicant.interviewDate, applicant.interviewHasTime)} />
+                <InfoRow
+                  label="When"
+                  value={formatInterviewWhen(applicant.interviewDate, applicant.interviewHasTime)}
+                />
                 <InfoRow label="Where" value={applicant.interviewLocation ?? "—"} />
               </div>
             )}
@@ -390,12 +431,12 @@ const parseInterviewParts = (iso, hasTime = false) => {
 };
 
 const ViewApplicants = () => {
-  const [applicants,    setApplicants]    = useState([]);
-  const [loading,       setLoading]       = useState(true);
+  const [applicants, setApplicants] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [sortCriterion, setSortCriterion] = useState("");
   const [sortAscending, setSortAscending] = useState(true);
-  const [refreshKey,    setRefreshKey]    = useState(0);
-  const [interviewData, setInterviewData]     = useState({});
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [interviewData, setInterviewData] = useState({});
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
 
@@ -405,23 +446,25 @@ const ViewApplicants = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`/api/applications?jobId=${jobId}`)
+    axios
+      .get(`/api/applications?jobId=${jobId}`)
       .then((r) => setApplicants(Array.isArray(r.data) ? r.data : []))
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [jobId, refreshKey]);
 
   const updateInterview = (id, field, value) =>
-    setInterviewData((prev) => ({ ...prev, [id]: { ...(prev[id] ?? {}), [field]: value } }));
+    setInterviewData((prev) => ({
+      ...prev,
+      [id]: { ...(prev[id] ?? {}), [field]: value },
+    }));
 
   const patchStatus = async (applicant, patch, successMessage) => {
     setActionLoading(applicant.id);
     try {
       const { data } = await axios.patch(`/api/applications/${applicant.id}`, patch);
       const updated = mergeApplication(applicant, data);
-      setApplicants((prev) =>
-        prev.map((a) => (a.id === applicant.id ? updated : a))
-      );
+      setApplicants((prev) => prev.map((a) => (a.id === applicant.id ? updated : a)));
       setSelectedApplicant((prev) => (prev?.id === applicant.id ? updated : prev));
       if (successMessage) toast.success(successMessage);
     } catch (e) {
@@ -432,10 +475,8 @@ const ViewApplicants = () => {
     }
   };
 
-  const accept = (a) =>
-    patchStatus(a, { status: "Under Consideration" }, "Applicant accepted");
-  const reject = (a) =>
-    patchStatus(a, { status: "Rejected" }, "Applicant rejected");
+  const accept = (a) => patchStatus(a, { status: "Under Consideration" }, "Applicant accepted");
+  const reject = (a) => patchStatus(a, { status: "Rejected" }, "Applicant rejected");
 
   const getInterviewFields = (applicant) => {
     const idata = interviewData[applicant.id] ?? {};
@@ -467,7 +508,10 @@ const ViewApplicants = () => {
     }
     patchStatus(
       a,
-      { status: "Interview Scheduled", ...buildInterviewPatch(interviewDate, interviewTime, interviewLocation) },
+      {
+        status: "Interview Scheduled",
+        ...buildInterviewPatch(interviewDate, interviewTime, interviewLocation),
+      },
       "Interview scheduled"
     );
   };
@@ -527,41 +571,70 @@ const ViewApplicants = () => {
 
   const handleSortChange = (c) => {
     if (sortCriterion === c) setSortAscending((v) => !v);
-    else { setSortCriterion(c); setSortAscending(true); }
+    else {
+      setSortCriterion(c);
+      setSortAscending(true);
+    }
   };
 
   const sorted = [...applicants].sort((a, b) => {
     const m = sortAscending ? 1 : -1;
     switch (sortCriterion) {
-      case "name":            return m * getApplicantName(a).localeCompare(getApplicantName(b));
-      case "applicationDate": return m * (new Date(getAppliedDate(a) || 0) - new Date(getAppliedDate(b) || 0));
-      case "status":          return m * a.status.localeCompare(b.status);
-      default:                return 0;
+      case "name":
+        return m * getApplicantName(a).localeCompare(getApplicantName(b));
+      case "applicationDate":
+        return m * (new Date(getAppliedDate(a) || 0) - new Date(getAppliedDate(b) || 0));
+      case "status":
+        return m * a.status.localeCompare(b.status);
+      default:
+        return 0;
     }
   });
 
   const canManage = myRole === "company_admin" || myRole === "superadmin";
-  const canView   = canManage || myRole === "superadmin";
+  const canView = canManage || myRole === "superadmin";
 
   const sortIcon = (key) => {
     if (sortCriterion !== key) return null;
-    return sortAscending
-      ? <SortUpIcon size={9} className="inline ml-1 opacity-70" />
-      : <SortDownIcon size={9} className="inline ml-1 opacity-70" />;
+    return sortAscending ? (
+      <SortUpIcon size={9} className="inline ml-1 opacity-70" />
+    ) : (
+      <SortDownIcon size={9} className="inline ml-1 opacity-70" />
+    );
   };
 
   const headers = [
-    { label: "Name",       key: "name",            onClick: () => handleSortChange("name"),            sort: sortIcon("name") },
-    { label: "Email",      key: "email" },
-    { label: "Phone",      key: "phone" },
-    { label: "Applied",    key: "applicationDate", onClick: () => handleSortChange("applicationDate"), sort: sortIcon("applicationDate") },
-    { label: "Status",     key: "status",          onClick: () => handleSortChange("status"),          sort: sortIcon("status") },
-    { label: "CV",         key: "cv" },
+    {
+      label: "Name",
+      key: "name",
+      onClick: () => handleSortChange("name"),
+      sort: sortIcon("name"),
+    },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phone" },
+    {
+      label: "Applied",
+      key: "applicationDate",
+      onClick: () => handleSortChange("applicationDate"),
+      sort: sortIcon("applicationDate"),
+    },
+    {
+      label: "Status",
+      key: "status",
+      onClick: () => handleSortChange("status"),
+      sort: sortIcon("status"),
+    },
+    { label: "CV", key: "cv" },
   ];
 
   if (!jobId) return <NotFoundPage />;
   if (!canView) return <NotFoundPage />;
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
 
   return (
     <Page className="max-w-7xl">
@@ -569,7 +642,8 @@ const ViewApplicants = () => {
         <div>
           <PageTitle>Applicants</PageTitle>
           <p className="text-sm text-gray-500 mt-1">
-            {applicants.length} total applicant{applicants.length !== 1 ? "s" : ""}
+            {applicants.length} total applicant
+            {applicants.length !== 1 ? "s" : ""}
           </p>
         </div>
 
@@ -587,9 +661,11 @@ const ViewApplicants = () => {
       <Card className="p-0 overflow-hidden mb-10">
         <Table
           headers={headers}
-          empty={sorted.length === 0
-            ? <Empty message="No applicants yet for this job." icon={UserCircleIcon} />
-            : null}
+          empty={
+            sorted.length === 0 ? (
+              <Empty message="No applicants yet for this job." icon={UserCircleIcon} />
+            ) : null
+          }
         >
           {sorted.map((applicant, i) => (
             <Tr
@@ -597,13 +673,19 @@ const ViewApplicants = () => {
               striped={i % 2 !== 0}
               onClick={() => setSelectedApplicant(applicant)}
             >
-              <Td className="font-medium text-gray-900 whitespace-nowrap">{getApplicantName(applicant)}</Td>
+              <Td className="font-medium text-gray-900 whitespace-nowrap">
+                {getApplicantName(applicant)}
+              </Td>
               <Td className="text-xs text-gray-500">{getApplicantEmail(applicant)}</Td>
               <Td className="whitespace-nowrap text-xs">
                 {getApplicantPhone(applicant) ? `+251 ${getApplicantPhone(applicant)}` : "—"}
               </Td>
-              <Td className="text-xs text-gray-500 whitespace-nowrap">{formatAppliedDate(applicant)}</Td>
-              <Td><Badge status={applicant.status} /></Td>
+              <Td className="text-xs text-gray-500 whitespace-nowrap">
+                {formatAppliedDate(applicant)}
+              </Td>
+              <Td>
+                <Badge status={applicant.status} />
+              </Td>
               <Td>
                 {getApplicantCv(applicant) ? (
                   <CvFileActions filename={getApplicantCv(applicant)} compact />
@@ -617,7 +699,9 @@ const ViewApplicants = () => {
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">Application Summary</h2>
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">
+          Application Summary
+        </h2>
         <Donut jobId={jobId} key={refreshKey} />
       </Card>
 

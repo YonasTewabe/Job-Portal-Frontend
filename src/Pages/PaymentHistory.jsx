@@ -8,8 +8,7 @@ import { toast } from "../utils/toast";
 import { Page, PageTitle, Card, Table, Tr, Td, Empty, inputCls, Btn } from "../Components/ui";
 import { CreditCardIcon } from "../Components/icons";
 
-const formatMoney = (amount, currency = "ETB") =>
-  `${Number(amount).toLocaleString()} ${currency}`;
+const formatMoney = (amount, currency = "ETB") => `${Number(amount).toLocaleString()} ${currency}`;
 
 const formatDateTime = (iso) => {
   if (!iso) return "—";
@@ -112,7 +111,10 @@ const PaymentHistory = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {isSuperAdmin && (
             <div>
-              <label htmlFor="company-filter" className="block mb-1.5 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="company-filter"
+                className="block mb-1.5 text-sm font-medium text-gray-700"
+              >
                 Company
               </label>
               <select
@@ -123,7 +125,9 @@ const PaymentHistory = () => {
               >
                 <option value="">All companies</option>
                 {companies.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -163,13 +167,20 @@ const PaymentHistory = () => {
 
       <Card className="p-0 overflow-hidden">
         {loading ? (
-          <div className="py-20"><Spinner loading /></div>
+          <div className="py-20">
+            <Spinner loading />
+          </div>
         ) : (
           <Table
             headers={headers}
-            empty={payments.length === 0
-              ? <Empty message="No payments found for the selected filters." icon={CreditCardIcon} />
-              : null}
+            empty={
+              payments.length === 0 ? (
+                <Empty
+                  message="No payments found for the selected filters."
+                  icon={CreditCardIcon}
+                />
+              ) : null
+            }
           >
             {payments.map((payment, i) => (
               <Tr key={payment.id} striped={i % 2 !== 0}>
@@ -201,8 +212,10 @@ const PaymentHistory = () => {
                 </Td>
                 <Td className="text-xs text-gray-500 font-mono">{payment.txRef}</Td>
                 <Td>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-                    bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">
+                  <span
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                    bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize"
+                  >
                     {payment.status}
                   </span>
                 </Td>

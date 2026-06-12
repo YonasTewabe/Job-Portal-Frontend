@@ -1,7 +1,6 @@
 import * as Yup from "yup";
 
-const dateField = (label) =>
-  Yup.string().required(`${label} is required`);
+const dateField = (label) => Yup.string().required(`${label} is required`);
 
 const optionalEndDate = Yup.string()
   .nullable()
@@ -35,7 +34,9 @@ export const formatDateForInput = (value) => {
 
 export const applicantProfileSchema = Yup.object().shape({
   profileName: Yup.string().trim().max(80, "Max 80 characters"),
-  fullname: Yup.string().matches(/^[A-Za-z ]*$/, "Letters only").required("Required"),
+  fullname: Yup.string()
+    .matches(/^[A-Za-z ]*$/, "Letters only")
+    .required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
   dateOfBirth: Yup.string()
     .required("Date of birth is required")
@@ -47,7 +48,9 @@ export const applicantProfileSchema = Yup.object().shape({
       return age !== null && age >= 16 && age <= 100;
     }),
   sex: Yup.string().oneOf(["Male", "Female"], "Select one").required("Required"),
-  userPhone: Yup.string().matches(/^[0-9]{9}$/, "9 digits required").required("Required"),
+  userPhone: Yup.string()
+    .matches(/^[0-9]{9}$/, "9 digits required")
+    .required("Required"),
   educations: Yup.array()
     .of(
       Yup.object({
@@ -88,12 +91,14 @@ export const normalizeEducations = (data) => {
     }));
   }
   if (data?.degree || data?.university) {
-    return [{
-      degree: data.degree ?? "",
-      university: data.university ?? "",
-      startDate: "",
-      endDate: "",
-    }];
+    return [
+      {
+        degree: data.degree ?? "",
+        university: data.university ?? "",
+        startDate: "",
+        endDate: "",
+      },
+    ];
   }
   return [{ degree: "", university: "", startDate: "", endDate: "" }];
 };
@@ -110,5 +115,4 @@ export const normalizeExperiences = (data) => {
   return [{ title: "", company: "", startDate: "", endDate: "" }];
 };
 
-export const normalizeDateOfBirth = (data) =>
-  formatDateForInput(data?.dateOfBirth) || "";
+export const normalizeDateOfBirth = (data) => formatDateForInput(data?.dateOfBirth) || "";

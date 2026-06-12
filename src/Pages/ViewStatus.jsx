@@ -9,7 +9,7 @@ import { MessageIcon, ClipboardIcon } from "../Components/icons";
 
 const ViewStatus = () => {
   const [applications, setApplications] = useState([]);
-  const [loading, setLoading]           = useState(true);
+  const [loading, setLoading] = useState(true);
   const { user: authUser } = useAuth();
   const myRole = authUser?.role;
   const userId = authUser?.userId;
@@ -29,15 +29,20 @@ const ViewStatus = () => {
     else setLoading(false);
   }, [userId]);
 
-  if (loading) return <div className="py-24"><Spinner loading /></div>;
+  if (loading)
+    return (
+      <div className="py-24">
+        <Spinner loading />
+      </div>
+    );
   if (myRole !== "user") return <NotFoundPage />;
 
   const headers = [
-    { label: "Company",    key: "company" },
-    { label: "Job Title",  key: "title" },
+    { label: "Company", key: "company" },
+    { label: "Job Title", key: "title" },
     { label: "Applied On", key: "date" },
-    { label: "Status",     key: "status" },
-    { label: "Chat",       key: "chat" },
+    { label: "Status", key: "status" },
+    { label: "Chat", key: "chat" },
   ];
 
   return (
@@ -45,16 +50,20 @@ const ViewStatus = () => {
       <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
         <div>
           <PageTitle>My Applications</PageTitle>
-          <p className="text-sm text-gray-500 mt-1">{applications.length} application{applications.length !== 1 ? "s" : ""}</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {applications.length} application{applications.length !== 1 ? "s" : ""}
+          </p>
         </div>
       </div>
 
       <Card className="p-0 overflow-hidden">
         <Table
           headers={headers}
-          empty={applications.length === 0
-            ? <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
-            : null}
+          empty={
+            applications.length === 0 ? (
+              <Empty message="You haven't applied to any jobs yet." icon={ClipboardIcon} />
+            ) : null
+          }
         >
           {applications.map((app, i) => (
             <Tr key={app.id ?? i} striped={i % 2 !== 0}>
@@ -67,7 +76,7 @@ const ViewStatus = () => {
               <Td className="text-gray-400 text-xs">
                 {app.applicationDate
                   ? new Date(app.applicationDate).toLocaleDateString()
-                  : app.applicationdate ?? "—"}
+                  : (app.applicationdate ?? "—")}
               </Td>
               <Td>
                 <Badge status={app.status} />

@@ -50,7 +50,12 @@ const DEFAULT_SIZE = 18;
 const DEFAULT_STROKE = 1.75;
 
 function createIcon(IconComponent) {
-  const Wrapped = ({ size = DEFAULT_SIZE, strokeWidth = DEFAULT_STROKE, className = "", ...props }) => (
+  const Wrapped = ({
+    size = DEFAULT_SIZE,
+    strokeWidth = DEFAULT_STROKE,
+    className = "",
+    ...props
+  }) => (
     <IconComponent
       size={size}
       strokeWidth={strokeWidth}
@@ -108,7 +113,9 @@ export const CreditCardIcon = createIcon(LuCreditCard);
 
 /** Decorative icon for empty states */
 export const EmptyStateIcon = ({ icon: Icon, className = "" }) => (
-  <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-500 ${className}`}>
+  <div
+    className={`w-14 h-14 mx-auto mb-4 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-500 ${className}`}
+  >
     <Icon size={26} strokeWidth={1.5} />
   </div>
 );

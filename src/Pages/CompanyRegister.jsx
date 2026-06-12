@@ -49,11 +49,7 @@ const CompanyRegister = () => {
           </div>
         </div>
 
-        <CompanyForm
-          onSubmit={handleSubmit}
-          loading={loading}
-          submitLabel="Register company"
-        />
+        <CompanyForm onSubmit={handleSubmit} loading={loading} submitLabel="Register company" />
 
         <div className="mt-8 pt-6 border-t border-gray-200 text-center space-y-2">
           <p className="text-sm text-gray-500">

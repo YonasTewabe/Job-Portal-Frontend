@@ -11,24 +11,26 @@ import { FormCard, Field, inputCls, Btn } from "../Components/ui";
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
 
 const schema = Yup.object().shape({
-  name:            Yup.string().required("Name is required"),
-  email:           Yup.string().email("Invalid email").required("Email is required"),
-  password:        Yup.string().required("Password is required")
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string()
+    .required("Password is required")
     .matches(passwordRegex, "Must include upper, lower, number & special char")
     .min(8, "At least 8 characters"),
-  confirmPassword: Yup.string().required("Please confirm the password")
+  confirmPassword: Yup.string()
+    .required("Please confirm the password")
     .oneOf([Yup.ref("password")], "Passwords must match"),
 });
 
 const AddSuperAdmin = () => {
-  const [name,            setName]            = useState("");
-  const [email,           setEmail]           = useState("");
-  const [password,        setPassword]        = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword,    setShowPassword]    = useState(false);
-  const [showConfirm,     setShowConfirm]     = useState(false);
-  const [errors,          setErrors]          = useState({});
-  const [loading,         setLoading]         = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
 
@@ -41,7 +43,9 @@ const AddSuperAdmin = () => {
       return true;
     } catch (err) {
       const fe = {};
-      err.inner.forEach((e) => { fe[e.path] = e.message; });
+      err.inner.forEach((e) => {
+        fe[e.path] = e.message;
+      });
       setErrors(fe);
       return false;
     }
@@ -94,8 +98,12 @@ const AddSuperAdmin = () => {
           />
         </Field>
 
-        <Field label="Password" htmlFor="password" error={errors.password}
-          hint="Min 8 chars with upper, lower, number & symbol">
+        <Field
+          label="Password"
+          htmlFor="password"
+          error={errors.password}
+          hint="Min 8 chars with upper, lower, number & symbol"
+        >
           <div className="relative">
             <input
               id="password"

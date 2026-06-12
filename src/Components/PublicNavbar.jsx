@@ -15,7 +15,6 @@ const PublicNavbar = () => (
     </Link>
 
     <div className="flex items-center gap-2 shrink-0">
-
       <Link
         to="/register/company"
         state={publicAuthState}
@@ -24,7 +23,11 @@ const PublicNavbar = () => (
       >
         Register company
       </Link>
-      <Link to="/login" state={publicAuthState} className="text-sm font-semibold link-nav px-3.5 py-2 rounded-xl">
+      <Link
+        to="/login"
+        state={publicAuthState}
+        className="text-sm font-semibold link-nav px-3.5 py-2 rounded-xl"
+      >
         Log in
       </Link>
       <Link to="/signup" state={publicAuthState} className="btn-primary text-sm px-3.5 py-2">

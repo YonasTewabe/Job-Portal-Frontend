@@ -25,7 +25,9 @@ const Account = ({ deleteUser }) => {
       toast.success("Account deleted");
       logout();
       navigate("/");
-    } catch { toast.error("Unable to delete account."); }
+    } catch {
+      toast.error("Unable to delete account.");
+    }
   };
 
   return (
@@ -40,7 +42,10 @@ const Account = ({ deleteUser }) => {
             <Card>
               <SectionTitle>Personal</SectionTitle>
               <InfoRow label="Full Name" value={user.fullname} />
-              <InfoRow label="Date of Birth" value={user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "—"} />
+              <InfoRow
+                label="Date of Birth"
+                value={user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "—"}
+              />
               <InfoRow label="Age" value={user.age ?? "—"} />
               <InfoRow label="Sex" value={user.sex} />
             </Card>
@@ -114,7 +119,7 @@ const Account = ({ deleteUser }) => {
   );
 };
 
-const userLoader = async ({ params }) => {
+const userLoader = async () => {
   const res = await axios.get("/api/applicants/me");
   return res.data;
 };

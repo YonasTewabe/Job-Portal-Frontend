@@ -17,36 +17,53 @@ const JobListing = ({ job }) => {
       <div className="p-5 flex-1">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200/80 flex items-center
-              justify-center text-brand-600 font-bold text-sm shrink-0 shadow-inner-soft">
+            <div
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200/80 flex items-center
+              justify-center text-brand-600 font-bold text-sm shrink-0 shadow-inner-soft"
+            >
               {job.companyName?.charAt(0)?.toUpperCase() ?? <BuildingIcon size={14} />}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-400 truncate">{job.companyName}</p>
-              <h3 className="text-sm font-bold text-gray-900 leading-snug mt-0.5 line-clamp-2">{job.title}</h3>
+              <h3 className="text-sm font-bold text-gray-900 leading-snug mt-0.5 line-clamp-2">
+                {job.title}
+              </h3>
             </div>
           </div>
 
-          <span className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full border
-            ${open
-              ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-              : "bg-red-50 text-red-600 border-red-200"}`}>
+          <span
+            className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full border
+            ${
+              open
+                ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                : "bg-red-50 text-red-600 border-red-200"
+            }`}
+          >
             {open ? "Open" : "Closed"}
           </span>
         </div>
 
         <div className="flex flex-wrap gap-1.5 mb-3">
-          <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100
-            px-2 py-0.5 rounded-full">
-            <BriefcaseIcon className="text-brand-400" size={10} />{job.type}
+          <span
+            className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100
+            px-2 py-0.5 rounded-full"
+          >
+            <BriefcaseIcon className="text-brand-400" size={10} />
+            {job.type}
           </span>
-          <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100
-            px-2 py-0.5 rounded-full">
-            <MapPinIcon className="text-orange-400" size={10} />{job.location}
+          <span
+            className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100
+            px-2 py-0.5 rounded-full"
+          >
+            <MapPinIcon className="text-orange-400" size={10} />
+            {job.location}
           </span>
-          <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-50 border border-gray-100
-            px-2 py-0.5 rounded-full">
-            <ClockIcon size={10} />{job.deadline}
+          <span
+            className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-50 border border-gray-100
+            px-2 py-0.5 rounded-full"
+          >
+            <ClockIcon size={10} />
+            {job.deadline}
           </span>
         </div>
 
@@ -66,10 +83,7 @@ const JobListing = ({ job }) => {
       </div>
 
       <div className="px-5 pb-5">
-        <Link
-          to={`/job/${job.id}`}
-          className="btn-primary w-full text-xs py-2.5"
-        >
+        <Link to={`/job/${job.id}`} className="btn-primary w-full text-xs py-2.5">
           View Details →
         </Link>
       </div>

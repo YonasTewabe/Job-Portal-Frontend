@@ -17,7 +17,11 @@ const EntryCard = ({ children, onRemove, canRemove }) => (
   <div className="rounded-xl border border-gray-100 bg-slate-50/60 p-4 space-y-4">
     {children}
     {canRemove && (
-      <button type="button" onClick={onRemove} className={Btn.ghost("text-xs text-red-600 hover:text-red-700 py-1.5")}>
+      <button
+        type="button"
+        onClick={onRemove}
+        className={Btn.ghost("text-xs text-red-600 hover:text-red-700 py-1.5")}
+      >
         Remove
       </button>
     )}
@@ -26,7 +30,11 @@ const EntryCard = ({ children, onRemove, canRemove }) => (
 
 const DateRangeFields = ({ index, prefix, entry, update, errors }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <Field label="Start date" htmlFor={`${prefix}-start-${index}`} error={errors[`${prefix}.${index}.startDate`]}>
+    <Field
+      label="Start date"
+      htmlFor={`${prefix}-start-${index}`}
+      error={errors[`${prefix}.${index}.startDate`]}
+    >
       <input
         id={`${prefix}-start-${index}`}
         type="date"
@@ -54,7 +62,9 @@ const DateRangeFields = ({ index, prefix, entry, update, errors }) => (
 
 export const EducationFields = ({ educations, setEducations, errors = {} }) => {
   const update = (index, field, value) => {
-    setEducations((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+    setEducations((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
   };
 
   const add = () => setEducations((prev) => [...prev, { ...EMPTY_EDUCATION }]);
@@ -75,7 +85,11 @@ export const EducationFields = ({ educations, setEducations, errors = {} }) => {
 
       {educations.map((entry, index) => (
         <EntryCard key={index} onRemove={() => remove(index)} canRemove={educations.length > 1}>
-          <Field label="Degree" htmlFor={`degree-${index}`} error={errors[`educations.${index}.degree`]}>
+          <Field
+            label="Degree"
+            htmlFor={`degree-${index}`}
+            error={errors[`educations.${index}.degree`]}
+          >
             <input
               id={`degree-${index}`}
               type="text"
@@ -85,7 +99,11 @@ export const EducationFields = ({ educations, setEducations, errors = {} }) => {
               className={inputCls(errors[`educations.${index}.degree`])}
             />
           </Field>
-          <Field label="University / Institution" htmlFor={`university-${index}`} error={errors[`educations.${index}.university`]}>
+          <Field
+            label="University / Institution"
+            htmlFor={`university-${index}`}
+            error={errors[`educations.${index}.university`]}
+          >
             <input
               id={`university-${index}`}
               type="text"
@@ -110,7 +128,9 @@ export const EducationFields = ({ educations, setEducations, errors = {} }) => {
 
 export const ExperienceFields = ({ experiences, setExperiences, errors = {} }) => {
   const update = (index, field, value) => {
-    setExperiences((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+    setExperiences((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
   };
 
   const add = () => setExperiences((prev) => [...prev, { ...EMPTY_EXPERIENCE }]);
@@ -119,7 +139,9 @@ export const ExperienceFields = ({ experiences, setExperiences, errors = {} }) =
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Work experience</h3>
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+          Work experience
+        </h3>
         <button type="button" onClick={add} className={Btn.ghost("text-xs py-1.5 px-2")}>
           + Add experience
         </button>
@@ -131,7 +153,11 @@ export const ExperienceFields = ({ experiences, setExperiences, errors = {} }) =
 
       {experiences.map((entry, index) => (
         <EntryCard key={index} onRemove={() => remove(index)} canRemove={experiences.length > 1}>
-          <Field label="Job title" htmlFor={`title-${index}`} error={errors[`experiences.${index}.title`]}>
+          <Field
+            label="Job title"
+            htmlFor={`title-${index}`}
+            error={errors[`experiences.${index}.title`]}
+          >
             <input
               id={`title-${index}`}
               type="text"
@@ -141,7 +167,11 @@ export const ExperienceFields = ({ experiences, setExperiences, errors = {} }) =
               className={inputCls(errors[`experiences.${index}.title`])}
             />
           </Field>
-          <Field label="Company" htmlFor={`company-${index}`} error={errors[`experiences.${index}.company`]}>
+          <Field
+            label="Company"
+            htmlFor={`company-${index}`}
+            error={errors[`experiences.${index}.company`]}
+          >
             <input
               id={`company-${index}`}
               type="text"
@@ -166,10 +196,14 @@ export const ExperienceFields = ({ experiences, setExperiences, errors = {} }) =
 
 export const formatEducationSummary = (educations = []) =>
   educations.length
-    ? educations.map((e) => `${e.degree} — ${e.university}${formatRange(e.startDate, e.endDate)}`).join("; ")
+    ? educations
+        .map((e) => `${e.degree} — ${e.university}${formatRange(e.startDate, e.endDate)}`)
+        .join("; ")
     : "—";
 
 export const formatExperienceSummary = (experiences = []) =>
   experiences.length
-    ? experiences.map((e) => `${e.title} at ${e.company}${formatRange(e.startDate, e.endDate)}`).join("; ")
+    ? experiences
+        .map((e) => `${e.title} at ${e.company}${formatRange(e.startDate, e.endDate)}`)
+        .join("; ")
     : "—";

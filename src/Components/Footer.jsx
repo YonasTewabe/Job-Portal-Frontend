@@ -18,20 +18,34 @@ const Footer = () => (
 
         {/* Platform */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Platform</h3>
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
+            Platform
+          </h3>
           <nav className="flex flex-col gap-2.5">
-            <Link to="/jobs" className="text-sm link-muted w-fit">Browse jobs</Link>
-            <Link to="/signup" className="text-sm link-muted w-fit">Sign up</Link>
-            <Link to="/register/company" className="text-sm link-muted w-fit">For companies</Link>
+            <Link to="/jobs" className="text-sm link-muted w-fit">
+              Browse jobs
+            </Link>
+            <Link to="/signup" className="text-sm link-muted w-fit">
+              Sign up
+            </Link>
+            <Link to="/register/company" className="text-sm link-muted w-fit">
+              For companies
+            </Link>
           </nav>
         </div>
 
         {/* Company */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Company</h3>
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
+            Company
+          </h3>
           <nav className="flex flex-col gap-2.5">
-            <Link to="/contact" className="text-sm link-muted w-fit">Contact</Link>
-            <Link to="/about" className="text-sm link-muted w-fit">About</Link>
+            <Link to="/contact" className="text-sm link-muted w-fit">
+              Contact
+            </Link>
+            <Link to="/about" className="text-sm link-muted w-fit">
+              About
+            </Link>
           </nav>
         </div>
       </div>
@@ -40,9 +54,7 @@ const Footer = () => (
         <p className="text-xs text-slate-400">
           © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </p>
-        <p className="text-xs text-slate-400">
-          Built for job seekers and recruiters
-        </p>
+        <p className="text-xs text-slate-400">Built for job seekers and recruiters</p>
       </div>
     </div>
   </footer>

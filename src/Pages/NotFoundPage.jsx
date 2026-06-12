@@ -10,10 +10,7 @@ const NotFoundPage = () => (
     <p className="text-sm text-gray-500 mb-10 max-w-xs leading-relaxed">
       The page you're looking for doesn't exist or has been moved.
     </p>
-    <Link
-      to="/"
-      className="btn-primary px-6 py-3"
-    >
+    <Link to="/" className="btn-primary px-6 py-3">
       Back to Home
     </Link>
   </div>

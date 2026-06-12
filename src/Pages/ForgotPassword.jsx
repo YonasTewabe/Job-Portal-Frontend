@@ -9,8 +9,8 @@ const schema = Yup.object().shape({
 });
 
 const ForgotPassword = () => {
-  const [email, setEmail]     = useState("");
-  const [errors, setErrors]   = useState({});
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -21,7 +21,9 @@ const ForgotPassword = () => {
       setErrors({});
     } catch (err) {
       const fe = {};
-      err.inner.forEach((e) => { fe[e.path] = e.message; });
+      err.inner.forEach((e) => {
+        fe[e.path] = e.message;
+      });
       setErrors(fe);
       return;
     }
@@ -43,8 +45,12 @@ const ForgotPassword = () => {
       <form onSubmit={handleSubmit} noValidate>
         <Field label="Email address" htmlFor="email" error={errors.email}>
           <input
-            id="email" type="email" autoComplete="email" placeholder="you@example.com"
-            value={email} onChange={(e) => setEmail(e.target.value)}
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className={inputCls(errors.email)}
           />
         </Field>

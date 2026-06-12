@@ -6,9 +6,24 @@ import { useAuth } from "../context/AuthContext";
 import { Page, Card, Field, inputCls, Btn } from "../Components/ui";
 
 const INFO = [
-  { icon: <MailIcon />,    label: "Email",   value: "contact@apptracker.com", color: "bg-brand-50 text-brand-500" },
-  { icon: <PhoneIcon />,       label: "Phone",   value: "+251 919 37 05 44",       color: "bg-emerald-50 text-emerald-500" },
-  { icon: <MapPinIcon />, label: "Address", value: "123 Main Street, Addis Ababa, Ethiopia", color: "bg-orange-50 text-orange-500" },
+  {
+    icon: <MailIcon />,
+    label: "Email",
+    value: "contact@apptracker.com",
+    color: "bg-brand-50 text-brand-500",
+  },
+  {
+    icon: <PhoneIcon />,
+    label: "Phone",
+    value: "+251 919 37 05 44",
+    color: "bg-emerald-50 text-emerald-500",
+  },
+  {
+    icon: <MapPinIcon />,
+    label: "Address",
+    value: "123 Main Street, Addis Ababa, Ethiopia",
+    color: "bg-orange-50 text-orange-500",
+  },
 ];
 
 const ContactUs = () => {
@@ -26,7 +41,8 @@ const ContactUs = () => {
       setDisplayEmail(user.email);
       return;
     }
-    axios.get("/api/users/me")
+    axios
+      .get("/api/users/me")
       .then(({ data }) => setDisplayEmail(data.email ?? ""))
       .catch(() => setDisplayEmail(""));
   }, [user]);
@@ -68,20 +84,28 @@ const ContactUs = () => {
     <Page className="max-w-4xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Contact Us</h1>
-        <p className="text-sm text-gray-500 mt-1.5">We're here to help — reach out via the form or directly.</p>
+        <p className="text-sm text-gray-500 mt-1.5">
+          We're here to help — reach out via the form or directly.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">Get in touch</h2>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">
+            Get in touch
+          </h2>
           <ul className="space-y-5">
             {INFO.map(({ icon, label, value, color }) => (
               <li key={label} className="flex items-start gap-3.5">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm ${color}`}>
+                <div
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm ${color}`}
+                >
                   {icon}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">
+                    {label}
+                  </p>
                   <p className="text-sm text-gray-800 font-medium">{value}</p>
                 </div>
               </li>
@@ -90,9 +114,12 @@ const ContactUs = () => {
         </Card>
 
         <Card>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">Send a message</h2>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-5">
+            Send a message
+          </h2>
           <p className="text-xs text-gray-500 mb-4">
-            Your message is sent as a one-way inquiry. Replies are not available in chat — use email or phone for urgent follow-up.
+            Your message is sent as a one-way inquiry. Replies are not available in chat — use email
+            or phone for urgent follow-up.
           </p>
           <form ref={form} onSubmit={handleSubmit} className="space-y-1">
             {user ? (
